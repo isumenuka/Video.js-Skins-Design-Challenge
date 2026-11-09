@@ -5,7 +5,6 @@
   --sc-ink: #dcffd2;
   --sc-dim: #a9c4a1; /* 9:1 on the card */
   --sc-green: #7cff3a;
-  --sc-card: rgb(14 18 15 / 0.86);
   --sc-edge: #2e3a2c;
   --sc-font: "Chakra Petch", "Bahnschrift", "Segoe UI", system-ui, sans-serif;
 }
@@ -90,55 +89,37 @@ body {
 
 .sc-stage {
   width: 100%;
-  max-width: 960px;
+  max-width: 1040px;
   margin-inline: auto;
   filter: drop-shadow(0 24px 48px rgb(0 0 0 / 0.7));
 }
 
-.sc-notes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-  gap: 16px;
-}
-
-.sc-card {
-  padding: 20px 22px;
-  background: var(--sc-card);
-  border: 1px solid var(--sc-edge);
-  border-top: 2px solid var(--sc-green);
-  backdrop-filter: blur(6px);
-}
-
-.sc-card h2 {
-  margin: 0 0 10px;
-  color: var(--sc-green);
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.sc-card p {
-  margin: 0 0 10px;
-  color: var(--sc-dim);
+.sc-keys-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 28px;
 }
 
 .sc-keys {
-  margin: 0 0 12px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 8px 16px;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 22px;
 }
 
 .sc-keys div {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .sc-keys dd {
   margin: 0;
   color: var(--sc-dim);
+  font-size: 14px;
 }
 
 kbd {
@@ -164,10 +145,6 @@ a:focus-visible {
   outline-offset: 3px;
 }
 
-.sc-links {
-  margin: 0;
-}
-
 .sc-footer {
   text-align: center;
   font-size: 13px;
@@ -178,9 +155,3 @@ a:focus-visible {
   color: inherit;
 }
 
-@media (prefers-reduced-transparency: reduce) {
-  .sc-card {
-    background: #0e120f;
-    backdrop-filter: none;
-  }
-}

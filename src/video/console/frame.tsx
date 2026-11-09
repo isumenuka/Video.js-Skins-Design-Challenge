@@ -3,7 +3,8 @@
 import { usePlayer } from '@videojs/react/video';
 import { useEffect, useRef, useState } from 'react';
 
-const SEGMENTS = 16;
+const VOLUME_SEGMENTS = 12;
+const PROGRESS_SEGMENTS = 24;
 
 /** A turbine rotor: six chamfered blades in a ring. Spins while the film plays (CSS, off under reduced motion). */
 function Turbine() {
@@ -20,40 +21,100 @@ function Turbine() {
   );
 }
 
+function Segments({ count, lit, className, zones = false }: { count: number; lit: number; className: string; zones?: boolean }) {
+  return (
+    <span className={className}>
+      {Array.from({ length: count }, (_, i) => (
+        <i
+          key={i}
+          data-lit={i < lit ? '' : undefined}
+          data-zone={zones ? (i >= count - 2 ? 'hot' : i >= count - 4 ? 'warm' : undefined) : undefined}
+        />
+      ))}
+    </span>
+  );
+}
+
+/** The bridge unit under the screen: an LED cartridge that fills with playback progress, plus a small volume meter. */
+function Bridge() {
+  const currentTime = usePlayer((s) => s.currentTime) ?? 0;
+  const duration = usePlayer((s) => s.duration) ?? 0;
+  const volume = usePlayer((s) => s.volume) ?? 1;
+  const muted = usePlayer((s) => s.muted) ?? false;
+  const progress = duration > 0 ? Math.ceil((currentTime / duration) * PROGRESS_SEGMENTS) : 0;
+
+  return (
+    <span className={'con-bridge'}>
+      <i className={'con-bridge-lamp'} />
+      <Segments className={'con-cartridge'} count={PROGRESS_SEGMENTS} lit={progress} />
+      <Segments className={'con-meter'} count={VOLUME_SEGMENTS} lit={muted ? 0 : Math.round(volume * VOLUME_SEGMENTS)} zones />
+      <i className={'con-bridge-lamp'} />
+    </span>
+  );
+}
+
+/** One side armour plate: a recessed slot with stacked green cells. */
+function SidePlate({ side }: { side: 'start' | 'end' }) {
+  return (
+    <span className={`con-side con-side-${side}`}>
+      <i />
+      <i />
+      <i />
+      <i />
+    </span>
+  );
+}
+
 /**
- * The machine around the screen: bezel, port lights, status LEDs and the hinge between screen and deck, whose meter
- * mirrors the volume and whose turbines turn while playing. Entirely decorative (`aria-hidden`); every control lives in
- * the deck.
+ * The machine around the screen: armour body, top housing with two "+" lamps, side plates, bezel, corner blocks,
+ * neon conduits, and the bridge unit between screen and deck. Entirely decorative (`aria-hidden`);
+ * every control lives in the deck.
  */
 export function ConsoleFrame() {
   const paused = usePlayer((s) => s.paused);
-  const volume = usePlayer((s) => s.volume) ?? 1;
-  const muted = usePlayer((s) => s.muted) ?? false;
-  const lit = muted ? 0 : Math.round(volume * SEGMENTS);
 
   return (
     <div className={'con-frame'} data-playing={paused ? undefined : ''} aria-hidden="true">
+      <div className={'con-body'} />
+
+      <div className={'con-housing'}>
+        <span className={'con-lamp'} />
+        <span className={'con-housing-vent'} />
+        <span className={'con-lamp'} />
+      </div>
+
+      <SidePlate side="start" />
+      <SidePlate side="end" />
+
       <div className={'con-bezel'}>
         <span className={'con-bezel-strip'} />
-        <span className={'con-port con-port-start'} />
-        <span className={'con-port con-port-end'} />
+        <span className={'con-corner con-corner-tl'} />
+        <span className={'con-corner con-corner-tr'} />
+        <span className={'con-corner con-corner-bl'} />
+        <span className={'con-corner con-corner-br'} />
         <span className={'con-status'}>
           <i className={'con-status-led con-status-power'} />
           <i className={'con-status-led con-status-signal'} />
           <i className={'con-status-led con-status-alert'} />
         </span>
       </div>
+
       <div className={'con-hinge'}>
         <Turbine />
         <span className={'con-vent'} />
-        <span className={'con-meter'}>
-          {Array.from({ length: SEGMENTS }, (_, i) => (
-            <i key={i} className={'con-meter-seg'} data-lit={i < lit ? '' : undefined} data-zone={i >= SEGMENTS - 3 ? 'hot' : i >= SEGMENTS - 6 ? 'warm' : undefined} />
-          ))}
-        </span>
+        <Bridge />
         <span className={'con-vent'} />
         <Turbine />
       </div>
+
+      {/* Neon: a current that orbits the bezel, and conduits along the armour with pulses running through them. */}
+      <svg className={'con-orbit'} aria-hidden="true" focusable="false">
+        <rect className={'con-orbit-track'} x="0" y="0" width="100%" height="100%" pathLength="100" />
+        <rect className={'con-orbit-spark'} x="0" y="0" width="100%" height="100%" pathLength="100" />
+      </svg>
+      <span className={'con-conduit con-conduit-top'} />
+      <span className={'con-conduit con-conduit-start'} />
+      <span className={'con-conduit con-conduit-end'} />
     </div>
   );
 }

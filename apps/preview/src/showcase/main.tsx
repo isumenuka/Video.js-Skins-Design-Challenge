@@ -35,38 +35,17 @@ function Showcase() {
           <Player />
         </section>
 
-        <section className="sc-notes">
-          <div className="sc-card">
-            <h2>Design notes</h2>
-            <p>
-              Console turns the player into a piece of lab hardware: an armoured monitor above a control deck that never
-              hides and never covers the picture. Time runs on a 7-segment readout with its unlit “88:88” ghost, the seek
-              bar is an LED strip, and a live oscilloscope traces the film’s real audio. Every toggle key carries a status
-              LED, and the icon changes too, so state is never colour alone.
-            </p>
-            <p>
-              Keys are 40&nbsp;px (44&nbsp;px on touch), every control shares one green focus ring, and the deck re-flows
-              with container queries down to phone widths. With reduced motion on, the boot sequence, turbines, flicker
-              and scope animation all stand still.
-            </p>
-          </div>
-
-          <div className="sc-card">
-            <h2>Try it with a keyboard</h2>
-            <dl className="sc-keys">
-              {KEYS.map(([key, action]) => (
-                <div key={key}>
-                  <dt>
-                    <kbd>{key}</kbd>
-                  </dt>
-                  <dd>{action}</dd>
-                </div>
-              ))}
-            </dl>
-            <p className="sc-links">
-              <a href="./workbench.html">Open the workbench</a> to test any size, language or direction.
-            </p>
-          </div>
+        <section className="sc-keys-bar" aria-label="Keyboard shortcuts">
+          <dl className="sc-keys">
+            {KEYS.map(([key, action]) => (
+              <div key={key}>
+                <dt>
+                  <kbd>{key}</kbd>
+                </dt>
+                <dd>{action}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
 
         <footer className="sc-footer">
