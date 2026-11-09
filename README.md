@@ -16,9 +16,9 @@ The workbench opens your skin in a slimmed-down version of the Video.js sandbox.
 npm run deploy
 ```
 
-It asks where to deploy the workbench: Vercel, Netlify, or Cloudflare Pages. Name one to skip the question, such as `npm run deploy vercel`. The first time, the host's CLI signs you in and creates the project, then every run prints the URL. Vercel and Netlify deploy to a preview URL you can share; to deploy to production instead, add `--prod` to the `deploy:netlify` script, or to both commands in `deploy:vercel`.
+It builds the workbench and deploys it to Vercel production (project `challenge-skin`). The first time, the Vercel CLI signs you in and links the project; every run prints the URL.
 
-To deploy on every push instead, put the project on GitHub and import it on Vercel or Netlify; `vercel.json` and `netlify.toml` already describe the build. The build uses relative URLs, so `dist/` also works on any static host, including in a subfolder.
+The build uses relative URLs, so `dist/` also works on any static host.
 
 ## Where things live
 
@@ -30,7 +30,7 @@ To deploy on every push instead, put the project on GitHub and import it on Verc
   - `src/shell/`: the Shadcn shell.
   - `src/frame/`: the page the shell frames. `player` mounts your skin in a player and sets the media it plays.
   - `public/`: files the preview serves, such as the chapters track.
-- `vercel.json`, `netlify.toml`: how those hosts build the workbench.
+- `vercel.json`: how Vercel builds the workbench.
 - `skin.json`: what this skin is built from. Keep it; it records the Video.js version the skin was created with.
 
 ## Learn more
