@@ -21,6 +21,17 @@ body {
   max-width: var(--preview-player-width, 56rem);
 }
 
+.preview-credit {
+  margin: 12px 0 0;
+  font: 13px/1.4 system-ui, sans-serif;
+  color: light-dark(#4b5563, #a3a3a3);
+  text-align: center;
+}
+
+.preview-credit a {
+  color: inherit;
+}
+
 /* The aspect ratio option overrides the skin's own; `auto` lets the media's intrinsic size decide. */
 .preview-player[style*="--preview-player-ratio"] .media-skin {
   aspect-ratio: var(--preview-player-ratio);

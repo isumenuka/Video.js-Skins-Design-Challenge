@@ -29,12 +29,8 @@ export function VideoControlsContent({
         renderThumbnail={renderThumbnail}
         seekBackward={seekBackward}
         seekForward={seekForward}
-        top={
-          <>
-            <Title />
-            <ScreenControls />
-          </>
-        }
+        screen={<ScreenControls />}
+        top={<Title />}
       />
     </>
   );

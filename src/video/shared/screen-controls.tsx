@@ -12,7 +12,7 @@ import {
   PipExitIcon as PipExitIconPrimitive,
   FullscreenEnterIcon as FullscreenEnterIconPrimitive,
   FullscreenExitIcon as FullscreenExitIconPrimitive,
-} from '@videojs/react/icons/scaffold';
+} from '@/video/icons';
 
 import { cn } from '@/lib/resolve-class-name';
 

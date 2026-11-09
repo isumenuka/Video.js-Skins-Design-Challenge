@@ -5,6 +5,9 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/resolve-class-name';
 
+import { Oscilloscope } from '../console/oscilloscope';
+import { SegmentTime } from '../console/segment-time';
+import { VolumeFader } from '../console/volume-fader';
 import { LiveButton } from './live-button';
 import { AudioPlayButton, PlayButton } from './play-button';
 import { TimeSlider } from './time-slider';
@@ -17,31 +20,50 @@ export function ControlsRow({
   live = false,
   menu,
   rate,
+  screen,
   seekBackward,
   seekForward,
-}: ControlsSlots & { audio?: boolean; live?: boolean; menu?: ReactNode } = {}) {
+}: ControlsSlots & { audio?: boolean; live?: boolean; menu?: ReactNode; screen?: ReactNode } = {}) {
+  if (audio) {
+    return (
+      <Controls.Group className={'video-controls-row'}>
+        <Controls.Group className={cn('video-controls-group', 'video-controls-start')}>
+          <AudioPlayButton />
+          {seekBackward}
+          {seekForward}
+          {!live && (
+            <Time.Group className={'media-time-group'}>
+              <Time.Value className={'media-time-current-value'} type="current" />
+              <Time.Separator className={'media-time-separator'} />
+              <Time.Value className={'media-time-duration-value'} type="duration" />
+            </Time.Group>
+          )}
+        </Controls.Group>
+        <Controls.Group className={'video-controls-group'}>
+          {rate}
+          {menu ?? <VolumePopover />}
+        </Controls.Group>
+      </Controls.Group>
+    );
+  }
+
+  // The console deck's key row, in focus order: transport, readouts, volume, then the toggles.
   return (
-    <Controls.Group className={'video-controls-row'}>
-      <Controls.Group className={cn('video-controls-group', 'video-controls-start')}>
-        {audio ? <AudioPlayButton /> : <PlayButton />}
+    <Controls.Group className={'video-controls-row con-keys'}>
+      <Controls.Group className={cn('video-controls-group', 'video-controls-start', 'con-transport')}>
+        <PlayButton className={'con-key-play'} />
         {seekBackward}
         {seekForward}
         {live && <LiveButton />}
-        {!audio && <VolumePopover />}
-        {!live && (
-          <Time.Group className={'media-time-group'}>
-            <Time.Value className={'media-time-toggle'} type="current" toggle />
-            <Time.Value className={'media-time-current-value'} type="current" />
-            <Time.Separator className={'media-time-separator'} />
-            <Time.Value className={'media-time-duration-value'} type="duration" />
-          </Time.Group>
-        )}
       </Controls.Group>
-
-      <Controls.Group className={'video-controls-group'}>
+      {!live && <SegmentTime />}
+      <Oscilloscope />
+      <VolumeFader />
+      <Controls.Group className={cn('video-controls-group', 'con-toggles')}>
         {captions}
         {rate}
-        {menu ?? (audio && <VolumePopover />)}
+        {menu}
+        {screen}
       </Controls.Group>
     </Controls.Group>
   );
@@ -66,10 +88,18 @@ export function ControlsContent({
   menu,
   rate,
   renderThumbnail,
+  screen,
   seekBackward,
   seekForward,
   top,
-}: ControlsSlots & { audio?: boolean; center?: boolean; live?: boolean; menu?: ReactNode; top?: ReactNode } = {}) {
+}: ControlsSlots & {
+  audio?: boolean;
+  center?: boolean;
+  live?: boolean;
+  menu?: ReactNode;
+  screen?: ReactNode;
+  top?: ReactNode;
+} = {}) {
   return (
     <Controls.Content className={cn('video-controls-content', audio && 'audio-controls-content')}>
       <Tooltip.Provider>
@@ -77,13 +107,11 @@ export function ControlsContent({
         {center && (
           <BufferingIndicator className={'video-controls-buffering'}>
             <Controls.Group className={'video-controls-center'}>
-              {seekBackward}
               <PlayButton
                 className={cn('video-controls-center-button', 'video-controls-center-play')}
                 iconClassName={'video-controls-center-play-icon'}
                 tooltip={false}
               />
-              {seekForward}
             </Controls.Group>
           </BufferingIndicator>
         )}
@@ -101,8 +129,9 @@ export function ControlsContent({
             live={live}
             menu={menu}
             rate={rate}
-            seekBackward={center ? undefined : seekBackward}
-            seekForward={center ? undefined : seekForward}
+            screen={screen}
+            seekBackward={seekBackward}
+            seekForward={seekForward}
           />
         </div>
       </Tooltip.Provider>

@@ -1,0 +1,186 @@
+/* The showcase page around the Console skin. The skin itself lives in src/; nothing here styles the player. */
+:root {
+  color-scheme: dark;
+  --sc-bg: #070908;
+  --sc-ink: #dcffd2;
+  --sc-dim: #a9c4a1; /* 9:1 on the card */
+  --sc-green: #7cff3a;
+  --sc-card: rgb(14 18 15 / 0.86);
+  --sc-edge: #2e3a2c;
+  --sc-font: "Chakra Petch", "Bahnschrift", "Segoe UI", system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 50% 35%, #142012, var(--sc-bg) 70%) fixed;
+  color: var(--sc-ink);
+  font: 500 16px/1.55 var(--sc-font);
+}
+
+/* Generated lab scene, fixed behind the page, darkened toward the centre so the console stays the brightest thing. */
+.sc-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+.sc-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sc-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgb(7 9 8 / 0.55), rgb(7 9 8 / 0.15) 70%),
+    linear-gradient(to bottom, rgb(7 9 8 / 0.2), rgb(7 9 8 / 0.75));
+}
+
+.sc-page {
+  width: min(100% - 32px, 1040px);
+  margin-inline: auto;
+  padding-block: clamp(20px, 5vh, 56px) 32px;
+  display: grid;
+  gap: clamp(20px, 4vh, 36px);
+}
+
+.sc-header {
+  text-align: center;
+}
+
+.sc-kicker {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sc-green);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.sc-led {
+  width: 8px;
+  height: 8px;
+  background: var(--sc-green);
+  box-shadow: 0 0 10px var(--sc-green);
+}
+
+.sc-title {
+  margin: 4px 0 0;
+  font-size: clamp(40px, 8vw, 72px);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 0 24px rgb(124 255 58 / 0.35);
+}
+
+.sc-stage {
+  width: 100%;
+  max-width: 960px;
+  margin-inline: auto;
+  filter: drop-shadow(0 24px 48px rgb(0 0 0 / 0.7));
+}
+
+.sc-notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 16px;
+}
+
+.sc-card {
+  padding: 20px 22px;
+  background: var(--sc-card);
+  border: 1px solid var(--sc-edge);
+  border-top: 2px solid var(--sc-green);
+  backdrop-filter: blur(6px);
+}
+
+.sc-card h2 {
+  margin: 0 0 10px;
+  color: var(--sc-green);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.sc-card p {
+  margin: 0 0 10px;
+  color: var(--sc-dim);
+}
+
+.sc-keys {
+  margin: 0 0 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px 16px;
+}
+
+.sc-keys div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sc-keys dd {
+  margin: 0;
+  color: var(--sc-dim);
+}
+
+kbd {
+  display: inline-block;
+  min-width: 2.2em;
+  padding: 2px 8px;
+  border: 1px solid var(--sc-edge);
+  border-bottom-width: 3px;
+  background: #1c221d;
+  color: var(--sc-green);
+  font: 600 13px/1.4 var(--sc-font);
+  text-align: center;
+  white-space: nowrap;
+}
+
+a {
+  color: var(--sc-green);
+  text-underline-offset: 3px;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--sc-green);
+  outline-offset: 3px;
+}
+
+.sc-links {
+  margin: 0;
+}
+
+.sc-footer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--sc-dim);
+}
+
+.sc-footer a {
+  color: inherit;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .sc-card {
+    background: #0e120f;
+    backdrop-filter: none;
+  }
+}

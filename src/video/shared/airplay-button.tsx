@@ -4,7 +4,7 @@ import { AirPlayButton as AirPlayButtonPrimitive } from '@videojs/react';
 import {
   AirPlayEnterIcon as AirPlayEnterIconPrimitive,
   AirPlayExitIcon as AirPlayExitIconPrimitive,
-} from '@videojs/react/icons/scaffold';
+} from '@/video/icons';
 import type { ClassValue } from 'cn';
 
 import { cn } from '@/lib/resolve-class-name';

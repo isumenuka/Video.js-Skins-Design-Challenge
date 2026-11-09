@@ -9,7 +9,7 @@ import {
   SpeedIcon as SpeedIconPrimitive,
   CaptionsOffIcon as CaptionsOffIconPrimitive,
   GearIcon as GearIconPrimitive,
-} from '@videojs/react/icons/scaffold';
+} from '@/video/icons';
 import { AudioTrackRadioGroup } from '@videojs/react/ui/audio-track-radio-group';
 import { CaptionsRadioGroup } from '@videojs/react/ui/captions-radio-group';
 import { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-group';
@@ -51,7 +51,6 @@ function QualityMenu() {
                   <span>{item.label}</span>
                   {item.tier ? <sup className={'media-menu-tier'}>{item.tier}</sup> : null}
                 </span>
-                {item.badge ? <span className={'media-menu-badge'}>{item.badge}</span> : null}
               </RadioItem>
             )}
           ></QualityRadioGroup.Options>
@@ -148,7 +147,6 @@ function CaptionsMenu() {
             renderItem={(props, item) => (
               <RadioItem {...props}>
                 <span>{item.label}</span>
-                {item.badge ? <span className={'media-menu-badge'}>{item.badge}</span> : null}
               </RadioItem>
             )}
           ></CaptionsRadioGroup.Options>

@@ -1,7 +1,7 @@
 /** @jsxImportSource react */
 
 import { SeekButton as SeekButtonPrimitive } from '@videojs/react';
-import { SeekIcon as SeekIconPrimitive } from '@videojs/react/icons/scaffold';
+import { SeekIcon as SeekIconPrimitive } from '@/video/icons';
 import type { ClassValue } from 'cn';
 
 import { cn, resolveClassName } from '@/lib/resolve-class-name';

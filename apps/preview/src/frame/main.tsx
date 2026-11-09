@@ -6,7 +6,7 @@ import '@/skin.css';
 import './preview.css';
 import { playbackProps, playerStyles } from '../shell/params';
 import { initialParams, onParamsChange } from './frame';
-import { Player } from './player';
+import { FilmCredit, Player } from './player';
 
 function Preview() {
   const [params, setParams] = useState(initialParams);
@@ -18,6 +18,9 @@ function Preview() {
     <I18nProvider locale={params.locale}>
       <div className="preview-player" style={playerStyles(params) as CSSProperties}>
         <Player media={playbackProps(params)} />
+        <p className="preview-credit">
+          <FilmCredit />
+        </p>
       </div>
     </I18nProvider>
   );
