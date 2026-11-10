@@ -832,7 +832,6 @@
     transition: opacity var(--media-duration) ease-out;
   }
 
-  /* Icons print on the cap (its centre sits a little above the ring's), with a slight emboss. */
   /* Icons are printed on the cap's top face: centred where the face sits in the render (a third of the way down),
      sized from the button, foreshortened to the camera's angle, with an engraved edge. */
   .media-arcade .video-controls-bottom .media-button > *,
@@ -1320,41 +1319,72 @@
   /* ============================================================================================================= */
   /* Screen overlays                                                                                                */
   /* ============================================================================================================= */
-  /* The big start button on the screen: the same green arcade button, larger, lit while waiting to start. */
+  /* The start icon on the screen: an 8-bit pixel ▶ glowing in the phosphor, as if drawn on the tube itself (a pixel
+     replay arrow when the film has ended). It's still the Video.js play button underneath — the same name, focus and
+     keys — and it shows only before the start, when paused and at the end; never over the film while it plays. */
   .media-arcade .video-controls-center-button {
     --media-background: transparent;
     --media-button-highlight: transparent;
+    --arc-pixel-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9' shape-rendering='crispEdges'%3E%3Cpath d='M2 0h1v1h-1zM3 0h1v1h-1zM2 1h1v1h-1zM3 1h1v1h-1zM4 1h1v1h-1zM2 2h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM5 3h1v1h-1zM6 3h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM2 5h1v1h-1zM3 5h1v1h-1zM4 5h1v1h-1zM5 5h1v1h-1zM6 5h1v1h-1zM2 6h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM2 7h1v1h-1zM3 7h1v1h-1zM4 7h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1z'/%3E%3C/svg%3E");
     scale: 1.7; /* Scaffold fixes its size with !important in an earlier layer; scale it up instead */
-    border-radius: 50%;
-    color: #0b1607;
-    background: var(--arc-img-btn-green, radial-gradient(circle at 50% 45%, #63d930 0 52%, #d6dcd7 54% 64%, #6c756d 66% 70%, transparent 72%)) center / contain no-repeat !important;
-    filter: drop-shadow(0 6px 6px rgb(0 0 0 / 0.55));
+    border-radius: 6px;
+    background: transparent !important;
+    color: var(--arc-green);
+    filter: drop-shadow(0 0 2px var(--arc-green)) drop-shadow(0 0 10px color-mix(in srgb, var(--arc-green) 70%, transparent));
+    transition: opacity var(--media-duration) ease-out, scale var(--media-duration-fast) ease-out;
+  }
+
+  .media-arcade .video-controls-center-button[data-ended] {
+    --arc-pixel-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 -0.5 9 9' shape-rendering='crispEdges'%3E%3Cpath d='M2 0h1v1h-1zM3 0h1v1h-1zM4 0h1v1h-1zM5 0h1v1h-1zM7 0h1v1h-1zM1 1h1v1h-1zM6 1h1v1h-1zM7 1h1v1h-1zM0 2h1v1h-1zM5 2h1v1h-1zM6 2h1v1h-1zM7 2h1v1h-1zM0 3h1v1h-1zM0 4h1v1h-1zM8 4h1v1h-1zM0 5h1v1h-1zM8 5h1v1h-1zM1 6h1v1h-1zM7 6h1v1h-1zM2 7h1v1h-1zM3 7h1v1h-1zM4 7h1v1h-1zM5 7h1v1h-1zM6 7h1v1h-1z'/%3E%3C/svg%3E");
+  }
+
+  /* The pixels, and a faint scanline over them, both cut by the icon's mask. */
+  .media-arcade .video-controls-center-button::before,
+  .media-arcade .video-controls-center-button::after {
+    content: "";
+    position: absolute;
+    inset: 4%;
+    mask: var(--arc-pixel-icon) center / contain no-repeat;
+    image-rendering: pixelated;
   }
 
   .media-arcade .video-controls-center-button::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--arc-img-btn-green-lit, radial-gradient(circle at 50% 45%, #e9ff9a 0 18%, #8dff4a 40% 52%, #d6dcd7 54% 64%, #6c756d 66% 70%, transparent 72%)) center / contain no-repeat;
+    background: var(--arc-green);
+  }
+
+  .media-arcade .video-controls-center-button::after {
+    background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.28) 0 1px, transparent 1px 3px);
+  }
+
+  /* Its own vector icons give way to the pixels. */
+  .media-arcade .video-controls-center-button > * {
     opacity: 0;
-    transition: opacity var(--media-duration) ease-out;
   }
 
-  .media-arcade:has(.arc-attract) .video-controls-center-button::before,
-  .media-arcade .video-controls-center-button[data-started]:not([data-paused])::before {
-    opacity: 1;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .media-arcade:has(.arc-attract) .video-controls-center-button::before {
-      animation: arc-pulse 1.4s ease-in-out infinite;
+  @media (hover: hover) {
+    .media-arcade .video-controls-center-button:hover {
+      filter: brightness(1.25) drop-shadow(0 0 3px var(--arc-green)) drop-shadow(0 0 16px var(--arc-green));
     }
   }
 
-
   .media-arcade .video-controls-center-button:active {
-    translate: 0 3px;
-    filter: brightness(0.86) drop-shadow(0 2px 2px rgb(0 0 0 / 0.6));
+    scale: 1.55;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .media-arcade .video-controls-center-button::before {
+      animation: arc-pixel-pulse 1.6s ease-in-out infinite;
+    }
+  }
+
+  @keyframes arc-pixel-pulse {
+    50% { opacity: 0.62; }
+  }
+
+  /* Never over the film while it plays: clicking the screen and the panel buttons still pause. */
+  .media-arcade .video-controls-center-button[data-started]:not([data-paused]):not([data-ended]) {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .media-arcade .media-title {
@@ -1922,13 +1952,21 @@
 
     .media-arcade .video-controls-bottom::before,
     .media-arcade .video-controls-bottom::after,
-    .media-arcade .video-controls-bottom .media-button::before,
-    .media-arcade .video-controls-center-button::before {
+    .media-arcade .video-controls-bottom .media-button::before {
       display: none;
     }
 
-    .media-arcade .video-controls-bottom .media-button,
-    .media-arcade .video-controls-center-button {
+    .media-arcade .video-controls-center-button::before {
+      forced-color-adjust: none;
+      background: ButtonText;
+      animation: none;
+    }
+
+    .media-arcade .video-controls-center-button::after {
+      display: none;
+    }
+
+    .media-arcade .video-controls-bottom .media-button {
       forced-color-adjust: none;
       background: ButtonFace !important;
       color: ButtonText;
