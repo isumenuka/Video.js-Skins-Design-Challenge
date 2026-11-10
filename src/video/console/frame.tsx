@@ -125,8 +125,14 @@ export function ConsoleFrame() {
  */
 export function ConsoleBoot() {
   const paused = usePlayer((s) => s.paused);
+  const ended = usePlayer((s) => s.ended);
   const [state, setState] = useState<'idle' | 'booting' | 'done'>('idle');
   const timer = useRef(0);
+
+  // When the film ends the monitor powers off, so the next play boots it again.
+  useEffect(() => {
+    if (ended) setState('idle');
+  }, [ended]);
 
   useEffect(() => {
     if (paused || state !== 'idle') return;
@@ -145,6 +151,20 @@ export function ConsoleBoot() {
     <div className={'con-boot'} aria-hidden="true">
       <span className={'con-boot-scan'} />
       <span className={'con-boot-bar'} />
+    </div>
+  );
+}
+
+/**
+ * CRT power-off: when the film ends, the picture collapses to a glowing line, then a dot, and the screen goes dark
+ * while the replay key waits. Glyphs only. Under reduced motion it goes straight to the dark screen.
+ */
+export function ConsoleCrt() {
+  const ended = usePlayer((s) => s.ended);
+  if (!ended) return null;
+  return (
+    <div className={'con-crt'} aria-hidden="true">
+      <span className={'con-crt-line'} />
     </div>
   );
 }

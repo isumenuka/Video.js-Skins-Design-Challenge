@@ -8,6 +8,24 @@
  * Geometry note: container queries cannot restyle the container itself, so the screen/deck tokens are set on every
  * direct child of the player (`.media-console > *`) and each child positions itself from them.
  */
+@property --con-ambient {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --con-ambient-start {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --con-ambient-end {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
 @layer console {
   /* ------------------------------------------------------------------------------------------------ Tokens */
   .media-skin.media-console {
@@ -17,17 +35,19 @@
     --con-steel-2: #262b27;
     --con-steel-3: #323833;
     --con-edge: #3d453e;
-    --con-green: var(--media-accent-color, #7cff3a); /* 13:1 on --con-black */
-    --con-green-dim: #3f7d1f;
-    --con-green-deep: #1a2e12;
-    --con-green-wash: rgb(124 255 58 / 0.14);
-    --con-glow: 0 0 10px rgb(124 255 58 / 0.55);
-    --con-glow-text: 0 0 6px rgb(124 255 58 / 0.7);
+    --con-green: var(--media-accent-color, #7cff3a); /* the phosphor: green 13:1, amber 11:1, cyan 14:1 on --con-black */
+    --con-hot: color-mix(in oklab, var(--con-green) 15%, white); /* white-hot core of a spark */
+    --con-green-dim: color-mix(in oklab, var(--con-green) 50%, black);
+    --con-green-deep: color-mix(in oklab, var(--con-green) 20%, #050605);
+    --con-green-wash: color-mix(in srgb, var(--con-green) 14%, transparent);
+    --con-glow: 0 0 10px color-mix(in srgb, var(--con-green) 55%, transparent);
+    --con-glow-text: 0 0 6px color-mix(in srgb, var(--con-green) 70%, transparent);
     --con-amber: #ffb020;
     --con-red: #ff4d3a;
-    --con-text: #dcffd2; /* 17:1 on --con-black */
-    --con-text-dim: #9fbf96; /* 8:1 on --con-steel */
-    --con-scope-grid: rgb(124 255 58 / 0.12);
+    --con-text: color-mix(in oklab, var(--con-green) 22%, white); /* ≥16:1 on --con-black for every phosphor */
+    --con-text-dim: color-mix(in oklab, var(--con-green) 30%, #8e9a8b); /* ≥7:1 on --con-steel */
+    --con-static: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --con-scope-grid: color-mix(in srgb, var(--con-green) 12%, transparent);
 
     /* Type */
     --con-font: "Chakra Petch", "Bahnschrift", "DIN Alternate", "Segoe UI", system-ui, sans-serif;
@@ -113,7 +133,7 @@
     box-sizing: border-box;
     width: calc(100% - (var(--con-gutter) + var(--con-pad)) * 2);
     height: calc(100% - var(--con-top) - var(--con-pad) - var(--con-bottom));
-    aspect-ratio: 16 / 9;
+    aspect-ratio: var(--con-screen-ratio, 16 / 9);
     margin: calc(var(--con-top) + var(--con-pad)) calc(var(--con-gutter) + var(--con-pad)) var(--con-bottom);
     position: relative;
     z-index: 1; /* above the armour body */
@@ -126,9 +146,6 @@
     background: var(--con-black);
   }
 
-  .media-console:fullscreen > * {
-    --con-gutter: 0px;
-  }
 
 
   .media-console:fullscreen > video {
@@ -175,7 +192,7 @@
     background-image:
       repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.09) 0 1px, transparent 1px 3px),
       radial-gradient(ellipse at center, transparent 62%, rgb(0 0 0 / 0.32));
-    box-shadow: inset 0 0 36px rgb(124 255 58 / 0.09);
+    box-shadow: inset 0 0 36px color-mix(in srgb, var(--con-green) 9%, transparent);
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -246,14 +263,14 @@
     background:
       linear-gradient(var(--con-lamp), var(--con-lamp)) center / 62% 22% no-repeat,
       linear-gradient(var(--con-lamp), var(--con-lamp)) center / 22% 62% no-repeat,
-      radial-gradient(circle, rgb(124 255 58 / 0.22), transparent 70%),
+      radial-gradient(circle, color-mix(in srgb, var(--con-green) 22%, transparent), transparent 70%),
       #070a07;
-    box-shadow: inset 0 0 0 2px var(--con-black), inset 0 0 0 3px var(--con-edge), 0 0 14px rgb(124 255 58 / 0.25);
+    box-shadow: inset 0 0 0 2px var(--con-black), inset 0 0 0 3px var(--con-edge), 0 0 14px color-mix(in srgb, var(--con-green) 25%, transparent);
   }
 
   .con-frame[data-playing] .con-lamp {
     --con-lamp: var(--con-green);
-    box-shadow: inset 0 0 0 2px var(--con-black), inset 0 0 0 3px var(--con-edge), 0 0 18px rgb(124 255 58 / 0.6);
+    box-shadow: inset 0 0 0 2px var(--con-black), inset 0 0 0 3px var(--con-edge), 0 0 18px color-mix(in srgb, var(--con-green) 60%, transparent);
   }
 
   .con-housing-vent {
@@ -284,12 +301,12 @@
   .con-side i {
     flex: 1;
     background: var(--con-green-dim);
-    box-shadow: 0 0 6px rgb(124 255 58 / 0.25);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--con-green) 25%, transparent);
   }
 
   .con-frame[data-playing] .con-side i {
     background: var(--con-green);
-    box-shadow: 0 0 8px rgb(124 255 58 / 0.6);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--con-green) 60%, transparent);
   }
 
   .con-frame[data-playing] .con-side i:nth-child(3) {
@@ -404,11 +421,11 @@
     position: absolute;
     z-index: 0;
     background-color: var(--con-green-deep);
-    background-image: linear-gradient(var(--con-pulse-dir, 90deg), transparent, #eaffe0, transparent);
+    background-image: linear-gradient(var(--con-pulse-dir, 90deg), transparent, var(--con-hot), transparent);
     background-repeat: no-repeat;
     background-size: 16% 100%;
     background-position: -20% 0;
-    box-shadow: 0 0 6px rgb(124 255 58 / 0.25);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--con-green) 25%, transparent);
   }
 
   .con-conduit-top {
@@ -432,7 +449,7 @@
 
   .con-frame[data-playing] .con-conduit {
     background-color: var(--con-green-dim);
-    box-shadow: 0 0 8px rgb(124 255 58 / 0.55);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--con-green) 55%, transparent);
   }
 
   @keyframes con-current-x {
@@ -547,7 +564,7 @@
   }
 
   .con-cartridge i[data-lit],
-  .con-meter i[data-lit] { background: var(--con-green); box-shadow: 0 0 5px rgb(124 255 58 / 0.65); }
+  .con-meter i[data-lit] { background: var(--con-green); box-shadow: 0 0 5px color-mix(in srgb, var(--con-green) 65%, transparent); }
   .con-meter i[data-lit][data-zone="warm"] { background: var(--con-amber); box-shadow: 0 0 5px var(--con-amber); }
   .con-meter i[data-lit][data-zone="hot"] { background: var(--con-red); box-shadow: 0 0 5px var(--con-red); }
 
@@ -560,7 +577,7 @@
 
   .con-frame[data-playing] .con-turbine {
     color: var(--con-green);
-    filter: drop-shadow(0 0 4px rgb(124 255 58 / 0.6));
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--con-green) 60%, transparent));
   }
 
   .con-turbine-rotor {
@@ -600,7 +617,7 @@
     z-index: 35;
     pointer-events: none;
     overflow: hidden;
-    background: rgb(124 255 58 / 0.18);
+    background: color-mix(in srgb, var(--con-green) 18%, transparent);
     animation: con-boot-flash 900ms ease-out forwards;
   }
 
@@ -609,8 +626,8 @@
     inset-inline: 0;
     top: 0;
     height: 3px;
-    background: #e9ffe0;
-    box-shadow: 0 0 18px 6px rgb(124 255 58 / 0.7);
+    background: var(--con-hot);
+    box-shadow: 0 0 18px 6px color-mix(in srgb, var(--con-green) 70%, transparent);
     animation: con-boot-scan 700ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
   }
 
@@ -725,7 +742,7 @@
 
     .media-console .video-controls-bottom .media-button:hover .media-button-icon,
     .media-console .video-controls-bottom .media-button:hover .media-button-icon-base {
-      filter: drop-shadow(0 0 4px rgb(124 255 58 / 0.6));
+      filter: drop-shadow(0 0 4px color-mix(in srgb, var(--con-green) 60%, transparent));
     }
   }
 
@@ -920,7 +937,7 @@
     width: var(--media-slider-fill, 0%);
     height: auto;
     background: repeating-linear-gradient(90deg, var(--con-green) 0 4px, transparent 4px 6px);
-    filter: drop-shadow(0 0 3px rgb(124 255 58 / 0.6));
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--con-green) 60%, transparent));
   }
 
   .media-console .con-fader-thumb {
@@ -935,7 +952,7 @@
       repeating-linear-gradient(180deg, #6b746c 0 1px, #3b423c 1px 3px);
     border: 1px solid var(--con-black);
     border-radius: 2px;
-    box-shadow: 0 2px 0 var(--con-black), 0 0 6px rgb(124 255 58 / 0.35);
+    box-shadow: 0 2px 0 var(--con-black), 0 0 6px color-mix(in srgb, var(--con-green) 35%, transparent);
   }
 
   /* -------------------------------------------------------------------------------- Seek bar: LED segment strip */
@@ -966,7 +983,7 @@
   .media-console .media-time-slider-fill {
     background-color: transparent;
     background-image: repeating-linear-gradient(90deg, var(--con-green) 0 5px, transparent 5px 7px);
-    filter: drop-shadow(0 0 4px rgb(124 255 58 / 0.65));
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--con-green) 65%, transparent));
   }
 
   .media-console .media-time-slider-thumb {
@@ -974,8 +991,8 @@
     height: 20px;
     border: 0;
     border-radius: 1px;
-    background: #f0ffe8;
-    box-shadow: 0 0 0 1px var(--con-black), 0 0 10px 1px rgb(124 255 58 / 0.85);
+    background: var(--con-hot);
+    box-shadow: 0 0 0 1px var(--con-black), 0 0 10px 1px color-mix(in srgb, var(--con-green) 85%, transparent);
   }
 
   .media-console .media-time-slider-preview {
@@ -1032,12 +1049,12 @@
     color: var(--con-green);
     border: 2px solid var(--con-green);
     clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-    box-shadow: inset 0 0 18px rgb(124 255 58 / 0.25);
-    filter: drop-shadow(0 0 10px rgb(124 255 58 / 0.45));
+    box-shadow: inset 0 0 18px color-mix(in srgb, var(--con-green) 25%, transparent);
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--con-green) 45%, transparent));
   }
 
   .media-console .video-controls-center-play-icon {
-    filter: drop-shadow(0 0 4px rgb(124 255 58 / 0.8));
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--con-green) 80%, transparent));
   }
 
   .media-console .media-title {
@@ -1075,7 +1092,7 @@
     width: calc(var(--media-spacing) * 10);
     height: calc(var(--media-spacing) * 10);
     color: var(--con-green);
-    filter: drop-shadow(0 0 6px rgb(124 255 58 / 0.8));
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--con-green) 80%, transparent));
   }
 
   /* ---------------------------------------------------------------------------------------- Tooltips & menus */
@@ -1139,7 +1156,7 @@
 
   .media-console .con-led {
     fill: var(--con-green);
-    filter: drop-shadow(0 0 3px rgb(124 255 58 / 0.8));
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--con-green) 80%, transparent));
   }
 
   .media-console .media-menu-hint {
@@ -1177,7 +1194,7 @@
   }
 
   /* -------------------------------------------------------------------------------- Responsive (container) */
-  @container media-root (width < 54rem) {
+  @container media-root (width < 62rem) {
     .media-console .con-scope { display: none; }
   }
 
@@ -1252,5 +1269,358 @@
       forced-color-adjust: none;
       background: Highlight;
     }
+  }
+
+  /* ============================================================================================================= */
+  /* Ambient light: the armour picks up the film's colours (set by <Ambient />, registered above so they glide).    */
+  /* ============================================================================================================= */
+  .media-skin.media-console {
+    transition:
+      --con-ambient 1.2s linear,
+      --con-ambient-start 1.2s linear,
+      --con-ambient-end 1.2s linear;
+  }
+
+  .con-body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    background:
+      radial-gradient(38% 60% at 0% 40%, color-mix(in srgb, var(--con-ambient-start) 55%, transparent), transparent 72%),
+      radial-gradient(38% 60% at 100% 40%, color-mix(in srgb, var(--con-ambient-end) 55%, transparent), transparent 72%),
+      radial-gradient(60% 24% at 50% 0%, color-mix(in srgb, var(--con-ambient) 40%, transparent), transparent 80%);
+  }
+
+  .con-bezel {
+    box-shadow:
+      inset 0 0 0 4px var(--con-black),
+      0 0 0 1px var(--con-black),
+      0 0 26px 2px color-mix(in srgb, var(--con-ambient) 45%, transparent),
+      0 0 18px rgb(0 0 0 / 0.6);
+  }
+
+  /* ============================================================================================================= */
+  /* Chapter LEDs: the seek strip splits into chapters; the hover tag names the chapter above the time.            */
+  /* ============================================================================================================= */
+  .media-console .media-time-slider-chapter {
+    --media-chapter-inset-start: 1.25;
+    --media-chapter-inset-end: 1.25;
+  }
+
+  .media-console .media-time-slider-chapter:first-of-type { --media-chapter-inset-start: 0; }
+  .media-console .media-time-slider-chapter:last-of-type { --media-chapter-inset-end: 0; }
+
+  .media-console .media-time-slider-preview-label {
+    flex-direction: column-reverse;
+    gap: 3px;
+  }
+
+  .media-console .media-time-slider-chapter-title {
+    opacity: 1;
+    color: var(--con-text);
+    font-family: var(--con-font);
+    font-size: calc(var(--media-spacing) * 2.75);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-shadow: none;
+    max-width: calc(var(--media-spacing) * 40);
+  }
+
+  /* ============================================================================================================= */
+  /* CRT power-off when the film ends: the picture closes to a line, the line to a dot, then dark.                 */
+  /* ============================================================================================================= */
+  .con-crt {
+    position: absolute;
+    z-index: 25; /* over the picture, under the controls */
+    inset: calc(var(--con-top) + var(--con-pad)) calc(var(--con-gutter) + var(--con-pad)) var(--con-bottom);
+    pointer-events: none;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--con-green) 10%, transparent), transparent 12%);
+  }
+
+  .con-crt::before,
+  .con-crt::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    height: 50%;
+    background: #000;
+  }
+
+  .con-crt::before { top: 0; transform-origin: top; }
+  .con-crt::after { bottom: 0; transform-origin: bottom; }
+
+  .con-crt-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(50% - 1.5px);
+    height: 3px;
+    background: var(--con-hot);
+    box-shadow: 0 0 12px 3px var(--con-green);
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .con-crt::before,
+    .con-crt::after {
+      animation: con-crt-close 380ms cubic-bezier(0.6, 0, 0.9, 0.6) both;
+    }
+
+    .con-crt-line {
+      animation: con-crt-line 950ms ease-in both;
+    }
+  }
+
+  @keyframes con-crt-close {
+    from { scale: 1 0; }
+    to { scale: 1 1; }
+  }
+
+  @keyframes con-crt-line {
+    0%, 32% { opacity: 0; scale: 1 1; }
+    40% { opacity: 1; scale: 1 1; }
+    78% { opacity: 1; scale: 0.008 1; }
+    100% { opacity: 0; scale: 0.008 1; }
+  }
+
+  /* The replay key waits, lit. */
+  .media-console .video-controls-bottom .con-key-play[data-ended] {
+    color: var(--con-green);
+    box-shadow: inset 0 0 0 1px var(--con-green), 0 2px 0 var(--con-black), var(--con-glow);
+  }
+
+  /* ============================================================================================================= */
+  /* Signal states: buffering static, "signal lost" error, standby when paused.                                     */
+  /* ============================================================================================================= */
+  .media-console .media-buffering-indicator {
+    background-color: color-mix(in srgb, var(--con-green-deep) 55%, transparent);
+    background-image: var(--con-static);
+    background-size: 180px 180px;
+  }
+
+  .media-console .media-dialog-backdrop {
+    background-color: #140605;
+    background-image:
+      linear-gradient(90deg, rgb(255 60 40 / 0.08), transparent 30%, transparent 70%, rgb(60 255 220 / 0.06)),
+      var(--con-static);
+    background-size: auto, 180px 180px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .media-console .media-buffering-indicator,
+    .media-console .media-dialog-backdrop[data-open] {
+      animation: con-static 0.45s steps(5) infinite;
+    }
+  }
+
+  @keyframes con-static {
+    to { background-position: 0 0, 180px 90px; }
+  }
+
+  .media-console:has(.con-key-play[data-started][data-paused]:not([data-ended])) .video-controls-content::before {
+    background-image:
+      repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.09) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at center, transparent 48%, rgb(0 0 0 / 0.5));
+  }
+
+  /* ============================================================================================================= */
+  /* Fullscreen: the frame steps away and the deck becomes a HUD that hides with the controls.                      */
+  /* ============================================================================================================= */
+  .media-console:fullscreen > * {
+    --con-gutter: 0px;
+    --con-top: 0px;
+    --con-pad: 0px;
+    --con-hinge: 0px;
+    --con-deck: 0px;
+  }
+
+  .media-console:fullscreen .con-frame {
+    display: none;
+  }
+
+  .media-console:fullscreen .video-controls-bottom {
+    top: auto;
+    bottom: calc(var(--media-spacing) * 4);
+    inset-inline: max(calc(var(--media-spacing) * 4), calc(50% - 40rem));
+    height: auto;
+    background-color: color-mix(in srgb, var(--con-steel-2) 84%, transparent);
+    backdrop-filter: blur(10px);
+    transition:
+      opacity var(--media-duration-controls) ease-out,
+      translate var(--media-duration-controls) ease-out;
+  }
+
+  .media-console:fullscreen .video-controls-content:not([data-visible]) .video-controls-bottom {
+    opacity: 0;
+    translate: 0 14px;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .media-console:fullscreen .video-controls-content:not([data-visible]) .video-controls-bottom {
+      translate: none;
+    }
+  }
+
+  /* ============================================================================================================= */
+  /* Physical controls: captions flip switch, speed knob.                                                          */
+  /* ============================================================================================================= */
+  .media-console .video-controls-bottom .media-captions-button {
+    width: calc(var(--con-key) + var(--media-spacing) * 3.5);
+    grid-template-columns: 8px var(--con-icon);
+    justify-content: center;
+    align-items: center;
+    column-gap: calc(var(--media-spacing) * 1.5);
+  }
+
+  .media-console .media-captions-button .con-lever {
+    grid-row: 1;
+    grid-column: 1;
+    position: relative;
+    width: 8px;
+    height: 20px;
+    border-radius: 4px;
+    background: #050706;
+    box-shadow: inset 0 1px 2px #000, 0 0 0 1px var(--con-black);
+  }
+
+  .media-console .media-captions-button .con-lever::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 1px;
+    height: 9px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #7c857d, #3d443e);
+    box-shadow: 0 1px 0 var(--con-black);
+    transition: translate var(--media-duration-fast) ease-out, background var(--media-duration-fast) ease-out;
+  }
+
+  .media-console .media-captions-button[data-active] .con-lever::after {
+    translate: 0 -9px;
+    background: var(--con-green);
+    box-shadow: 0 0 6px var(--con-green);
+  }
+
+  .media-console .media-captions-button :is(.media-button-icon) {
+    grid-column: 2;
+  }
+
+  .media-console .con-speed {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--media-spacing) * 2);
+    flex: none;
+  }
+
+  .media-console .con-knob {
+    --con-knob-size: calc(var(--media-spacing) * 8.5);
+    position: relative;
+    width: var(--con-knob-size);
+    height: var(--con-knob-size);
+    margin: 4px;
+    border-radius: 50%;
+    cursor: grab;
+    touch-action: none;
+    outline: none;
+  }
+
+  @media (pointer: coarse) {
+    .media-console .con-knob {
+      --con-knob-size: calc(var(--media-spacing) * 11);
+    }
+  }
+
+  .media-console .con-knob:active {
+    cursor: grabbing;
+  }
+
+  /* Tick marks at the six stops, around a recessed ring. */
+  .media-console .con-knob::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    background: conic-gradient(
+      from -136deg,
+      var(--con-green-dim) 0 2deg, transparent 2deg 54deg,
+      var(--con-green-dim) 54deg 56deg, transparent 56deg 108deg,
+      var(--con-green-dim) 108deg 110deg, transparent 110deg 162deg,
+      var(--con-green-dim) 162deg 164deg, transparent 164deg 216deg,
+      var(--con-green-dim) 216deg 218deg, transparent 218deg 270deg,
+      var(--con-green-dim) 270deg 272deg, transparent 272deg
+    );
+    mask: radial-gradient(circle, transparent 66%, #000 68%);
+  }
+
+  /* The knurled cap turns to the current stop. */
+  .media-console .con-knob-cap {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 36% 30%, rgb(255 255 255 / 0.18), transparent 46%),
+      repeating-conic-gradient(#4a534b 0 7deg, #2b312c 7deg 14deg);
+    box-shadow: 0 2px 0 var(--con-black), inset 0 0 0 1px var(--con-black), 0 0 0 2px #050706;
+    rotate: var(--con-knob-angle, 0deg);
+    transition: rotate var(--media-duration) cubic-bezier(0.3, 1.4, 0.6, 1);
+  }
+
+  .media-console .con-knob-cap::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 50%;
+    width: 3px;
+    height: 32%;
+    translate: -50% 0;
+    border-radius: 2px;
+    background: var(--con-green);
+    box-shadow: 0 0 6px var(--con-green);
+  }
+
+  .media-console .con-knob:focus-visible {
+    outline: 2px solid var(--con-green);
+    outline-offset: 8px;
+  }
+
+  .media-console .con-knob[aria-disabled] {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .media-console .con-knob-readout {
+    min-width: 4ch;
+    padding: 4px 6px;
+    background: #050706;
+    border-radius: 2px;
+    box-shadow: inset 0 1px 3px #000, 0 0 0 1px var(--con-black);
+    color: var(--con-green);
+    font-family: var(--con-font-seg);
+    font-size: calc(var(--media-spacing) * 3);
+    font-weight: 700;
+    text-shadow: var(--con-glow-text);
+  }
+
+  /* Speed stays in the settings menu when the knob doesn't fit. */
+  @container media-root (width < 58rem) {
+    .media-console .con-speed { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .media-skin.media-console { transition: none; }
+    .media-console .con-knob-cap { transition: none; }
+    .media-console .media-captions-button .con-lever::after { transition: none; }
+  }
+
+  @media (forced-colors: active) {
+    .con-crt-line { display: none; }
+    .media-console .con-knob-cap { forced-color-adjust: none; background: ButtonFace; border: 1px solid ButtonText; }
+    .media-console .con-knob-cap::after { background: Highlight; box-shadow: none; }
   }
 }

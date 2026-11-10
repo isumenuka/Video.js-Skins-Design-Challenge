@@ -13,7 +13,9 @@ import { cn } from '@/lib/resolve-class-name';
 
 import { VideoGestures } from './behaviors/gestures';
 import { VideoHotkeys } from './behaviors/hotkeys';
-import { ConsoleBoot, ConsoleFrame } from './console/frame';
+import { Ambient } from './console/ambient';
+import { ConsoleBoot, ConsoleCrt, ConsoleFrame } from './console/frame';
+import { ScreenRatio } from './console/screen-ratio';
 import { VideoControls } from './controls';
 import { ErrorDialog } from './shared/error-dialog';
 import { Indicators } from './shared/indicators';
@@ -39,8 +41,11 @@ export function VideoSkin({ children, className, renderPoster, renderThumbnail, 
       <ConsoleFrame />
       <Poster renderImage={renderPoster} />
       <ErrorDialog />
+      <ConsoleCrt />
       <VideoControls renderThumbnail={renderThumbnail} />
       <ConsoleBoot />
+      <ScreenRatio />
+      <Ambient />
 
       <VideoHotkeys />
       <VideoGestures />

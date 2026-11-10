@@ -7,6 +7,7 @@ import { cn } from '@/lib/resolve-class-name';
 
 import { Oscilloscope } from '../console/oscilloscope';
 import { SegmentTime } from '../console/segment-time';
+import { SpeedKnob } from '../console/speed-knob';
 import { VolumeFader } from '../console/volume-fader';
 import { LiveButton } from './live-button';
 import { AudioPlayButton, PlayButton } from './play-button';
@@ -58,6 +59,7 @@ export function ControlsRow({
       </Controls.Group>
       {!live && <SegmentTime />}
       <Oscilloscope />
+      <SpeedKnob />
       <VolumeFader />
       <Controls.Group className={cn('video-controls-group', 'con-toggles')}>
         {captions}

@@ -1,101 +1,96 @@
 # Skin design spec — "Console"
 
-A neon-green sci-fi machine:
-- An armoured monitor (the screen) above a control deck.
-- The deck is hardware: it never hides, and it never covers the picture.
-- The style is inspired by a reference image the user supplied. Nothing is copied from it: the art, icons and code are original, and the background scene was generated from a text prompt only.
+A sci-fi lab machine built around a Video.js 10 player:
+- **The screen** is an armoured monitor, shaped to the film.
+- **The deck** below holds every control. It never covers the picture and never hides, except in fullscreen, where it becomes a HUD.
+- **Look:** the reference image the user supplied set the style. The art, icons and code are original. The lab background was generated from a text prompt only (invideo AI).
 
-## Base
-- Scaffold, React + plain CSS, video preset, Video.js 10.3.0.
-- Skin rules live in `src/video/console.css` (`@layer console`, after Scaffold's `components`).
-- Components in `src/video/console/`:
-  - frame and boot: `frame.tsx`;
-  - `segment-time.tsx`;
-  - `volume-fader.tsx`;
-  - `oscilloscope.tsx`.
-- Icons are in `src/video/icons.tsx`.
-- Fonts are embedded in `src/video/fonts.css`.
+## Signature ideas
+- **Phosphor colour.** One public token, `--media-accent-color`, recolours the whole machine (green #7cff3a / amber #ffb020 / cyan #3fe6ff). Every glow, dim tone and text tint is derived from it with `color-mix`. The showcase has a three-key switch.
+- **Ambient light.** While playing, the armour around the screen picks up the film's colours from a 16×9 sample of the frame (`console/ambient.tsx`). The colours are registered with `@property`, so they glide.
+- **A screen that fits the film.** `--con-screen-ratio` comes from the media's frame size (`console/screen-ratio.tsx`), clamped between 4:3 and 2.4:1, so there are no letterbox bars. The host can pass the ratio up front to avoid a jump.
+- **Chapter LEDs.** The seek bar is an LED segment strip, split into Sintel's 8 chapters. The hover tag shows the chapter name above the time.
+- **7-segment time readout,** with an unlit "88:88" ghost (`console/segment-time.tsx`).
+- **Live oscilloscope** of the film's audio (`console/oscilloscope.tsx`).
+- **Physical controls:**
+  - The captions key is a flip switch; its lever rises when captions are on.
+  - Playback speed is a click-stop rotary knob (`console/speed-knob.tsx`). It's an ARIA slider with arrows, PgUp/PgDn, Home and End, click to advance, and drag to turn. Its label comes from the Video.js translation.
+- **Power and signal states:**
+  - First play boots the monitor (scan sweep, flash, progress bar).
+  - The end of the film is a CRT power-off: the picture collapses to a line, then a dot, then dark, and the replay key is lit. Replay boots again.
+  - Buffering shows phosphor static.
+  - Errors show a "signal lost" static screen with a red-framed dialog.
+  - Paused dims the edges to standby.
+- **Living hardware:**
+  - Neon tube around the bezel, with sparks circling it.
+  - Current pulses through the conduits; turbines turn.
+  - "+" lamps hum, and the status LEDs show power, signal and standby.
+  - A bridge cartridge fills with playback progress, next to a volume meter.
+- **Fullscreen HUD.** The frame steps away. The deck floats as a blurred steel bar and hides with the controls.
 
 ## Layout (source order = focus order)
-1. **Screen.** 16:9; the machine grows around it, even when the host sets an aspect-ratio on the player box. Screen overlays:
-   - the title tag (top left);
-   - the power key (the centre play button);
-   - indicators;
-   - the buffering spinner;
-   - the boot sequence.
-2. **Hinge** (decorative): turbines that spin while playing, vents, and a 16-segment volume meter.
-3. **Deck, readout row:** the seek bar as an LED segment strip.
+1. **Screen:** title tag, power key (centre play), indicators, buffering, boot and CRT overlays.
+2. **Hinge (decorative):** turbines, vents, bridge (progress cartridge plus volume meter).
+3. **Deck, readout row:** the chapter LED seek strip.
 4. **Deck, key row:**
-   - Play/pause (wide key);
+   - Play/pause;
    - Skip −10 / +10;
-   - 7-segment time `current / duration`;
-   - the oscilloscope;
-   - Mute plus the fader;
-   - Captions*, Settings, AirPlay/Cast*, PiP, Fullscreen.
+   - 7-segment time;
+   - oscilloscope;
+   - speed knob;
+   - Mute plus fader;
+   - Captions switch, Settings, AirPlay/Cast (when available), PiP, Fullscreen.
 
-   \* only when available.
-
-## Tokens
-- **Steel:** #1b1f1c / #262b27 / #323833, edge #3d453e, black #0b0d0c.
-- **Green:** `--con-green` = `var(--media-accent-color, #7cff3a)` — 13:1 on black. Dim #3f7d1f, deep #1a2e12.
-- **Warnings:** amber #ffb020, red #ff4d3a.
-- **Text:** #dcffd2 (17:1 on black); dim text #9fbf96.
-- **Sizes:** keys 40px, or 44px on coarse pointers. Icons 20px on a 20-unit grid.
-- **Geometry:** screen frame 16px, hinge 32px, deck 108px (148px in two-row mode).
-
-## Type
-- **Labels:** Chakra Petch 500/600, uppercase with tracking for tooltips, title and menu headings.
-- **Time and seek preview:** DSEG7 Classic Bold, monospace segments, with a 10% "88:88" ghost.
-- **Licences:** both OFL. They are embedded as base64 Latin subsets, because the project folder name contains `#`, which breaks `url()` file paths in Vite.
-
-## Icons
-- Original stencil set: 2px stroke, square caps, mitred joins, chamfered panels.
-- **Settings** is a hex nut.
-- **Captions:** "on" shows text lines; "off" strikes the panel through.
-- **The only fill is the LED** (`.con-led`), used for the menu check and connected AirPlay/Cast.
-
-## State
-- Toggle keys carry a status LED:
-  - Play: green while playing.
-  - Mute: red when muted.
-  - Captions, PiP, Fullscreen and Cast: green when active.
-  - Settings: green while open.
-- The icon also changes, so state is never shown by colour alone. An open popup's trigger is also outlined.
-
-## Motion (all off or stepped under `prefers-reduced-motion: reduce`)
-- **Boot (derived):** on the first play, a 900ms flash with a scanline sweep and a progress bar. Glyphs only; it doesn't render under reduced motion.
-- **Turbines:** spin while playing.
-- **Signal LED:** blinks while playing.
-- **CRT flicker:** every 7s.
-- **Oscilloscope:** redraws every frame; at 4fps under reduced motion.
-- **Keys:** press translate of 1px.
+## Type, icons, colour
+- **Labels:** Chakra Petch 500/600.
+- **Readouts:** DSEG7 Classic. Both fonts are OFL and embedded as Latin subsets.
+- **Icons:** an original stencil set, 20px grid, 2px square-cap strokes. The only fill is the LED.
+- **Text contrast:** at least 16:1 on the deck in every phosphor. Every phosphor colour is at least 11:1 on black.
 
 ## Accessibility
-- **Focus ring:** one ring everywhere, a 2px green outline with an offset black halo and glow.
-- **Contrast:** controls sit on an opaque deck. The screen overlays (title, power key, indicators) sit on black tags.
-- **Labels:** hotkeys, gestures, status announcer, error dialog and all labels come from Video.js; there is no hardcoded UI copy.
-- **Fader:** a real Video.js `VolumeSlider`, with arrow keys, Home/End and `aria-valuetext`.
-- **Contrast preferences:** `prefers-contrast: more` raises dim tokens and drops the CRT layer. Forced colors hide the decoration and map the LEDs and fills to system colours.
+- **Focus:** one ring on every focusable part, a 2px phosphor outline plus a black halo. 13 tab stops checked.
+- **Touch:** keys are 40px, or 44px on coarse pointers. All targets measured at 44px or more on touch.
+- **Text:** all UI text comes from Video.js i18n. The knob's name is translated (checked in Spanish).
+- **Reduced motion:** no animation runs (boot, CRT, sparks, current, flicker, static and knob are all still). The scope drops to 4fps.
+- **Contrast preferences:** `prefers-contrast: more` raises the dim tokens and drops the scanlines. Forced colors hide the decoration and map LEDs and fills to system colours.
+- **Decoration:** marked `aria-hidden`. State is never colour alone: the LEDs pair with icon changes and the lever position.
 
-## Responsive (container queries on the player)
+## Responsive (container queries)
 | Width | Change |
 | --- | --- |
-| below 54rem | oscilloscope hidden |
-| below 46rem | skip keys hidden; fader and readout compact |
-| below 36rem | toggles wrap to a second key row; deck 148px |
-| below 34rem | thinner frame; ports and status LEDs hidden |
-| below 26rem | fader hidden, mute stays; arrow keys still change volume |
+| below 62rem | oscilloscope hidden |
+| below 58rem | speed knob hidden (speed stays in the settings menu) |
+| below 46rem | skip keys hidden; fader and readout compact; side plates and conduits hidden |
+| below 36rem | toggles wrap to a second key row |
+| below 34rem | thinner frame; status LEDs hidden |
+| below 26rem | fader hidden (mute stays) |
 | below 20rem | time collapses to Scaffold's toggle |
 
-## Derived (not in the reference — styled from its tokens)
-- Menus, tooltips, the error dialog (red-framed), the seek preview, the indicators, the boot sequence and the focus ring.
-
 ## Media
-- Mux public playback ID in `FILM.playbackId` (`apps/preview/src/frame/player.tsx`).
-- The current film is *Sintel*; it switches to *Tears of Steel* when its ID arrives.
-- English captions for *Tears of Steel* are ready at `apps/preview/public/tos-en.vtt`. Set `FILM.captions = './tos-en.vtt'`.
-- The credit line renders from `FILM.credit` on the showcase and in the workbench.
+- *Sintel* on Mux, public playback ID `fNEeWPY4UUEkfCFd9617w8gvYFEsFOv72rPQj3qKG700`.
+- **Captions:** `apps/preview/public/sintel-en.vtt` (official English subtitles).
+- **Chapters:** `sintel-chapters.vtt` (8 chapters, marked from the film's scenes).
+- **Credit:** "Sintel © Blender Foundation | durian.blender.org, CC BY 3.0", shown on the page.
 
-## Pages
-- `/` (showcase): generated lab background (invideo AI, GPT Image 2.5; prompt only), the player, design notes, the keyboard map and credits.
-- `/workbench.html`: the Video.js workbench for size, language and direction tests.
+## Verification (local, Chrome)
+- The state audit passes 29 of 29 checks:
+  - **Playback:** plays; captions and cue; chapters and hover name; ambient sampled.
+  - **Speed knob:** keys don't seek; click advances.
+  - **Keyboard and menus:** menus and Esc with focus return; visible focus on all stops.
+  - **Power states:** CRT on end; replay reboots.
+  - **Fullscreen:** HUD hides when idle.
+  - **Signal states:** buffering; error.
+  - **Locale:** Spanish labels.
+  - **Layout:** the deck fits at 1240/896/650/380/300px.
+  - **Touch, motion and axe:** 44px touch targets; reduced motion; axe clean.
+- No console errors.
+
+## Submission assets
+`design/submission/`:
+- desktop showcase;
+- player playing;
+- chapter hover;
+- settings menu;
+- amber and cyan variants;
+- phone;
+- `console-demo.mp4` (15s).

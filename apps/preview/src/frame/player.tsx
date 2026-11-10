@@ -1,5 +1,6 @@
 import { MuxVideo } from '@videojs/react/media/mux-video';
 import { VideoPlayer } from '@videojs/react/video';
+import type { CSSProperties } from 'react';
 
 import { VideoSkin } from '@/video/skin';
 
@@ -12,9 +13,12 @@ import type { PlaybackProps } from '../shell/params';
 export const FILM = {
   title: 'Sintel',
   playbackId: 'fNEeWPY4UUEkfCFd9617w8gvYFEsFOv72rPQj3qKG700',
-  posterTime: 120,
-  /** English captions served from `apps/preview/public`, or null. */
-  captions: null as string | null,
+  posterTime: 336,
+  /** The film's frame shape (1920×818), so the console's screen is the right shape before metadata loads. */
+  aspect: 1920 / 818,
+  /** English captions and chapter markers, served from `apps/preview/public`. */
+  captions: './sintel-en.vtt' as string | null,
+  chapters: './sintel-chapters.vtt' as string | null,
   credit: { owner: 'Blender Foundation', site: 'durian.blender.org', license: 'CC BY 3.0', licenseUrl: 'https://creativecommons.org/licenses/by/3.0/' },
 };
 
@@ -25,9 +29,10 @@ const POSTER = `https://image.mux.com/${FILM.playbackId}/thumbnail.webp?time=${F
 export function Player({ media }: { media?: PlaybackProps }) {
   return (
     <VideoPlayer poster={POSTER} title={FILM.title}>
-      <VideoSkin>
+      <VideoSkin style={{ '--con-screen-ratio': FILM.aspect } as CSSProperties}>
         <MuxVideo {...media} src={SRC} playsInline crossOrigin="">
           {FILM.captions && <track kind="captions" srcLang="en" label="English" src={FILM.captions} />}
+          {FILM.chapters && <track kind="chapters" srcLang="en" label="Chapters" src={FILM.chapters} default />}
         </MuxVideo>
       </VideoSkin>
     </VideoPlayer>

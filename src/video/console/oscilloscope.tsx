@@ -74,8 +74,10 @@ export function Oscilloscope() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     if (paused) {
+      // Idle: a flat trace, repainted now and then so a phosphor change recolours it.
       draw(canvas, null);
-      return;
+      const idle = window.setInterval(() => draw(canvas, null), 1000);
+      return () => clearInterval(idle);
     }
     const video = canvas.closest('.media-skin')?.querySelector('video');
     let frame = 0;
@@ -116,13 +118,13 @@ function draw(canvas: HTMLCanvasElement, tap: Tap | null) {
   if (!g) return;
   const { width: w, height: h } = canvas;
   const green = readColor(canvas, '--con-green', '#7cff3a');
-  const grid = readColor(canvas, '--con-scope-grid', 'rgb(124 255 58 / 0.12)');
   const dpr = w / Math.max(1, canvas.clientWidth);
 
   g.clearRect(0, 0, w, h);
 
-  // Graticule.
-  g.strokeStyle = grid;
+  // Graticule: the phosphor colour, faint.
+  g.globalAlpha = 0.14;
+  g.strokeStyle = green;
   g.lineWidth = 1;
   g.beginPath();
   const step = 12 * dpr;
@@ -133,6 +135,7 @@ function draw(canvas: HTMLCanvasElement, tap: Tap | null) {
   g.moveTo(0, Math.round(h / 2) + 0.5);
   g.lineTo(w, Math.round(h / 2) + 0.5);
   g.stroke();
+  g.globalAlpha = 1;
 
   // Trace.
   g.strokeStyle = green;

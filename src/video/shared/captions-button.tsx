@@ -28,6 +28,8 @@ export function CaptionsButton({ className, ...props }: CaptionsButtonProps = {}
       className={(state) => cn('media-captions-button', resolveClassName(className, state))}
       {...props}
     >
+      {/* A flip switch beside the icon: the lever is up while captions are on. */}
+      <span className={'con-lever'} aria-hidden="true" />
       <CaptionsOffIconPrimitive className={cn('media-button-icon', 'media-captions-button-off-icon')} />
       <CaptionsOnIconPrimitive className={cn('media-button-icon', 'media-captions-button-on-icon')} />
     </CaptionsButtonPrimitive>
