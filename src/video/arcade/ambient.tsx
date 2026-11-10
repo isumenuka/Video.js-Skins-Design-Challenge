@@ -35,8 +35,8 @@ function average(data: Uint8ClampedArray, x0: number, x1: number): RGB {
 
 /**
  * Ambient light: the machine picks up the film's colours, like a TV that lights the wall behind it. While playing,
- * a few times a second it reads a tiny 16×9 copy of the frame and sets `--con-ambient`, `--con-ambient-start` and
- * `--con-ambient-end` on the player; the armour around the screen glows with them. Decorative only. If the frame
+ * a few times a second it reads a tiny 16×9 copy of the frame and sets `--arc-ambient`, `--arc-ambient-start` and
+ * `--arc-ambient-end` on the player; the armour around the screen glows with them. Decorative only. If the frame
  * can't be read (for example a cross-origin source without CORS), it stops quietly and the skin keeps its own colours.
  */
 export function Ambient() {
@@ -62,9 +62,9 @@ export function Ambient() {
       try {
         g.drawImage(video, 0, 0, W, H);
         const { data } = g.getImageData(0, 0, W, H);
-        root.style.setProperty('--con-ambient-start', lift(average(data, 0, 4)));
-        root.style.setProperty('--con-ambient-end', lift(average(data, W - 4, W)));
-        root.style.setProperty('--con-ambient', lift(average(data, 0, W)));
+        root.style.setProperty('--arc-ambient-start', lift(average(data, 0, 4)));
+        root.style.setProperty('--arc-ambient-end', lift(average(data, W - 4, W)));
+        root.style.setProperty('--arc-ambient', lift(average(data, 0, W)));
         root.setAttribute('data-ambient', '');
       } catch {
         broken = true; // tainted canvas: leave the skin's own colours alone

@@ -14,7 +14,7 @@ export const FILM = {
   title: 'Sintel',
   playbackId: 'fNEeWPY4UUEkfCFd9617w8gvYFEsFOv72rPQj3qKG700',
   posterTime: 336,
-  /** The film's frame shape (1920×818), so the console's screen is the right shape before metadata loads. */
+  /** The film's frame shape (1920×818), so the cabinet's screen is the right shape before metadata loads. */
   aspect: 1920 / 818,
   /** English captions and chapter markers, served from `apps/preview/public`. */
   captions: './sintel-en.vtt' as string | null,
@@ -29,7 +29,7 @@ const POSTER = `https://image.mux.com/${FILM.playbackId}/thumbnail.webp?time=${F
 export function Player({ media }: { media?: PlaybackProps }) {
   return (
     <VideoPlayer poster={POSTER} title={FILM.title}>
-      <VideoSkin style={{ '--con-screen-ratio': FILM.aspect } as CSSProperties}>
+      <VideoSkin style={{ '--arc-screen-ratio': FILM.aspect } as CSSProperties}>
         <MuxVideo {...media} src={SRC} playsInline crossOrigin="">
           {FILM.captions && <track kind="captions" srcLang="en" label="English" src={FILM.captions} />}
           {FILM.chapters && <track kind="chapters" srcLang="en" label="Chapters" src={FILM.chapters} default />}

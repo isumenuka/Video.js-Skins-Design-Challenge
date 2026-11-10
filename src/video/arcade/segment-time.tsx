@@ -12,21 +12,21 @@ const ghost = (text: string) => text.replace(/\d/g, '8');
  */
 export function SegmentTime() {
   return (
-    <Time.Group className={'media-time-group con-readout'}>
+    <Time.Group className={'media-time-group arc-readout'}>
       <Time.Value
-        className={'media-time-toggle con-seg'}
+        className={'media-time-toggle arc-seg'}
         type="current"
         toggle
         render={(props, state) => <button {...props} data-ghost={ghost(state.text)} />}
       />
       <Time.Value
-        className={'media-time-current-value con-seg'}
+        className={'media-time-current-value arc-seg'}
         type="current"
         render={(props, state) => <span {...props} data-ghost={ghost(state.text)} />}
       />
       <Time.Separator className={'media-time-separator'} />
       <Time.Value
-        className={'media-time-duration-value con-seg'}
+        className={'media-time-duration-value arc-seg'}
         type="duration"
         render={(props, state) => <span {...props} data-ghost={ghost(state.text)} />}
       />

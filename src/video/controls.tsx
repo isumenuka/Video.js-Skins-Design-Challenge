@@ -14,8 +14,8 @@ export function VideoControls({ renderThumbnail }: ThumbnailSlot = {}) {
         center
         menu={<SettingsMenu />}
         renderThumbnail={renderThumbnail}
-        seekBackward={<SeekButton className={'con-key-seek'} seconds={-10} />}
-        seekForward={<SeekButton className={'con-key-seek'} seconds={10} />}
+        seekBackward={<SeekButton className={'arc-btn-seek'} seconds={-10} />}
+        seekForward={<SeekButton className={'arc-btn-seek'} seconds={10} />}
       />
     </Controls.Root>
   );

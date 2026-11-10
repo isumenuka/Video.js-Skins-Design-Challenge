@@ -5,14 +5,15 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/resolve-class-name';
 
-import { Oscilloscope } from '../console/oscilloscope';
-import { SegmentTime } from '../console/segment-time';
-import { SpeedKnob } from '../console/speed-knob';
-import { VolumeFader } from '../console/volume-fader';
+import { SeekStick, VolumeStick } from '../arcade/joystick';
+import { Oscilloscope } from '../arcade/oscilloscope';
+import { SegmentTime } from '../arcade/segment-time';
 import { LiveButton } from './live-button';
+import { MuteButton } from './mute-button';
 import { AudioPlayButton, PlayButton } from './play-button';
 import { TimeSlider } from './time-slider';
 import { type ThumbnailSlot } from './time-slider';
+import { ButtonTooltip } from './tooltip';
 import { VolumePopover } from './volume-popover';
 
 export function ControlsRow({
@@ -48,20 +49,30 @@ export function ControlsRow({
     );
   }
 
-  // The console deck's key row, in focus order: transport, readouts, volume, then the toggles.
+  // The arcade control panel, in focus order (= reading order): seek stick, the big transport buttons with the
+  // readouts under them, the volume stick and mute, then the row of small buttons along the front.
   return (
-    <Controls.Group className={'video-controls-row con-keys'}>
-      <Controls.Group className={cn('video-controls-group', 'video-controls-start', 'con-transport')}>
-        <PlayButton className={'con-key-play'} />
-        {seekBackward}
-        {seekForward}
-        {live && <LiveButton />}
-      </Controls.Group>
-      {!live && <SegmentTime />}
-      <Oscilloscope />
-      <SpeedKnob />
-      <VolumeFader />
-      <Controls.Group className={cn('video-controls-group', 'con-toggles')}>
+    <Controls.Group className={'video-controls-row arc-panel'}>
+      <div className={'arc-cluster arc-cluster-seek'}>{!live && <SeekStick />}</div>
+      <div className={'arc-center'}>
+        <Controls.Group className={cn('video-controls-group', 'video-controls-start', 'arc-transport')}>
+          {seekBackward}
+          <PlayButton className={'arc-btn-play'} />
+          {seekForward}
+          {live && <LiveButton />}
+        </Controls.Group>
+        <div className={'arc-readouts'}>
+          {!live && <SegmentTime />}
+          <Oscilloscope />
+        </div>
+      </div>
+      <div className={'arc-cluster arc-cluster-volume'}>
+        <VolumeStick />
+        <ButtonTooltip>
+          <MuteButton />
+        </ButtonTooltip>
+      </div>
+      <Controls.Group className={cn('video-controls-group', 'arc-small')}>
         {captions}
         {rate}
         {menu}

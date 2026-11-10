@@ -1,4 +1,4 @@
-/* The showcase page around the Console skin. The skin itself lives in src/; nothing here styles the player. */
+/* The showcase page around the Arcade skin. The skin itself lives in src/; nothing here styles the player. */
 :root {
   color-scheme: dark;
   --sc-bg: #070908;
@@ -15,15 +15,22 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  height: 100%;
+}
+
+/* One screen, no scrolling: the page is exactly the window, and the cabinet is sized to fit it (see main.tsx).
+   If a window is too small for even the smallest cabinet, the page falls back to scrolling. */
 body {
   margin: 0;
-  min-height: 100vh;
+  overflow: hidden;
   background: radial-gradient(ellipse at 50% 35%, #142012, var(--sc-bg) 70%) fixed;
   color: var(--sc-ink);
   font: 500 16px/1.55 var(--sc-font);
 }
 
-/* Generated lab scene, fixed behind the page, darkened toward the centre so the console stays the brightest thing. */
+/* Generated arcade room, fixed behind the page, darkened toward the centre so the cabinet stays the brightest thing. */
 .sc-bg {
   position: fixed;
   inset: 0;
@@ -38,84 +45,6 @@ body {
   transition: filter 0.6s ease;
 }
 
-/* The lab's lights follow the phosphor. */
-[data-phosphor="amber"] .sc-bg img { filter: hue-rotate(-62deg) saturate(1.15); }
-[data-phosphor="cyan"] .sc-bg img { filter: hue-rotate(88deg); }
-[data-phosphor="amber"] { --sc-green: #ffb020; --sc-ink: #fff0d6; }
-[data-phosphor="cyan"] { --sc-green: #3fe6ff; --sc-ink: #d8faff; }
-
-@media (prefers-reduced-motion: reduce) {
-  .sc-bg img { transition: none; }
-}
-
-/* Phosphor switch: three hardware keys. Real radio buttons, so arrows move between them. */
-.sc-phosphor {
-  margin: 0 auto;
-  padding: 0;
-  border: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sc-phosphor legend {
-  float: left;
-  margin-right: 10px;
-  padding: 0;
-  color: var(--sc-dim);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.sc-phosphor label {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  padding: 0 14px;
-  border: 1px solid var(--sc-edge);
-  border-bottom-width: 3px;
-  background: #1c221d;
-  color: var(--sc-ink);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.sc-phosphor label::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  background: color-mix(in srgb, var(--sc-swatch) 35%, #000);
-}
-
-.sc-phosphor label:has(input:checked) {
-  border-color: var(--sc-swatch);
-}
-
-.sc-phosphor label:has(input:checked)::before {
-  background: var(--sc-swatch);
-  box-shadow: 0 0 8px var(--sc-swatch);
-}
-
-.sc-phosphor input {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.sc-phosphor label:has(input:focus-visible) {
-  outline: 2px solid var(--sc-green);
-  outline-offset: 3px;
-}
-
 .sc-bg::after {
   content: "";
   position: absolute;
@@ -125,12 +54,32 @@ body {
     linear-gradient(to bottom, rgb(7 9 8 / 0.2), rgb(7 9 8 / 0.75));
 }
 
+html.sc-tight body {
+  overflow: auto;
+}
+
 .sc-page {
+  box-sizing: border-box;
   width: min(100% - 32px, 1040px);
+  height: 100dvh;
   margin-inline: auto;
-  padding-block: clamp(20px, 5vh, 56px) 32px;
+  padding-block: clamp(8px, 2.2vh, 24px) clamp(8px, 1.6vh, 16px);
   display: grid;
-  gap: clamp(20px, 4vh, 36px);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  gap: clamp(8px, 1.8vh, 18px);
+}
+
+html.sc-tight .sc-page {
+  height: auto;
+  min-height: 100dvh;
+}
+
+/* The cell the cabinet must fit in; the cabinet's width is chosen so its height fits too. */
+.sc-stage-cell {
+  min-height: 0;
+  display: grid;
+  place-items: center;
 }
 
 .sc-header {
@@ -143,7 +92,7 @@ body {
   align-items: center;
   gap: 8px;
   color: var(--sc-green);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -158,17 +107,18 @@ body {
 
 .sc-title {
   margin: 4px 0 0;
-  font-size: clamp(40px, 8vw, 72px);
-  font-weight: 600;
+  font-family: "Anton", "Impact", sans-serif;
+  font-size: clamp(30px, min(7vw, 7vh), 64px);
+  font-weight: 400;
   line-height: 1;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   text-shadow: 0 0 24px rgb(124 255 58 / 0.35);
 }
 
 .sc-stage {
-  width: 100%;
-  max-width: 1040px;
+  width: var(--sc-stage-width, 100%);
+  max-width: 100%;
   margin-inline: auto;
   filter: drop-shadow(0 24px 48px rgb(0 0 0 / 0.7));
 }
@@ -178,7 +128,7 @@ body {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 12px 28px;
+  gap: 6px 22px;
 }
 
 .sc-keys {
@@ -186,7 +136,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px 22px;
+  gap: 6px 18px;
 }
 
 .sc-keys div {
@@ -198,18 +148,18 @@ body {
 .sc-keys dd {
   margin: 0;
   color: var(--sc-dim);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 kbd {
   display: inline-block;
   min-width: 2.2em;
-  padding: 2px 8px;
+  padding: 1px 7px;
   border: 1px solid var(--sc-edge);
   border-bottom-width: 3px;
   background: #1c221d;
   color: var(--sc-green);
-  font: 600 13px/1.4 var(--sc-font);
+  font: 600 12px/1.4 var(--sc-font);
   text-align: center;
   white-space: nowrap;
 }
@@ -225,12 +175,46 @@ a:focus-visible {
 }
 
 .sc-footer {
+  /* Wider than the page column (negative margins out to the window's edges), so the credits line has the whole
+     window; the column itself stays put. */
+  margin-inline: calc(50% - 50vw + 12px);
   text-align: center;
-  font-size: 13px;
+  /* The credits are one line: the type shrinks with the window, and on very narrow screens the line is cut with an
+     ellipsis (the full text is in its title). */
+  font-size: clamp(9px, 0.86vw, 12px);
+  line-height: 1.4;
   color: var(--sc-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sc-footer p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sc-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .sc-footer a {
   color: inherit;
 }
 
+
+kbd.sc-stick {
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sc-footer p {
+  margin: 0;
+}

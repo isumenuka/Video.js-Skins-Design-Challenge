@@ -9,6 +9,9 @@ import { useEffect, useRef } from 'react';
  * On the first play it routes the `<video>` through one AnalyserNode. It only connects once the AudioContext is
  * actually running, so a blocked context can never silence the film; any failure leaves a flat trace and the audio
  * untouched. It draws only while playing, and at ~4 fps under reduced motion.
+ *
+ * It also reports the loudness as `--arc-level` (0–1) on the cabinet's top housing, so the speaker grilles pulse with
+ * the film's sound.
  */
 
 interface Tap {
@@ -79,7 +82,9 @@ export function Oscilloscope() {
       const idle = window.setInterval(() => draw(canvas, null), 1000);
       return () => clearInterval(idle);
     }
-    const video = canvas.closest('.media-skin')?.querySelector('video');
+    const root = canvas.closest('.media-skin');
+    const video = root?.querySelector('video');
+    const speakers = root?.querySelector<HTMLElement>('.arc-top');
     let frame = 0;
     let timer = 0;
     let stopped = false;
@@ -87,7 +92,8 @@ export function Oscilloscope() {
 
     const tick = () => {
       if (stopped) return;
-      draw(canvas, tapRef.current);
+      const level = draw(canvas, tapRef.current);
+      speakers?.style.setProperty('--arc-level', level.toFixed(2));
       if (reduced) timer = window.setTimeout(tick, 250);
       else frame = requestAnimationFrame(tick);
     };
@@ -103,21 +109,24 @@ export function Oscilloscope() {
       stopped = true;
       cancelAnimationFrame(frame);
       clearTimeout(timer);
+      speakers?.style.setProperty('--arc-level', '0');
     };
   }, [paused]);
 
   return (
-    <div className={'con-scope'} aria-hidden="true">
-      <canvas ref={canvasRef} className={'con-scope-canvas'} />
+    <div className={'arc-scope'} aria-hidden="true">
+      <canvas ref={canvasRef} className={'arc-scope-canvas'} />
     </div>
   );
 }
 
-function draw(canvas: HTMLCanvasElement, tap: Tap | null) {
+/** Draws the trace and returns the loudness (RMS, scaled to 0–1). */
+function draw(canvas: HTMLCanvasElement, tap: Tap | null): number {
   const g = canvas.getContext('2d');
-  if (!g) return;
+  if (!g) return 0;
+  let level = 0;
   const { width: w, height: h } = canvas;
-  const green = readColor(canvas, '--con-green', '#7cff3a');
+  const green = readColor(canvas, '--arc-green', '#7cff3a');
   const dpr = w / Math.max(1, canvas.clientWidth);
 
   g.clearRect(0, 0, w, h);
@@ -148,7 +157,9 @@ function draw(canvas: HTMLCanvasElement, tap: Tap | null) {
     const n = tap.data.length;
     for (let i = 0; i < n; i++) {
       const x = (i / (n - 1)) * w;
-      const y = h / 2 + ((tap.data[i]! - 128) / 128) * (h / 2) * 0.9;
+      const v = (tap.data[i]! - 128) / 128;
+      level += v * v;
+      const y = h / 2 + v * (h / 2) * 0.9;
       if (i === 0) g.moveTo(x, y);
       else g.lineTo(x, y);
     }
@@ -158,4 +169,5 @@ function draw(canvas: HTMLCanvasElement, tap: Tap | null) {
   }
   g.stroke();
   g.shadowBlur = 0;
+  return tap ? Math.min(1, Math.sqrt(level / tap.data.length) * 4) : 0;
 }

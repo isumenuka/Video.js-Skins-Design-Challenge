@@ -1,0 +1,1847 @@
+/*
+ * Arcade — a Video.js 10 skin built as an arcade cabinet.
+ *
+ * The player is the whole machine: a top housing (lit marquee between two speakers), a curved CRT screen with a
+ * glowing rim, and a control panel below with two joysticks (seek and volume) and round arcade buttons. The panel is
+ * hardware: it never hides and never covers the picture (in fullscreen it becomes a floating HUD). Built on Scaffold's
+ * structure; this layer comes after `components`, so it restyles without editing Scaffold. Where Scaffold uses
+ * `!important`, this file changes the token that rule reads.
+ *
+ * Geometry note: container queries cannot restyle the container itself, so the cabinet tokens are set on every direct
+ * child of the player (`.media-arcade > *`) and each child positions itself from them.
+ */
+@property --arc-ambient {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --arc-ambient-start {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --arc-ambient-end {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@layer arcade {
+  /* ============================================================================================================= */
+  /* Tokens                                                                                                         */
+  /* ============================================================================================================= */
+  .media-skin.media-arcade {
+    /* Palette. The phosphor is the one public colour: --media-accent-color recolours the glow, the screen and the
+       start button. Everything else is cabinet paint and chrome. */
+    --arc-green: var(--media-accent-color, #7cff3a);
+    --arc-hot: color-mix(in oklab, var(--arc-green) 20%, white);
+    --arc-green-dim: color-mix(in oklab, var(--arc-green) 50%, black);
+    --arc-green-deep: color-mix(in oklab, var(--arc-green) 18%, #050805);
+    --arc-green-wash: color-mix(in srgb, var(--arc-green) 16%, transparent);
+    --arc-glow: 0 0 12px color-mix(in srgb, var(--arc-green) 60%, transparent);
+    --arc-glow-text: 0 0 6px color-mix(in srgb, var(--arc-green) 70%, transparent);
+    --arc-ink: #0c1a0a; /* dark green ink on lit (phosphor) surfaces: ≥12:1 on the phosphor */
+    --arc-paint: #1f4a26; /* cabinet paint */
+    --arc-paint-dark: #13301a;
+    --arc-paint-deep: #0a1c0f;
+    --arc-black: #070b08;
+    --arc-chrome: linear-gradient(180deg, #f4f7f4 0%, #a9b1aa 30%, #59625b 55%, #c9d0ca 78%, #6c756d 100%);
+    --arc-chrome-v: linear-gradient(90deg, #6c756d 0%, #e9eee9 35%, #8d968e 60%, #4b534c 100%);
+    --arc-cap: #d9ead3; /* mint-white button caps */
+    --arc-cap-play: var(--arc-green);
+    --arc-red: #ff4d5e;
+    --arc-text: #eef8ea;
+    --arc-text-dim: #b9cbb4; /* ≥7:1 on --arc-paint-deep */
+    --arc-static: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+    /* Type */
+    --arc-font: "Chakra Petch", "Bahnschrift", "Segoe UI", system-ui, sans-serif;
+    --arc-font-display: "Anton", "Impact", "Haettenschweiler", "Arial Narrow Bold", sans-serif;
+    --arc-font-seg: "DSEG7 Classic", "Consolas", ui-monospace, monospace;
+
+    /* Video.js tokens */
+    --media-font-family: var(--arc-font);
+    --media-foreground: var(--arc-text);
+    --media-background: transparent;
+    --media-accent: var(--arc-green);
+    --media-accent-foreground: var(--arc-ink);
+    --media-primary: var(--arc-green);
+    --media-primary-foreground: var(--arc-ink);
+    --media-popover: var(--arc-paint-deep);
+    --media-popover-foreground: var(--arc-text);
+    --media-ring: var(--arc-green);
+    --media-button-highlight: transparent;
+    --media-popover-side-offset: calc(var(--media-spacing) * 3);
+    --media-tooltip-side-offset: calc(var(--media-spacing) * 3);
+
+    box-sizing: border-box;
+    /* The cabinet grows around a screen shaped like the film, so a host's aspect-ratio on the player box can't squeeze
+       the picture to make room for the panel. */
+    aspect-ratio: auto !important;
+    height: auto;
+    background: transparent; /* the cabinet is drawn by .arc-body */
+    font-family: var(--arc-font);
+    font-weight: 500;
+  }
+
+  /* Geometry, set on every child (see the note at the top). Proportions follow the cabinet renders. */
+  .media-arcade > * {
+    --arc-top: calc(var(--media-spacing) * 32); /* the hood: speakers and marquee */
+    --arc-side: calc(var(--media-spacing) * 5); /* side posts */
+    --arc-pad: calc(var(--media-spacing) * 5); /* recessed bezel around the tube */
+    --arc-ledge: calc(var(--media-spacing) * 1);
+    --arc-panel: calc(var(--media-spacing) * 46); /* the control deck, including its chrome lip */
+    --arc-apron: calc(var(--media-spacing) * 19); /* the front face: small buttons and coin doors */
+    --arc-bottom: calc(var(--arc-pad) + var(--arc-ledge) + var(--arc-panel) + var(--arc-apron));
+    --arc-radius: calc(var(--media-spacing) * 7); /* the tube's curve */
+    --arc-btn: 48px; /* small buttons (the render includes its chrome ring) */
+    --arc-btn-seek: 58px;
+    --arc-btn-play: 76px;
+    --arc-icon: 20px;
+    --arc-stick-w: calc(var(--media-spacing) * 25);
+    --arc-stick-h: calc(var(--media-spacing) * 28);
+    --arc-lever: calc(var(--media-spacing) * 21);
+  }
+
+  @container media-root (width < 44rem) {
+    .media-arcade > * {
+      --arc-top: calc(var(--media-spacing) * 19);
+      --arc-side: calc(var(--media-spacing) * 4);
+      --arc-pad: calc(var(--media-spacing) * 3.5);
+      --arc-panel: calc(var(--media-spacing) * 42);
+      --arc-apron: calc(var(--media-spacing) * 17);
+      --arc-btn-seek: 52px;
+      --arc-btn-play: 66px;
+      --arc-stick-w: calc(var(--media-spacing) * 19);
+      --arc-stick-h: calc(var(--media-spacing) * 24);
+      --arc-lever: calc(var(--media-spacing) * 17);
+      --arc-radius: calc(var(--media-spacing) * 5);
+    }
+  }
+
+  /* Phones: the sticks take a row of their own above the transport. */
+  @container media-root (width < 30rem) {
+    .media-arcade > * {
+      --arc-top: calc(var(--media-spacing) * 14);
+      --arc-side: calc(var(--media-spacing) * 3);
+      --arc-pad: calc(var(--media-spacing) * 2.5);
+      --arc-panel: calc(var(--media-spacing) * 66);
+      --arc-apron: calc(var(--media-spacing) * 16);
+      --arc-stick-h: calc(var(--media-spacing) * 22);
+      --arc-lever: calc(var(--media-spacing) * 15);
+      --arc-radius: calc(var(--media-spacing) * 4);
+    }
+  }
+
+  @container media-root (width < 26rem) {
+    .media-arcade > * {
+      --arc-btn: 44px;
+      --arc-btn-seek: 50px;
+      --arc-btn-play: 62px;
+    }
+  }
+
+  /* ============================================================================================================= */
+  /* The screen: a curved tube                                                                                      */
+  /* ============================================================================================================= */
+  .media-arcade > video {
+    box-sizing: border-box;
+    width: calc(100% - (var(--arc-side) + var(--arc-pad)) * 2);
+    height: calc(100% - var(--arc-top) - var(--arc-pad) - var(--arc-bottom));
+    aspect-ratio: var(--arc-screen-ratio, 16 / 9);
+    margin: calc(var(--arc-top) + var(--arc-pad)) calc(var(--arc-side) + var(--arc-pad)) var(--arc-bottom);
+    position: relative;
+    z-index: 1; /* above the cabinet body */
+    background-color: #000;
+    border-radius: var(--arc-radius);
+  }
+
+  .media-skin.media-arcade:fullscreen {
+    height: 100%;
+    background: #000;
+  }
+
+  .media-arcade:fullscreen > video {
+    aspect-ratio: auto;
+    border-radius: 0;
+  }
+
+  /* Everything that belongs on the picture is inset to the screen box. */
+  .media-arcade :is(
+      .video-controls-content,
+      .video-controls-backdrop,
+      .media-poster,
+      .media-buffering-indicator-controls > .media-buffering-indicator,
+      .media-indicator-group,
+      .arc-boot,
+      .arc-crt,
+      .arc-attract,
+      .arc-glass
+    ) {
+    inset: calc(var(--arc-top) + var(--arc-pad)) calc(var(--arc-side) + var(--arc-pad)) var(--arc-bottom);
+  }
+
+  /* Layers on the picture follow the tube's curve. */
+  .media-arcade :is(.media-poster, .video-controls-backdrop, .arc-boot, .arc-crt, .arc-attract, .arc-glass, .media-buffering-indicator) {
+    border-radius: var(--arc-radius);
+    overflow: hidden;
+  }
+
+  .media-arcade :is(.media-poster, .video-controls-backdrop) {
+    z-index: 2;
+  }
+
+  .media-arcade .media-poster {
+    position: absolute;
+    width: auto;
+    height: auto;
+  }
+
+  .media-arcade .media-poster-image {
+    width: 100%;
+    height: 100%;
+  }
+
+  .media-arcade .video-controls-backdrop {
+    background-image: linear-gradient(to bottom, rgb(0 0 0 / 0.55), transparent 26%);
+  }
+
+  /* The tube: scanlines, a curved-glass glare and a dark vignette, over the picture only. */
+  .media-arcade .video-controls-content::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: var(--arc-radius);
+    background-image:
+      repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.1) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at center, transparent 58%, rgb(0 0 0 / 0.42));
+    box-shadow:
+      inset 0 0 0 2px rgb(0 0 0 / 0.6),
+      inset 0 0 30px color-mix(in srgb, var(--arc-green) 12%, transparent);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .media-arcade .video-controls-content::before {
+      animation: arc-flicker 8s steps(1) infinite;
+    }
+  }
+
+  @keyframes arc-flicker {
+    0%, 100% { opacity: 1; }
+    93% { opacity: 0.84; }
+    95% { opacity: 1; }
+  }
+
+  /* ============================================================================================================= */
+  /* The cabinet (decorative): photoreal renders, 3-sliced so they hold at any width                                */
+  /* ============================================================================================================= */
+  .arc-frame {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Cabinet body: the green powder-coat between hood and panel, rounded side posts with chrome T-molding. */
+  .arc-body {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px 16px 8px 8px;
+    background:
+      linear-gradient(90deg,
+        rgb(255 255 255 / 0.12) 0, rgb(0 0 0 / 0.42) var(--arc-side), transparent calc(var(--arc-side) + 18px),
+        transparent calc(100% - var(--arc-side) - 18px), rgb(0 0 0 / 0.42) calc(100% - var(--arc-side)), rgb(255 255 255 / 0.08) 100%),
+      linear-gradient(180deg, rgb(0 0 0 / 0.5), transparent 22%, transparent 78%, rgb(0 0 0 / 0.4)),
+      var(--arc-img-material, none) 0 0 / 256px 256px,
+      #1a3b27;
+    box-shadow:
+      inset 3px 0 0 #d6dcd7,
+      inset -3px 0 0 #d6dcd7,
+      inset 5px 0 0 #5b645d,
+      inset -5px 0 0 #5b645d,
+      0 30px 60px rgb(0 0 0 / 0.6),
+      0 0 0 1px var(--arc-black);
+  }
+
+  /* The hood: the generated render, a left cap, a repeating middle and a right cap. */
+  .arc-top {
+    --arc-level: 0;
+    position: absolute;
+    top: 0;
+    inset-inline: 0;
+    height: var(--arc-top);
+    border-radius: 16px 16px 0 0;
+    overflow: hidden;
+    background:
+      var(--arc-img-hood-l, none) left top / auto 100% no-repeat,
+      var(--arc-img-hood-r, none) right top / auto 100% no-repeat,
+      var(--arc-img-hood-m, none) center top / 100% 100% no-repeat;
+    box-shadow: 0 10px 18px rgb(0 0 0 / 0.55); /* the hood overhangs the screen */
+  }
+
+  /* Speakers are in the render; these sit over the grilles and glow with the screen and the sound. */
+  .arc-speaker {
+    position: absolute;
+    top: calc(var(--arc-top) * 0.27);
+    width: calc(var(--arc-top) * 0.56);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--arc-spill, var(--arc-ambient)) 34%, transparent), transparent 70%);
+    mix-blend-mode: screen;
+    opacity: calc(0.35 + var(--arc-level) * 0.9);
+    scale: calc(1 + var(--arc-level) * 0.05);
+  }
+
+  .arc-speaker-start { left: calc(var(--arc-top) * 0.244); }
+  .arc-speaker-end { right: calc(var(--arc-top) * 0.219); }
+
+  /* The marquee: dark smoked glass in a chrome frame, carrying the neon sign. */
+  .arc-marquee {
+    position: absolute;
+    top: calc(var(--arc-top) * 0.15);
+    height: calc(var(--arc-top) * 0.56);
+    inset-inline: calc(var(--arc-top) * 0.97 + var(--media-spacing) * 2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-inline: calc(var(--media-spacing) * 4);
+    border-radius: calc(var(--media-spacing) * 1.5);
+    background:
+      radial-gradient(60% 90% at 50% 50%, color-mix(in srgb, var(--arc-green) 16%, transparent), transparent 75%),
+      repeating-linear-gradient(115deg, rgb(255 255 255 / 0.025) 0 2px, transparent 2px 9px),
+      radial-gradient(ellipse at 50% 40%, #0c2214, #030805 78%);
+    box-shadow:
+      0 0 0 2px #c7cec8,
+      0 0 0 3px #3a413b,
+      0 0 0 5px rgb(0 0 0 / 0.6),
+      inset 0 3px 10px rgb(0 0 0 / 0.75),
+      0 0 26px color-mix(in srgb, var(--arc-green) 28%, transparent);
+    overflow: hidden;
+  }
+
+  /* A reflection across the marquee glass. */
+  .arc-marquee::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(170deg, rgb(255 255 255 / 0.1), transparent 40%);
+    pointer-events: none;
+  }
+
+  /* The neon sign: each mark is a tube — a wide soft bloom, the coloured tube and a thin white-hot core. Widths are
+     in screen pixels (non-scaling strokes), so the tubes stay crisp at every cabinet size. */
+  .arc-neon-sign {
+    height: 88%;
+    width: auto;
+    max-width: 100%;
+    overflow: visible;
+  }
+
+  .arc-neon path {
+    fill: none;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .arc-neon-bloom {
+    stroke: var(--arc-green);
+    stroke-width: 9px;
+    opacity: 0.22;
+  }
+
+  .arc-neon-tube {
+    stroke: var(--arc-green);
+    stroke-width: 2.6px;
+  }
+
+  .arc-neon-core {
+    stroke: color-mix(in oklab, var(--arc-green) 25%, white);
+    stroke-width: 1px;
+  }
+
+  .arc-neon {
+    filter:
+      drop-shadow(0 0 2px var(--arc-green))
+      drop-shadow(0 0 8px color-mix(in srgb, var(--arc-green) 75%, transparent));
+  }
+
+  /* Neon flicker: mostly steady, with irregular buzzing dips. Each mark has its own rhythm. */
+  @media (prefers-reduced-motion: no-preference) {
+    .arc-neon-vjs { animation: arc-neon-flicker 7.3s linear infinite; }
+    .arc-neon-mux { animation: arc-neon-flicker 9.1s linear infinite -3.2s; }
+    .arc-neon-star { animation: arc-neon-flicker-star 5.7s linear infinite -1.4s; }
+  }
+
+  @keyframes arc-neon-flicker {
+    0%, 37%, 39.5%, 41%, 74%, 76.5%, 100% { opacity: 1; }
+    38% { opacity: 0.3; }
+    40% { opacity: 0.55; }
+    75% { opacity: 0.18; }
+    75.8% { opacity: 0.8; }
+  }
+
+  @keyframes arc-neon-flicker-star {
+    0%, 18%, 20%, 58%, 61%, 100% { opacity: 1; }
+    19% { opacity: 0.25; }
+    59% { opacity: 0.1; }
+    60% { opacity: 0.7; }
+  }
+
+  /* Spark burst when the film starts: streaks fly off the sign and burn out. */
+  .arc-sparks {
+    position: absolute;
+    z-index: 42;
+    pointer-events: none;
+    top: calc(var(--arc-top) * 0.15);
+    height: calc(var(--arc-top) * 0.56);
+    inset-inline: calc(var(--arc-top) * 0.97 + var(--media-spacing) * 2);
+  }
+
+  .arc-spark {
+    position: absolute;
+    left: var(--x);
+    top: 50%;
+    width: 2px;
+    height: 14px;
+    margin: -7px 0 0 -1px;
+    border-radius: 1px;
+    background: linear-gradient(#ffffff, var(--arc-green));
+    box-shadow: 0 0 6px 1px color-mix(in srgb, var(--arc-green) 80%, transparent);
+    opacity: 0;
+    animation: arc-spark var(--t) cubic-bezier(0.15, 0.7, 0.35, 1) var(--delay) both;
+  }
+
+  @keyframes arc-spark {
+    0% { opacity: 1; transform: rotate(var(--a)) translateY(0) scaleY(1.4); }
+    70% { opacity: 1; }
+    100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(-1 * var(--d))) scaleY(0.3); }
+  }
+
+  /* Bezel: the tube sits deep in a black surround; light catches its top edge. */
+  .arc-bezel {
+    position: absolute;
+    top: var(--arc-top);
+    inset-inline: var(--arc-side);
+    bottom: calc(var(--arc-bottom) - var(--arc-pad));
+    border-radius: calc(var(--arc-radius) + var(--arc-pad) * 0.6);
+    background:
+      radial-gradient(120% 90% at 50% 50%, #0b110d 60%, #030504),
+      #050806;
+    box-shadow:
+      inset 0 14px 22px rgb(0 0 0 / 0.85),
+      inset 0 -3px 6px rgb(255 255 255 / 0.05),
+      0 1px 0 rgb(255 255 255 / 0.08),
+      0 0 0 3px #0c1a11,
+      0 0 40px 6px color-mix(in srgb, var(--arc-spill, var(--arc-ambient)) 35%, transparent);
+  }
+
+  /* The phosphor rim where the glass meets the bezel: a crisp line inside a wide bloom. */
+  .arc-rim {
+    position: absolute;
+    inset: calc(var(--arc-pad) - 4px);
+    border-radius: calc(var(--arc-radius) + 4px);
+    border: 3px solid var(--arc-green);
+    box-shadow:
+      0 0 6px 1px color-mix(in srgb, var(--arc-green) 90%, transparent),
+      0 0 26px 6px color-mix(in srgb, var(--arc-green) 45%, transparent),
+      inset 0 0 14px color-mix(in srgb, var(--arc-green) 60%, transparent);
+  }
+
+  /* Coin-slot lamps over the two doors in the front-face render; they light while the film plays. */
+  .arc-doors {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+  }
+
+  .arc-door-lamp {
+    position: absolute;
+    bottom: calc(var(--arc-apron) * 0.645);
+    width: calc(var(--arc-apron) * 0.05);
+    height: calc(var(--arc-apron) * 0.18);
+    margin-inline: calc(var(--arc-apron) * -0.025);
+    border-radius: 2px;
+    transition: background-color var(--media-duration) ease-out, box-shadow var(--media-duration) ease-out;
+  }
+
+  .arc-door-lamp-start { left: calc(var(--arc-apron) * 0.18); }
+  .arc-door-lamp-end { right: calc(var(--arc-apron) * 0.18); }
+
+  .arc-doors[data-playing] .arc-door-lamp {
+    background-color: color-mix(in srgb, var(--arc-red) 80%, transparent);
+    box-shadow: 0 0 10px 3px color-mix(in srgb, var(--arc-red) 70%, transparent);
+  }
+
+  /* The tube's glass, over everything on the screen: bulge shading, edge shadow and a slow drifting reflection. */
+  .arc-glass {
+    position: absolute;
+    z-index: 30;
+    pointer-events: none;
+    background:
+      radial-gradient(70% 50% at 28% 14%, rgb(255 255 255 / 0.1), transparent 70%),
+      radial-gradient(140% 130% at 50% 50%, transparent 55%, rgb(0 0 0 / 0.38));
+    box-shadow:
+      inset 0 0 0 2px rgb(0 0 0 / 0.55),
+      inset 0 10px 26px rgb(0 0 0 / 0.45),
+      inset 0 -8px 20px rgb(0 0 0 / 0.35);
+  }
+
+  .arc-glass-sheen {
+    position: absolute;
+    inset: -30% -70%;
+    background: linear-gradient(105deg,
+      transparent 42%, rgb(255 255 255 / 0.05) 46%, rgb(255 255 255 / 0.12) 49%, rgb(255 255 255 / 0.04) 53%, transparent 58%);
+    translate: -12% 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .arc-glass-sheen {
+      animation: arc-sheen 14s ease-in-out infinite alternate;
+    }
+  }
+
+  @keyframes arc-sheen {
+    from { translate: -22% 0; }
+    to { translate: 22% 0; }
+  }
+
+  /* ============================================================================================================= */
+  /* Attract mode (before the first play): a lit screen that types the title, flashes, and points at start          */
+  /* ============================================================================================================= */
+  .arc-attract {
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5cqi;
+    padding: 6cqi 8cqi;
+    background:
+      radial-gradient(90% 120% at 30% 35%, color-mix(in oklab, var(--arc-green) 55%, white), var(--arc-green) 55%, color-mix(in oklab, var(--arc-green) 72%, black));
+    color: color-mix(in oklab, var(--arc-ink) 88%, var(--arc-green));
+  }
+
+  .arc-attract::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.07) 0 1px, transparent 1px 3px);
+  }
+
+  /* Pixel letters, typed in and then flashed, on a loop. */
+  .arc-attract-title {
+    align-self: flex-start;
+    max-width: 70%;
+    font-family: "Silkscreen", var(--arc-font-display);
+    font-size: 14cqi;
+    line-height: 0.95;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+    opacity: 0.88;
+    text-shadow: 0.6cqi 0.6cqi 0 rgb(0 0 0 / 0.12);
+  }
+
+  .arc-attract-cue {
+    display: flex;
+    align-items: center;
+    gap: 2.4cqi;
+    font-family: "Silkscreen", var(--arc-font-display);
+    font-size: 4.6cqi;
+    line-height: 1;
+    text-transform: uppercase;
+    opacity: 0.88;
+  }
+
+  .arc-attract-arrow {
+    width: 9cqi;
+    height: auto;
+  }
+
+  .arc-attract-arrow:dir(rtl) {
+    scale: -1 1;
+  }
+
+  .arc-attract-cursor {
+    width: 0.6em;
+    height: 0.9em;
+    background: currentColor;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .arc-attract-title {
+      animation:
+        arc-type 6s steps(var(--arc-letters, 8), jump-end) infinite,
+        arc-flash 6s steps(1) infinite;
+    }
+
+    .arc-attract-cursor {
+      animation: arc-blink 1.1s steps(1) infinite;
+    }
+
+    .arc-attract-arrow {
+      animation: arc-nudge 1.1s ease-in-out infinite;
+    }
+
+    /* The panel's buttons light one after another while the cabinet waits. */
+    .media-arcade:has(.arc-attract) .video-controls-bottom .media-button::before {
+      animation: arc-attract-blink 3.2s steps(1) infinite;
+      animation-delay: calc(var(--arc-blink, 0) * 320ms);
+    }
+  }
+
+  @keyframes arc-type {
+    0% { clip-path: inset(0 100% 0 0); }
+    35%, 100% { clip-path: inset(0 0 0 0); }
+  }
+
+  @keyframes arc-flash {
+    0%, 70% { opacity: 0.88; }
+    72% { opacity: 0.15; }
+    75% { opacity: 0.88; }
+    78% { opacity: 0.15; }
+    81%, 94% { opacity: 0.88; }
+    96%, 100% { opacity: 0; }
+  }
+
+  @keyframes arc-blink {
+    50% { opacity: 0; }
+  }
+
+  @keyframes arc-nudge {
+    50% { translate: 0.8cqi 0; }
+  }
+
+  @keyframes arc-attract-blink {
+    0% { opacity: 1; }
+    10%, 100% { opacity: 0; }
+  }
+
+  /* While attracting, the start button sits where the arrow points: the screen's right side. */
+  .media-arcade:has(.arc-attract) .video-controls-center {
+    display: flex; /* Scaffold hides it on narrow players; the attract screen leaves room for it */
+    left: auto;
+    inset-inline-end: 12%;
+    transform: translateY(-50%);
+  }
+
+  .media-arcade:has(.arc-attract) .video-controls-center:dir(rtl) {
+    left: 12%;
+  }
+
+  .media-arcade:has(.arc-attract) .video-controls-backdrop,
+  .media-arcade:has(.arc-attract) .media-title {
+    display: none;
+  }
+
+  /* The lit screen lights the cabinet green. */
+  .media-arcade:has(.arc-attract) > * {
+    --arc-spill: var(--arc-green);
+    --arc-spill-start: var(--arc-green);
+    --arc-spill-end: var(--arc-green);
+  }
+
+  /* ============================================================================================================= */
+  /* Boot sequence                                                                                                  */
+  /* ============================================================================================================= */
+  .arc-boot {
+    position: absolute;
+    z-index: 35;
+    pointer-events: none;
+    background: color-mix(in srgb, var(--arc-green) 20%, transparent);
+    animation: arc-boot-flash 900ms ease-out forwards;
+  }
+
+  .arc-boot-scan {
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 3px;
+    background: var(--arc-hot);
+    box-shadow: 0 0 18px 6px color-mix(in srgb, var(--arc-green) 70%, transparent);
+    animation: arc-boot-scan 700ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  }
+
+  .arc-boot-bar {
+    position: absolute;
+    left: 50%;
+    bottom: 18%;
+    width: 30%;
+    height: 6px;
+    translate: -50% 0;
+    background: linear-gradient(var(--arc-green), var(--arc-green)) left / 0% 100% no-repeat, var(--arc-black);
+    box-shadow: 0 0 0 1px var(--arc-green);
+    animation: arc-boot-bar 650ms steps(10) forwards;
+  }
+
+  @keyframes arc-boot-flash {
+    0% { opacity: 1; }
+    60% { opacity: 0.6; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes arc-boot-scan {
+    from { top: 0; }
+    to { top: 100%; }
+  }
+
+  @keyframes arc-boot-bar {
+    to { background-size: 100% 100%, auto; }
+  }
+
+  /* ============================================================================================================= */
+  /* The control panel: the deck and front-face renders behind the controls                                        */
+  /* ============================================================================================================= */
+  .media-arcade .video-controls-bottom {
+    position: absolute;
+    top: calc(100% + var(--arc-pad) + var(--arc-ledge));
+    bottom: auto;
+    inset-inline: calc(-1 * (var(--arc-pad) + var(--arc-side)));
+    height: calc(var(--arc-panel) + var(--arc-apron));
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--media-spacing) * 1.5);
+    padding: calc(var(--media-spacing) * 3.5) calc(var(--arc-side) + var(--media-spacing) * 6) 0;
+    background: none;
+    isolation: isolate;
+  }
+
+  .media-arcade .video-controls-bottom::before,
+  .media-arcade .video-controls-bottom::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-inline: 0;
+    pointer-events: none;
+  }
+
+  /* The deck, seen from slightly above, with the screen's light falling on its back half. */
+  .media-arcade .video-controls-bottom::before {
+    top: 0;
+    height: var(--arc-panel);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--arc-spill, var(--arc-ambient)) 38%, transparent), transparent 55%),
+      var(--arc-img-panel-l, none) left top / auto 100% no-repeat,
+      var(--arc-img-panel-r, none) right top / auto 100% no-repeat,
+      var(--arc-img-panel-m, none) center top / 100% 100% no-repeat,
+      linear-gradient(180deg, #24513a, #173a28 86%, #c9d0ca 87% 91%, #4b544d 92%, #0f2419 95%);
+    background-blend-mode: screen, normal, normal, normal, normal;
+  }
+
+  /* The front face with its two coin doors. */
+  .media-arcade .video-controls-bottom::after {
+    bottom: 0;
+    height: var(--arc-apron);
+    border-radius: 0 0 8px 8px;
+    background:
+      var(--arc-img-apron-l, none) left top / auto 100% no-repeat,
+      var(--arc-img-apron-r, none) right top / auto 100% no-repeat,
+      var(--arc-img-apron-m, none) center top / 100% 100% no-repeat,
+      linear-gradient(180deg, #c9d0ca 0 3px, #1a3b27 3px);
+  }
+
+  /* The panel is hardware: it stays when the screen's overlays idle away. */
+  .media-arcade .video-controls-content:not([data-visible]) .video-controls-bottom {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Rows: controls on the deck, the deck's chrome lip, then the front face. */
+  .media-arcade .arc-panel {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: 1fr calc(var(--arc-panel) * 0.12) var(--arc-apron);
+    align-items: center;
+    justify-items: center;
+    gap: 0 calc(var(--media-spacing) * 3);
+  }
+
+  .media-arcade .arc-cluster {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--media-spacing) * 3);
+  }
+
+  .media-arcade .arc-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--media-spacing) * 2);
+  }
+
+  .media-arcade .arc-transport {
+    align-items: center;
+    gap: calc(var(--media-spacing) * 3);
+  }
+
+  .media-arcade .arc-readouts {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--media-spacing) * 2);
+  }
+
+  /* The front face: small buttons in a row between the coin doors. */
+  .media-arcade .arc-small {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    align-self: center;
+    justify-content: center;
+    gap: calc(var(--media-spacing) * 2.5);
+    padding-inline: calc(var(--arc-apron) * 0.45);
+  }
+
+  /* Recessed black windows: seek strip, time readout, oscilloscope. */
+  .media-arcade :is(.video-controls-slider-row, .arc-readout, .arc-scope) {
+    background: #030604;
+    border-radius: 4px;
+    box-shadow: inset 0 2px 5px #000, 0 0 0 1px var(--arc-black), 0 1px 0 rgb(255 255 255 / 0.1);
+  }
+
+  .media-arcade .video-controls-slider-row {
+    width: auto;
+    margin-inline: calc(var(--media-spacing) * 2);
+    padding-inline: calc(var(--media-spacing) * 2.5);
+  }
+
+  /* ============================================================================================================= */
+  /* Arcade buttons: photoreal caps in chrome rings, a lit render crossfaded in for on-states                       */
+  /* ============================================================================================================= */
+  .media-arcade .video-controls-bottom .media-button {
+    --arc-size: var(--arc-btn);
+    --arc-cap: var(--arc-img-btn-green, radial-gradient(circle at 50% 45%, #63d930 0 52%, #d6dcd7 54% 64%, #6c756d 66% 70%, transparent 72%));
+    --arc-cap-lit: var(--arc-img-btn-green-lit, radial-gradient(circle at 50% 45%, #e9ff9a 0 18%, #8dff4a 40% 52%, #d6dcd7 54% 64%, #6c756d 66% 70%, transparent 72%));
+    --arc-bloom: color-mix(in srgb, var(--arc-green) 60%, transparent);
+    width: var(--arc-size);
+    height: var(--arc-size);
+    border-radius: 50%;
+    color: #0b1607;
+    background: var(--arc-cap) center / contain no-repeat;
+    filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.55));
+    transition-property: translate, filter;
+    transition-duration: var(--media-duration-fast);
+    transition-timing-function: ease-out;
+  }
+
+  /* Purple caps, as on the reference cabinets: mute and every other button on the front face. */
+  .media-arcade .video-controls-bottom :is(
+      .media-mute-button,
+      .media-captions-button,
+      .media-cast-button,
+      .media-airplay-button,
+      .media-fullscreen-button
+    ) {
+    --arc-cap: var(--arc-img-btn-purple, radial-gradient(circle at 50% 45%, #8a3df0 0 52%, #d6dcd7 54% 64%, #6c756d 66% 70%, transparent 72%));
+    --arc-cap-lit: var(--arc-img-btn-purple-lit, radial-gradient(circle at 50% 45%, #f1dcff 0 18%, #b46bff 40% 52%, #d6dcd7 54% 64%, #6c756d 66% 70%, transparent 72%));
+    --arc-bloom: rgb(176 96 255 / 0.6);
+  }
+
+  /* The lit render, faded in over the unlit one. */
+  .media-arcade .video-controls-bottom .media-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--arc-cap-lit) center / contain no-repeat;
+    opacity: 0;
+    transition: opacity var(--media-duration) ease-out;
+  }
+
+  /* Icons print on the cap (its centre sits a little above the ring's), with a slight emboss. */
+  /* Icons are printed on the cap's top face: centred where the face sits in the render (a third of the way down),
+     sized from the button, foreshortened to the camera's angle, with an engraved edge. */
+  .media-arcade .video-controls-bottom .media-button > *,
+  .media-arcade .video-controls-center-button > * {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 35%;
+    translate: -50% -50%;
+    scale: 1 0.78;
+    color: rgb(6 26 4 / 0.88);
+    filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.55)) drop-shadow(0 -1px 0 rgb(0 0 0 / 0.22));
+  }
+
+  .media-arcade .video-controls-bottom :is(
+      .media-mute-button,
+      .media-captions-button,
+      .media-cast-button,
+      .media-airplay-button,
+      .media-fullscreen-button
+    ) > * {
+    color: rgb(24 4 44 / 0.9);
+  }
+
+  .media-arcade .video-controls-bottom .media-button :is(.media-button-icon, .media-button-icon-base) {
+    width: calc(var(--arc-size) * 0.42);
+    height: calc(var(--arc-size) * 0.42);
+  }
+
+  /* The skip buttons' arrow and seconds sit together on the cap. */
+  .media-arcade .video-controls-bottom .media-seek-button-content {
+    display: grid;
+    place-items: center;
+  }
+
+  .media-arcade .video-controls-bottom .media-seek-button-content > * {
+    grid-area: 1 / 1;
+  }
+
+  .media-arcade .video-controls-bottom .media-button.arc-btn-play {
+    --arc-size: var(--arc-btn-play);
+  }
+
+  .media-arcade .video-controls-bottom .media-button.arc-btn-seek {
+    --arc-size: var(--arc-btn-seek);
+  }
+
+  @media (hover: hover) {
+    .media-arcade .video-controls-bottom .media-button:hover {
+      filter: brightness(1.08) drop-shadow(0 4px 3px rgb(0 0 0 / 0.55));
+    }
+  }
+
+  /* Pressed: the cap sinks into the panel and its shadow tightens. */
+  .media-arcade .video-controls-bottom .media-button:active {
+    translate: 0 3px;
+    filter: brightness(0.86) drop-shadow(0 1px 1px rgb(0 0 0 / 0.6));
+  }
+
+  .media-arcade :is(.media-button-icon, .media-button-icon-base) {
+    width: var(--arc-icon);
+    height: var(--arc-icon);
+  }
+
+
+  /* On-states light from inside, with a bloom. The icon changes too, so state is never shown by colour alone. */
+  .media-arcade .video-controls-bottom :is(
+      .arc-btn-play[data-started]:not([data-paused]),
+      .media-captions-button[data-active],
+      .media-pip-button[data-pip],
+      .media-fullscreen-button[data-fullscreen],
+      .media-mute-button[data-muted],
+      .media-cast-button[data-cast-state="connected"],
+      .media-airplay-button[data-airplay-state="connected"],
+      [aria-haspopup="menu"][aria-expanded="true"]
+    ) {
+    filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.55)) drop-shadow(0 0 10px var(--arc-bloom));
+  }
+
+  .media-arcade .video-controls-bottom :is(
+      .arc-btn-play[data-started]:not([data-paused]),
+      .media-captions-button[data-active],
+      .media-pip-button[data-pip],
+      .media-fullscreen-button[data-fullscreen],
+      .media-mute-button[data-muted],
+      .media-cast-button[data-cast-state="connected"],
+      .media-airplay-button[data-airplay-state="connected"],
+      [aria-haspopup="menu"][aria-expanded="true"]
+    )::before {
+    opacity: 1;
+  }
+
+  /* The start button waits, pulsing, when the film has ended. */
+  .media-arcade .video-controls-bottom .arc-btn-play[data-ended]::before {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .media-arcade .video-controls-bottom .arc-btn-play[data-ended]::before {
+      animation: arc-pulse 1.4s ease-in-out infinite;
+    }
+  }
+
+  @keyframes arc-pulse {
+    50% { opacity: 0.25; }
+  }
+
+  /* The order the buttons light in during attract mode. */
+  .media-arcade .video-controls-bottom .arc-btn-seek { --arc-blink: 2; }
+  .media-arcade .video-controls-bottom .arc-btn-seek:has(.media-seek-button-backward-icon) { --arc-blink: 0; }
+  .media-arcade .video-controls-bottom .arc-btn-play { --arc-blink: 1; }
+  .media-arcade .video-controls-bottom .media-mute-button { --arc-blink: 3; }
+  .media-arcade .video-controls-bottom .media-captions-button { --arc-blink: 4; }
+  .media-arcade .video-controls-bottom [aria-haspopup="menu"] { --arc-blink: 5; }
+  .media-arcade .video-controls-bottom :is(.media-cast-button, .media-airplay-button) { --arc-blink: 6; }
+  .media-arcade .video-controls-bottom .media-pip-button { --arc-blink: 7; }
+  .media-arcade .video-controls-bottom .media-fullscreen-button { --arc-blink: 8; }
+
+  /* Skip buttons print their seconds inside the arrow. */
+  .media-arcade .media-seek-button-label {
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding-top: 1px;
+    font-size: calc(var(--arc-size) * 0.16);
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* ============================================================================================================= */
+  /* Joysticks                                                                                                      */
+  /* ============================================================================================================= */
+  .media-arcade .arc-stick {
+    --arc-tilt: 0;
+    position: relative;
+    width: var(--arc-stick-w);
+    height: var(--arc-stick-h);
+    flex: none;
+    border-radius: calc(var(--media-spacing) * 3);
+    cursor: grab;
+    touch-action: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .media-arcade .arc-stick[data-held] {
+    cursor: grabbing;
+  }
+
+  .media-arcade .arc-stick[aria-disabled] {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  /* Chrome base ring with a black dust washer (render), seen from slightly above. */
+  .media-arcade .arc-stick-plate {
+    position: absolute;
+    left: 50%;
+    bottom: 4%;
+    width: 80%;
+    aspect-ratio: 220 / 147;
+    translate: -50% 0;
+    background: var(
+      --arc-img-stickbase,
+      radial-gradient(closest-side, #050806 0 30%, #1b221d 32% 58%, #e3e8e4 60% 72%, #6c756d 74% 80%, transparent 82%)
+    ) center / 100% 100% no-repeat;
+    filter: drop-shadow(0 3px 3px rgb(0 0 0 / 0.5));
+  }
+
+  /* Contact shadow of the lever on the washer: slides opposite the tilt. */
+  .media-arcade .arc-stick-plate::after {
+    content: "";
+    position: absolute;
+    left: 30%;
+    right: 30%;
+    top: 30%;
+    bottom: 34%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.65), transparent);
+    translate: calc(var(--arc-tilt) * -10px) 0;
+    transition: translate 260ms cubic-bezier(0.3, 1.7, 0.5, 1);
+  }
+
+  .media-arcade .arc-stick-volume .arc-stick-plate::after {
+    translate: 0 calc(var(--arc-tilt) * 4px);
+  }
+
+  /* The bat-top lever (render), pivoting in the washer. It springs back to centre when released. */
+  .media-arcade .arc-stick-lever {
+    position: absolute;
+    left: 50%;
+    bottom: calc(4% + var(--arc-stick-w) * 0.8 * 147 / 220 * 0.52);
+    width: calc(var(--arc-lever) * 0.271);
+    height: var(--arc-lever);
+    margin-inline-start: calc(var(--arc-lever) * -0.1355);
+    background: var(
+      --arc-img-lever,
+      radial-gradient(ellipse 50% 30% at 50% 22%, #c9cdca 0 96%, transparent 100%),
+      linear-gradient(90deg, #6c756d, #eef2ee 45%, #6c756d) center bottom / 22% 70% no-repeat
+    ) center bottom / 100% 100% no-repeat;
+    transform-origin: 50% 100%;
+    transition: transform 260ms cubic-bezier(0.3, 1.7, 0.5, 1);
+    filter: drop-shadow(2px 4px 3px rgb(0 0 0 / 0.45));
+  }
+
+  .media-arcade .arc-stick-seek .arc-stick-lever {
+    transform: rotate(calc(var(--arc-tilt) * 26deg));
+  }
+
+  .media-arcade .arc-stick-volume .arc-stick-lever {
+    transform: perspective(260px) rotateX(calc(var(--arc-tilt) * 32deg));
+  }
+
+  .media-arcade .arc-stick[data-held] :is(.arc-stick-lever, .arc-stick-plate) {
+    transition-duration: 40ms;
+    transition-timing-function: linear;
+  }
+
+  .media-arcade .arc-stick[data-held] .arc-stick-plate::after {
+    transition-duration: 40ms;
+  }
+
+  /* Direction marks on the plate: which way each stick goes. */
+  .media-arcade .arc-stick::before,
+  .media-arcade .arc-stick::after {
+    content: "";
+    position: absolute;
+    bottom: calc(6% + var(--arc-stick-w) * 0.78 / 12);
+    width: 0;
+    height: 0;
+    border: 5px solid transparent;
+    opacity: 0.8;
+  }
+
+  .media-arcade .arc-stick-seek::before {
+    left: 2%;
+    border-right-color: var(--arc-green);
+  }
+
+  .media-arcade .arc-stick-seek::after {
+    right: 2%;
+    border-left-color: var(--arc-green);
+  }
+
+  .media-arcade .arc-stick-volume::before {
+    top: 4%;
+    bottom: auto;
+    left: calc(50% - 5px);
+    border-bottom-color: var(--arc-green);
+  }
+
+  .media-arcade .arc-stick-volume::after {
+    bottom: -3%;
+    left: calc(50% - 5px);
+    border-top-color: var(--arc-green);
+  }
+
+  /* Volume meter: ten LEDs up the stick's side. */
+  .media-arcade .arc-meter {
+    position: absolute;
+    inset-inline-end: -2px;
+    bottom: 12%;
+    height: 70%;
+    width: 7px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 2px;
+    padding: 2px;
+    background: #030604;
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px #000, 0 0 0 1px var(--arc-black);
+  }
+
+  .media-arcade .arc-meter i {
+    flex: 1;
+    background: var(--arc-green-deep);
+  }
+
+  .media-arcade .arc-meter i[data-lit] {
+    background: var(--arc-green);
+    box-shadow: 0 0 4px color-mix(in srgb, var(--arc-green) 80%, transparent);
+  }
+
+  .media-arcade .arc-meter[data-muted] i {
+    background: color-mix(in srgb, var(--arc-red) 25%, #030604);
+  }
+
+  /* ============================================================================================================= */
+  /* 7-segment time readout and oscilloscope                                                                        */
+  /* ============================================================================================================= */
+  .media-arcade .arc-readout {
+    height: calc(var(--media-spacing) * 8);
+    padding-inline: calc(var(--media-spacing) * 2.5);
+    gap: 0;
+    color: var(--arc-green);
+    font-family: var(--arc-font-seg);
+    font-size: calc(var(--media-spacing) * 3.75);
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .media-arcade .arc-seg {
+    position: relative;
+    isolation: isolate;
+    color: var(--arc-green);
+    text-shadow: var(--arc-glow-text);
+    opacity: 1;
+  }
+
+  .media-arcade .arc-seg::before {
+    content: attr(data-ghost);
+    position: absolute;
+    inset-inline-start: 0;
+    z-index: -1;
+    color: var(--arc-green);
+    opacity: 0.1;
+    text-shadow: none;
+  }
+
+  .media-arcade .media-time-duration-value.arc-seg {
+    color: var(--arc-green-dim);
+    text-shadow: none;
+  }
+
+  .media-arcade .media-time-duration-value.arc-seg::before {
+    opacity: 0.08;
+  }
+
+  .media-arcade .media-time-separator {
+    opacity: 1;
+    font-size: 0;
+    align-items: center;
+    padding-inline: calc(var(--media-spacing) * 1.75);
+  }
+
+  @container media-root (width >= 20rem) {
+    .media-arcade .media-time-separator {
+      display: inline-flex;
+    }
+  }
+
+  .media-arcade .media-time-separator::before {
+    content: "";
+    width: 2px;
+    height: calc(var(--media-spacing) * 4);
+    background: var(--arc-green-dim);
+    rotate: 18deg;
+  }
+
+  .media-arcade .media-time-toggle.arc-seg {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    border-radius: 2px;
+  }
+
+  .media-arcade .arc-scope {
+    width: calc(var(--media-spacing) * 26);
+    height: calc(var(--media-spacing) * 8);
+    overflow: hidden;
+  }
+
+  .media-arcade .arc-scope-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ============================================================================================================= */
+  /* Seek strip: chapter LEDs                                                                                       */
+  /* ============================================================================================================= */
+  .media-arcade .media-time-slider {
+    height: calc(var(--media-spacing) * 6);
+  }
+
+  @media (pointer: coarse) {
+    .media-arcade .media-time-slider {
+      height: calc(var(--media-spacing) * 8);
+    }
+  }
+
+  .media-arcade .media-time-slider-track {
+    height: 8px;
+  }
+
+  .media-arcade .media-time-slider-track::before {
+    background-color: transparent;
+    background-image: repeating-linear-gradient(90deg, var(--arc-green-deep) 0 5px, transparent 5px 7px);
+  }
+
+  .media-arcade .media-time-slider-buffer {
+    background-color: transparent;
+    background-image: repeating-linear-gradient(90deg, color-mix(in oklab, var(--arc-green) 30%, #0b130c) 0 5px, transparent 5px 7px);
+  }
+
+  .media-arcade .media-time-slider-fill {
+    background-color: transparent;
+    background-image: repeating-linear-gradient(90deg, var(--arc-green) 0 5px, transparent 5px 7px);
+    filter: drop-shadow(0 0 4px color-mix(in srgb, var(--arc-green) 65%, transparent));
+  }
+
+  .media-arcade .media-time-slider-thumb {
+    width: 4px;
+    height: 20px;
+    border: 0;
+    border-radius: 1px;
+    background: var(--arc-hot);
+    box-shadow: 0 0 0 1px var(--arc-black), 0 0 10px 1px color-mix(in srgb, var(--arc-green) 85%, transparent);
+  }
+
+  .media-arcade .media-time-slider-chapter {
+    --media-chapter-inset-start: 1.25;
+    --media-chapter-inset-end: 1.25;
+  }
+
+  .media-arcade .media-time-slider-chapter:first-of-type { --media-chapter-inset-start: 0; }
+  .media-arcade .media-time-slider-chapter:last-of-type { --media-chapter-inset-end: 0; }
+
+  .media-arcade .media-time-slider-preview {
+    bottom: calc(100% + var(--media-spacing) * 3);
+  }
+
+  .media-arcade .media-time-slider-preview-label {
+    flex-direction: column-reverse;
+    gap: 3px;
+  }
+
+  .media-arcade .media-time-slider-preview-meta {
+    width: auto;
+    padding: calc(var(--media-spacing) * 0.75) calc(var(--media-spacing) * 2.5);
+    background: var(--arc-black);
+    color: var(--arc-green);
+    box-shadow: 0 0 0 1px var(--arc-green), var(--arc-glow);
+    font-family: var(--arc-font-seg);
+    font-size: calc(var(--media-spacing) * 3.25);
+    font-weight: 700;
+    text-shadow: var(--arc-glow-text);
+  }
+
+  .media-arcade .media-time-slider-chapter-title {
+    opacity: 1;
+    color: var(--arc-text);
+    font-family: var(--arc-font-display);
+    font-size: calc(var(--media-spacing) * 3.5);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-shadow: none;
+    max-width: calc(var(--media-spacing) * 44);
+  }
+
+  .media-arcade .media-slider-thumbnail {
+    box-shadow: 0 0 0 1px var(--arc-green), 0 0 0 3px var(--arc-black), var(--arc-glow);
+  }
+
+  /* ============================================================================================================= */
+  /* Focus: one ring, everywhere                                                                                    */
+  /* ============================================================================================================= */
+  .media-arcade :is(
+      .media-button,
+      .arc-stick,
+      .media-time-slider-thumb,
+      .media-volume-slider-thumb,
+      .media-time-toggle,
+      .media-menu-item,
+      .media-menu-radio-item,
+      .media-menu-back-item,
+      .media-dialog-close
+    ):focus-visible {
+    outline: 3px solid var(--arc-green);
+    outline-offset: 3px;
+  }
+
+  .media-arcade :is(.media-menu-item, .media-menu-radio-item, .media-menu-back-item):focus-visible {
+    outline-offset: -3px;
+  }
+
+  .media-skin.media-arcade:focus-visible {
+    outline: 3px solid var(--arc-green);
+    outline-offset: -4px;
+  }
+
+  /* ============================================================================================================= */
+  /* Screen overlays                                                                                                */
+  /* ============================================================================================================= */
+  /* The big start button on the screen: the same green arcade button, larger, lit while waiting to start. */
+  .media-arcade .video-controls-center-button {
+    --media-background: transparent;
+    --media-button-highlight: transparent;
+    scale: 1.7; /* Scaffold fixes its size with !important in an earlier layer; scale it up instead */
+    border-radius: 50%;
+    color: #0b1607;
+    background: var(--arc-img-btn-green, radial-gradient(circle at 50% 45%, #63d930 0 52%, #d6dcd7 54% 64%, #6c756d 66% 70%, transparent 72%)) center / contain no-repeat !important;
+    filter: drop-shadow(0 6px 6px rgb(0 0 0 / 0.55));
+  }
+
+  .media-arcade .video-controls-center-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--arc-img-btn-green-lit, radial-gradient(circle at 50% 45%, #e9ff9a 0 18%, #8dff4a 40% 52%, #d6dcd7 54% 64%, #6c756d 66% 70%, transparent 72%)) center / contain no-repeat;
+    opacity: 0;
+    transition: opacity var(--media-duration) ease-out;
+  }
+
+  .media-arcade:has(.arc-attract) .video-controls-center-button::before,
+  .media-arcade .video-controls-center-button[data-started]:not([data-paused])::before {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .media-arcade:has(.arc-attract) .video-controls-center-button::before {
+      animation: arc-pulse 1.4s ease-in-out infinite;
+    }
+  }
+
+
+  .media-arcade .video-controls-center-button:active {
+    translate: 0 3px;
+    filter: brightness(0.86) drop-shadow(0 2px 2px rgb(0 0 0 / 0.6));
+  }
+
+  .media-arcade .media-title {
+    flex: none;
+    max-width: 70%;
+    padding: calc(var(--media-spacing) * 1) calc(var(--media-spacing) * 3);
+    background: rgb(0 0 0 / 0.72);
+    border-inline-start: 4px solid var(--arc-green);
+    color: var(--arc-text);
+    font-family: var(--arc-font-display);
+    font-size: calc(var(--media-spacing) * 4.5);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .media-arcade .video-controls-top {
+    justify-content: flex-start;
+  }
+
+  .media-arcade .media-indicator {
+    padding: calc(var(--media-spacing) * 1.5) calc(var(--media-spacing) * 3);
+    background: rgb(4 8 5 / 0.9);
+    color: var(--arc-green);
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px var(--arc-green), var(--arc-glow);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .media-arcade :is(.media-status-indicator-icon, .media-volume-indicator-icon, .media-seek-indicator-icon) {
+    width: var(--arc-icon);
+    height: var(--arc-icon);
+  }
+
+  .media-arcade .media-buffering-indicator-spinner-icon {
+    width: calc(var(--media-spacing) * 10);
+    height: calc(var(--media-spacing) * 10);
+    color: var(--arc-green);
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--arc-green) 80%, transparent));
+  }
+
+  /* ============================================================================================================= */
+  /* Tooltips, menus, dialog, captions                                                                              */
+  /* ============================================================================================================= */
+  .media-arcade .media-tooltip-popup {
+    padding: calc(var(--media-spacing) * 1) calc(var(--media-spacing) * 2.5);
+    background: var(--arc-black);
+    color: var(--arc-text);
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px var(--arc-green-dim), 0 6px 16px rgb(0 0 0 / 0.5);
+    font-size: calc(var(--media-spacing) * 3);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .media-arcade .media-tooltip-shortcut {
+    background: var(--arc-green-deep);
+    color: var(--arc-green);
+    border-radius: 2px;
+    padding-inline: 0.4em;
+  }
+
+  .media-arcade .media-menu-popup {
+    background: var(--arc-paint-deep);
+    color: var(--arc-text);
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px var(--arc-green-dim), 0 0 0 3px var(--arc-black), 0 12px 28px rgb(0 0 0 / 0.6);
+    font-size: calc(var(--media-spacing) * 3.5);
+  }
+
+  .media-arcade :is(.media-menu-item, .media-menu-radio-item, .media-menu-back-item) {
+    min-height: 40px;
+    border-radius: 4px;
+  }
+
+  .media-arcade :is(.media-menu-item, .media-menu-radio-item, .media-menu-back-item)[data-highlighted] {
+    background-color: var(--arc-green-wash);
+    box-shadow: inset 3px 0 0 var(--arc-green);
+  }
+
+  .media-arcade .media-menu-back-item {
+    color: var(--arc-green);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .media-arcade :is(.media-menu-trigger-icon, .media-menu-back-chevron, .media-menu-forward-chevron) {
+    color: var(--arc-green);
+    opacity: 1;
+  }
+
+  .media-arcade :is(.media-menu-radio-icon, .media-menu-trigger-icon) {
+    width: var(--arc-icon);
+    height: var(--arc-icon);
+    opacity: 1;
+  }
+
+  .media-arcade .arc-led {
+    fill: currentColor;
+  }
+
+  .media-arcade .media-menu .arc-led {
+    fill: var(--arc-green);
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--arc-green) 80%, transparent));
+  }
+
+  .media-arcade .media-menu-hint {
+    color: var(--arc-text-dim);
+    opacity: 1;
+  }
+
+  .media-arcade .media-dialog-popup {
+    background: var(--arc-paint-deep);
+    color: var(--arc-text);
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px var(--arc-red), 0 0 0 3px var(--arc-black), 0 0 16px rgb(255 77 94 / 0.4);
+  }
+
+  .media-arcade .media-dialog-title {
+    color: var(--arc-red);
+    font-family: var(--arc-font-display);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .media-arcade .media-dialog-close {
+    border-color: var(--arc-green) !important;
+    color: var(--arc-green);
+  }
+
+  .media-arcade {
+    --media-caption-controls-y: 0px;
+  }
+
+  .media-arcade video::cue {
+    font-family: var(--arc-font);
+    color: #f2ffee;
+    background-color: rgb(4 8 5 / 0.82);
+  }
+
+  /* ============================================================================================================= */
+  /* Screen light: the film's colours fall on the cabinet (set by <Ambient />, registered above so they glide).     */
+  /* ============================================================================================================= */
+  .media-skin.media-arcade {
+    transition:
+      --arc-ambient 1.2s linear,
+      --arc-ambient-start 1.2s linear,
+      --arc-ambient-end 1.2s linear;
+  }
+
+  /* On the side posts, the underside of the hood and the bottom of the bezel surround. */
+  .arc-body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    background:
+      radial-gradient(22% 45% at 0% 45%, color-mix(in srgb, var(--arc-spill-start, var(--arc-ambient-start)) 60%, transparent), transparent 75%),
+      radial-gradient(22% 45% at 100% 45%, color-mix(in srgb, var(--arc-spill-end, var(--arc-ambient-end)) 60%, transparent), transparent 75%),
+      radial-gradient(60% 12% at 50% calc(var(--arc-top) + 2%), color-mix(in srgb, var(--arc-spill, var(--arc-ambient)) 40%, transparent), transparent 80%);
+  }
+
+  /* ============================================================================================================= */
+  /* CRT power-off when the film ends: the picture closes to a line, the line to a dot, then dark.                  */
+  /* ============================================================================================================= */
+  .arc-crt {
+    position: absolute;
+    z-index: 25; /* over the picture, under the controls */
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--arc-green) 10%, transparent), transparent 12%);
+  }
+
+  .arc-crt::before,
+  .arc-crt::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    height: 50%;
+    background: #000;
+  }
+
+  .arc-crt::before { top: 0; transform-origin: top; }
+  .arc-crt::after { bottom: 0; transform-origin: bottom; }
+
+  .arc-crt-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(50% - 1.5px);
+    height: 3px;
+    background: var(--arc-hot);
+    box-shadow: 0 0 12px 3px var(--arc-green);
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .arc-crt::before,
+    .arc-crt::after {
+      animation: arc-crt-close 380ms cubic-bezier(0.6, 0, 0.9, 0.6) both;
+    }
+
+    .arc-crt-line {
+      animation: arc-crt-line 950ms ease-in both;
+    }
+  }
+
+  @keyframes arc-crt-close {
+    from { scale: 1 0; }
+    to { scale: 1 1; }
+  }
+
+  @keyframes arc-crt-line {
+    0%, 32% { opacity: 0; scale: 1 1; }
+    40% { opacity: 1; scale: 1 1; }
+    78% { opacity: 1; scale: 0.008 1; }
+    100% { opacity: 0; scale: 0.008 1; }
+  }
+
+  /* ============================================================================================================= */
+  /* Signal states: buffering static, "signal lost" error, standby when paused.                                     */
+  /* ============================================================================================================= */
+  .media-arcade .media-buffering-indicator {
+    background-color: color-mix(in srgb, var(--arc-green-deep) 55%, transparent);
+    background-image: var(--arc-static);
+    background-size: 180px 180px;
+  }
+
+  .media-arcade .media-dialog-backdrop {
+    background-color: #140508;
+    background-image:
+      linear-gradient(90deg, rgb(255 60 80 / 0.08), transparent 30%, transparent 70%, rgb(60 255 120 / 0.06)),
+      var(--arc-static);
+    background-size: auto, 180px 180px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .media-arcade .media-buffering-indicator,
+    .media-arcade .media-dialog-backdrop[data-open] {
+      animation: arc-static 0.45s steps(5) infinite;
+    }
+  }
+
+  @keyframes arc-static {
+    to { background-position: 0 0, 180px 90px; }
+  }
+
+  .media-arcade:has(.arc-btn-play[data-started][data-paused]:not([data-ended])) .video-controls-content::before {
+    background-image:
+      repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.1) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at center, transparent 44%, rgb(0 0 0 / 0.55));
+  }
+
+  /* ============================================================================================================= */
+  /* Fullscreen: the cabinet steps away and the panel becomes a HUD that hides with the controls.                   */
+  /* ============================================================================================================= */
+  .media-arcade:fullscreen > * {
+    --arc-top: 0px;
+    --arc-side: 0px;
+    --arc-pad: 0px;
+    --arc-ledge: 0px;
+    --arc-panel: 0px;
+    --arc-apron: 0px;
+    --arc-radius: 0px;
+    --arc-stick-w: calc(var(--media-spacing) * 18);
+    --arc-stick-h: calc(var(--media-spacing) * 18);
+    --arc-lever: calc(var(--media-spacing) * 14);
+  }
+
+  .media-arcade:fullscreen :is(.arc-frame, .arc-doors, .arc-glass, .arc-sparks) {
+    display: none;
+  }
+
+  .media-arcade:fullscreen .video-controls-bottom {
+    top: auto;
+    bottom: calc(var(--media-spacing) * 4);
+    inset-inline: max(calc(var(--media-spacing) * 4), calc(50% - 44rem));
+    height: auto;
+    padding: calc(var(--media-spacing) * 3) calc(var(--media-spacing) * 4);
+    border-radius: 14px;
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.06), transparent 40%),
+      var(--arc-img-material, none) 0 0 / 256px 256px,
+      color-mix(in srgb, #173a28 88%, transparent);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 0 2px #c9d0ca, 0 0 0 3px #3a413b, 0 12px 30px rgb(0 0 0 / 0.5);
+    transition:
+      opacity var(--media-duration-controls) ease-out,
+      translate var(--media-duration-controls) ease-out;
+  }
+
+  .media-arcade:fullscreen .video-controls-bottom::before,
+  .media-arcade:fullscreen .video-controls-bottom::after {
+    display: none;
+  }
+
+  .media-arcade:fullscreen .arc-panel {
+    grid-template-columns: auto 1fr auto auto;
+    grid-template-rows: auto;
+  }
+
+  .media-arcade:fullscreen .arc-small {
+    grid-column: auto;
+    grid-row: auto;
+    padding-inline: 0;
+  }
+
+  .media-arcade:fullscreen .video-controls-content:not([data-visible]) .video-controls-bottom {
+    opacity: 0;
+    translate: 0 14px;
+    pointer-events: none;
+  }
+
+  /* ============================================================================================================= */
+  /* Responsive (container)                                                                                         */
+  /* ============================================================================================================= */
+  @container media-root (width < 56rem) {
+    .media-arcade .arc-scope { display: none; }
+  }
+
+  @container media-root (width < 44rem) {
+    .media-arcade .video-controls-bottom {
+      padding-inline: calc(var(--arc-side) + var(--media-spacing) * 3);
+    }
+
+    .media-arcade .arc-panel {
+      gap: 0 calc(var(--media-spacing) * 1.5);
+    }
+
+    .media-arcade .arc-transport {
+      gap: calc(var(--media-spacing) * 2);
+    }
+
+    .media-arcade .arc-small {
+      gap: calc(var(--media-spacing) * 1.5);
+    }
+
+    .media-arcade .arc-readout {
+      height: calc(var(--media-spacing) * 7);
+      font-size: calc(var(--media-spacing) * 3.25);
+    }
+
+    .media-arcade .video-controls-center-button {
+      scale: 1.3;
+    }
+  }
+
+  /* Phones: sticks on their own row, transport and readout below them, small buttons along the front. */
+  @container media-root (width < 30rem) {
+    .media-arcade .arc-panel {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto calc(var(--arc-panel) * 0.08) var(--arc-apron);
+      gap: calc(var(--media-spacing) * 1) calc(var(--media-spacing) * 2);
+    }
+
+    .media-arcade .arc-cluster-seek { grid-area: 1 / 1; }
+    .media-arcade .arc-cluster-volume { grid-area: 1 / 2; }
+    .media-arcade .arc-center { grid-area: 2 / 1 / 3 / 3; }
+    .media-arcade .arc-small { grid-area: 4 / 1 / 5 / 3; }
+
+    .media-arcade .video-controls-center-button {
+      scale: 1.05;
+    }
+  }
+
+  @container media-root (width < 26rem) {
+    .media-arcade .arc-small {
+      padding-inline: calc(var(--arc-apron) * 0.3);
+      gap: calc(var(--media-spacing) * 1);
+    }
+  }
+
+  /* ============================================================================================================= */
+  /* Preferences                                                                                                    */
+  /* ============================================================================================================= */
+  @media (prefers-reduced-motion: reduce) {
+    .arc-boot { display: none; }
+    .media-skin.media-arcade { transition: none; }
+    .arc-speaker { scale: none; }
+
+    .media-arcade .arc-stick-lever,
+    .media-arcade .arc-stick-plate::after {
+      transition: none;
+    }
+
+    .media-arcade .video-controls-bottom .media-button:active,
+    .media-arcade .video-controls-center-button:active {
+      translate: none;
+    }
+
+    .media-arcade:fullscreen .video-controls-content:not([data-visible]) .video-controls-bottom {
+      translate: none;
+    }
+  }
+
+  @media (prefers-contrast: more) {
+    .media-skin.media-arcade {
+      --arc-text-dim: var(--arc-text);
+      --arc-green-dim: var(--arc-green);
+    }
+
+    .media-arcade .video-controls-content::before,
+    .arc-attract::after,
+    .arc-glass {
+      display: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .media-arcade .video-controls-content::before,
+    .arc-frame,
+    .arc-doors,
+    .arc-glass,
+    .arc-sparks,
+    .arc-crt-line,
+    .arc-attract {
+      display: none;
+    }
+
+    .media-arcade .video-controls-bottom::before,
+    .media-arcade .video-controls-bottom::after,
+    .media-arcade .video-controls-bottom .media-button::before,
+    .media-arcade .video-controls-center-button::before {
+      display: none;
+    }
+
+    .media-arcade .video-controls-bottom .media-button,
+    .media-arcade .video-controls-center-button {
+      forced-color-adjust: none;
+      background: ButtonFace !important;
+      color: ButtonText;
+      border: 1px solid ButtonText;
+      filter: none;
+    }
+
+    .media-arcade .video-controls-bottom .media-button > *,
+    .media-arcade .video-controls-center-button > * {
+      top: 50%;
+      scale: none;
+      filter: none;
+      color: ButtonText;
+    }
+
+    .media-arcade .arc-stick-plate {
+      forced-color-adjust: none;
+      background: none;
+      border: 1px solid CanvasText;
+      border-radius: 50%;
+    }
+
+    .media-arcade .arc-stick-lever {
+      forced-color-adjust: none;
+      background: ButtonText;
+      width: 4px;
+      margin-inline-start: -2px;
+    }
+
+    .media-arcade .arc-meter i[data-lit],
+    .media-arcade .media-time-slider-fill {
+      forced-color-adjust: none;
+      background: Highlight;
+    }
+  }
+}

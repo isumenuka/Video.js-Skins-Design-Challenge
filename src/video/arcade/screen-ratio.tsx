@@ -6,9 +6,9 @@ const MIN_RATIO = 4 / 3;
 const MAX_RATIO = 2.4;
 
 /**
- * Shapes the console's screen to the film: once the media reports its frame size, sets `--con-screen-ratio` on the
+ * Shapes the cabinet's screen to the film: once the media reports its frame size, sets `--arc-screen-ratio` on the
  * player, so a widescreen film fills the monitor instead of sitting between black bars. Hosts can pass the ratio up
- * front (style `--con-screen-ratio`) to avoid a jump before metadata loads.
+ * front (style `--arc-screen-ratio`) to avoid a jump before metadata loads.
  */
 export function ScreenRatio() {
   const anchor = useRef<HTMLSpanElement>(null);
@@ -21,7 +21,7 @@ export function ScreenRatio() {
     const apply = () => {
       if (!video.videoWidth || !video.videoHeight) return;
       const ratio = Math.min(MAX_RATIO, Math.max(MIN_RATIO, video.videoWidth / video.videoHeight));
-      root.style.setProperty('--con-screen-ratio', ratio.toFixed(4));
+      root.style.setProperty('--arc-screen-ratio', ratio.toFixed(4));
     };
 
     apply();

@@ -1,11 +1,11 @@
 /** @jsxImportSource react */
 
 /**
- * Console icon set — drawn for this skin.
+ * Arcade icon set — drawn for this skin.
  *
- * One grid: 20×20 viewBox, rendered at 20px (`--con-icon`).
+ * One grid: 20×20 viewBox, rendered at 20px (`--arc-icon`).
  * One pen: 2px stroke, square caps, mitred joins, chamfered corners — stencilled hardware labels.
- * The only filled shape is the LED (`.con-led`), which the skin lights green.
+ * The only filled shape is the LED (`.arc-led`), which the skin lights green.
  *
  * Exports use the names of `@videojs/react/icons/scaffold`, so the skin's components only swap the import path.
  */
@@ -39,7 +39,7 @@ function createIcon(name: string, children: ReactNode) {
 }
 
 function Led({ x, y, s = 3 }: { x: number; y: number; s?: number }) {
-  return <rect className="con-led" x={x} y={y} width={s} height={s} fill="currentColor" stroke="none" />;
+  return <rect className="arc-led" x={x} y={y} width={s} height={s} fill="currentColor" stroke="none" />;
 }
 
 const SPEAKER = 'M3 7.5h3l4-3.5v12l-4-3.5H3z';
@@ -193,7 +193,7 @@ export const ChevronIcon = createIcon('ChevronIcon', <path d="m7.5 5 5 5-5 5" />
 export const SpinnerIcon = createIcon(
   'SpinnerIcon',
   <>
-    <style>{'@keyframes con-spin{to{transform:rotate(360deg)}}'}</style>
+    <style>{'@keyframes arc-spin{to{transform:rotate(360deg)}}'}</style>
     <circle
       cx="10"
       cy="10"
@@ -203,7 +203,7 @@ export const SpinnerIcon = createIcon(
       style={{
         transformBox: 'view-box',
         transformOrigin: 'center',
-        animation: 'var(--media-spinner-animation, con-spin 1.2s steps(8) infinite)',
+        animation: 'var(--media-spinner-animation, arc-spin 1.2s steps(8) infinite)',
       }}
     />
   </>

@@ -5,7 +5,8 @@
 import './fonts.css';
 import '../styles/video/scaffold.css';
 import './skin.css';
-import './console.css';
+import './arcade/assets.css';
+import './arcade.css';
 import { Container as ContainerPrimitive, Poster as PosterPrimitive, Slider as SliderPrimitive } from '@videojs/react';
 import type { ReactNode } from 'react';
 
@@ -13,9 +14,10 @@ import { cn } from '@/lib/resolve-class-name';
 
 import { VideoGestures } from './behaviors/gestures';
 import { VideoHotkeys } from './behaviors/hotkeys';
-import { Ambient } from './console/ambient';
-import { ConsoleBoot, ConsoleCrt, ConsoleFrame } from './console/frame';
-import { ScreenRatio } from './console/screen-ratio';
+import { Ambient } from './arcade/ambient';
+import { ArcadeAttract, ArcadeBoot, ArcadeCrt, ArcadeGlass, CabinetDoor, CabinetFrame } from './arcade/cabinet';
+import { MarqueeSparks } from './arcade/marquee';
+import { ScreenRatio } from './arcade/screen-ratio';
 import { VideoControls } from './controls';
 import { ErrorDialog } from './shared/error-dialog';
 import { Indicators } from './shared/indicators';
@@ -32,18 +34,22 @@ export interface VideoSkinProps extends Omit<ContainerPrimitive.Props, 'children
 export function VideoSkin({ children, className, renderPoster, renderThumbnail, ...props }: VideoSkinProps = {}) {
   return (
     <ContainerPrimitive
-      className={cn('media-skin', 'media-console', 'media-container', 'media-video', className)}
+      className={cn('media-skin', 'media-arcade', 'media-container', 'media-video', className)}
       data-theme="scaffold"
       data-preset="video"
       {...props}
     >
       {children}
-      <ConsoleFrame />
+      <CabinetFrame />
       <Poster renderImage={renderPoster} />
+      <ArcadeAttract />
       <ErrorDialog />
-      <ConsoleCrt />
+      <ArcadeCrt />
       <VideoControls renderThumbnail={renderThumbnail} />
-      <ConsoleBoot />
+      <ArcadeBoot />
+      <ArcadeGlass />
+      <CabinetDoor />
+      <MarqueeSparks />
       <ScreenRatio />
       <Ambient />
 
