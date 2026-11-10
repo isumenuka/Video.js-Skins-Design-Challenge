@@ -84,7 +84,9 @@ export function Oscilloscope() {
     }
     const root = canvas.closest('.media-skin');
     const video = root?.querySelector('video');
-    const speakers = root?.querySelector<HTMLElement>('.arc-top');
+    // The level goes on the hood (speakers, neon sign) and the panel (lit buttons), not the root, which would restyle
+    // the whole player every frame.
+    const lit = [root?.querySelector<HTMLElement>('.arc-top'), root?.querySelector<HTMLElement>('.video-controls-bottom')];
     let frame = 0;
     let timer = 0;
     let stopped = false;
@@ -93,7 +95,7 @@ export function Oscilloscope() {
     const tick = () => {
       if (stopped) return;
       const level = draw(canvas, tapRef.current);
-      speakers?.style.setProperty('--arc-level', level.toFixed(2));
+      lit.forEach((el) => el?.style.setProperty('--arc-level', level.toFixed(2)));
       if (reduced) timer = window.setTimeout(tick, 250);
       else frame = requestAnimationFrame(tick);
     };
@@ -109,7 +111,7 @@ export function Oscilloscope() {
       stopped = true;
       cancelAnimationFrame(frame);
       clearTimeout(timer);
-      speakers?.style.setProperty('--arc-level', '0');
+      lit.forEach((el) => el?.style.setProperty('--arc-level', '0'));
     };
   }, [paused]);
 

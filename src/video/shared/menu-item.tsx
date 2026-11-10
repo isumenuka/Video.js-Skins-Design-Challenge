@@ -13,3 +13,14 @@ export function RadioItem({ children, ...props }: MenuPrimitive.RadioItemProps) 
     </MenuPrimitive.RadioItem>
   );
 }
+
+export function CheckboxItem({ children, ...props }: MenuPrimitive.CheckboxItemProps) {
+  return (
+    <MenuPrimitive.CheckboxItem className={'media-menu-radio-item media-menu-checkbox-item'} {...props}>
+      {children}
+      <MenuPrimitive.ItemIndicator forceMount className={'media-menu-indicator'}>
+        <CheckIconPrimitive className={'media-menu-radio-icon'} />
+      </MenuPrimitive.ItemIndicator>
+    </MenuPrimitive.CheckboxItem>
+  );
+}

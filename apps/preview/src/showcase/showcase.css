@@ -72,7 +72,7 @@ html.sc-tight body {
   padding-block: clamp(8px, 2.2vh, 24px) clamp(8px, 1.6vh, 16px);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) auto auto;
+  grid-template-rows: minmax(0, 1fr) auto auto; /* player, the drawer, the credits */
   gap: clamp(8px, 1.8vh, 18px);
 }
 
@@ -223,4 +223,131 @@ kbd.sc-stick {
 
 .sc-footer p {
   margin: 0;
+}
+
+/* Cartridge slot: four game cartridges, real radio buttons (arrow keys move between them). */
+.sc-carts {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The drawer's button already says "Cartridges"; the legend stays for screen readers only. */
+.sc-carts legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.sc-carts label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  min-height: 30px;
+  padding: 0 10px 4px;
+  border-radius: 4px 4px 2px 2px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--sc-cart) 85%, white) 0 5px, transparent 5px),
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.18) 0 2px, transparent 2px 5px) bottom / 100% 5px no-repeat,
+    color-mix(in srgb, var(--sc-cart) 35%, #111);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.5), 0 2px 0 #000;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  translate: 0 0;
+  transition: translate 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+.sc-carts label:has(input:checked) {
+  translate: 0 3px;
+  box-shadow: inset 0 0 0 2px var(--sc-cart), 0 0 12px var(--sc-cart);
+}
+
+.sc-carts input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.sc-carts label:has(input:focus-visible) {
+  outline: 2px solid var(--sc-green);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-carts label { transition: none; }
+}
+
+/* The room's glow follows the cartridge. */
+[data-cartridge="red"] .sc-bg img { filter: saturate(0.85) brightness(0.62) contrast(1.05) blur(1.5px) hue-rotate(-150deg); }
+[data-cartridge="blue"] .sc-bg img { filter: saturate(0.85) brightness(0.62) contrast(1.05) blur(1.5px) hue-rotate(70deg); }
+[data-cartridge="gold"] .sc-bg img { filter: saturate(0.85) brightness(0.62) contrast(1.05) blur(1.5px) hue-rotate(-105deg); }
+[data-cartridge="red"] { --sc-green: #ff4d5e; }
+[data-cartridge="blue"] { --sc-green: #3fc8ff; }
+[data-cartridge="gold"] { --sc-green: #ffc93a; }
+
+/* The controls drawer: closed by default so the player gets the room. Opening it shrinks the player to fit (the page
+   never scrolls) — the stage re-fits whenever its cell changes size. */
+.sc-drawer {
+  justify-self: center;
+  max-width: 100%;
+}
+
+.sc-drawer summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: max-content;
+  min-height: 32px;
+  margin-inline: auto;
+  padding: 2px 14px;
+  border: 1px solid var(--sc-edge);
+  border-radius: 999px;
+  background: rgb(10 18 12 / 0.75);
+  color: var(--sc-green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+}
+
+.sc-drawer summary::-webkit-details-marker {
+  display: none;
+}
+
+.sc-drawer summary:focus-visible {
+  outline: 2px solid var(--sc-green);
+  outline-offset: 3px;
+}
+
+.sc-drawer-chevron {
+  transition: rotate 0.2s ease-out;
+}
+
+.sc-drawer[open] .sc-drawer-chevron {
+  rotate: 180deg;
+}
+
+.sc-drawer[open] .sc-keys-bar {
+  margin-top: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sc-drawer-chevron { transition: none; }
 }

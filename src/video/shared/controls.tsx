@@ -5,9 +5,12 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/resolve-class-name';
 
+import { HowToPlay } from '../arcade/how-to-play';
 import { SeekStick, VolumeStick } from '../arcade/joystick';
+import { LevelSelect } from '../arcade/levels';
 import { Oscilloscope } from '../arcade/oscilloscope';
 import { SegmentTime } from '../arcade/segment-time';
+import { TurboButton } from '../arcade/turbo';
 import { LiveButton } from './live-button';
 import { MuteButton } from './mute-button';
 import { AudioPlayButton, PlayButton } from './play-button';
@@ -73,10 +76,13 @@ export function ControlsRow({
         </ButtonTooltip>
       </div>
       <Controls.Group className={cn('video-controls-group', 'arc-small')}>
+        {!live && <LevelSelect />}
+        {!live && <TurboButton />}
         {captions}
         {rate}
         {menu}
         {screen}
+        <HowToPlay />
       </Controls.Group>
     </Controls.Group>
   );

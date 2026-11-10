@@ -393,9 +393,6 @@
     --arc-neon-tube: #f4f6f4;
     --arc-neon-core: #ffffff;
     --arc-neon-glow: rgb(235 240 255);
-    filter:
-      drop-shadow(0 0 2px var(--arc-neon-glow))
-      drop-shadow(0 0 8px color-mix(in srgb, var(--arc-neon-glow) 70%, transparent));
   }
 
   .arc-neon-vjs {
@@ -565,7 +562,7 @@
   }
 
   /* ============================================================================================================= */
-  /* Attract mode (before the first play): the poster, dimmed, with a blinking "insert coin" style prompt         */
+  /* Attract mode (before the first play): the poster, dimmed, with a blinking pixel "Play" prompt                  */
   /* ============================================================================================================= */
   .arc-attract {
     position: absolute;
@@ -595,13 +592,6 @@
     text-transform: uppercase;
     color: var(--arc-green);
     text-shadow: 0 0 6px color-mix(in srgb, var(--arc-green) 80%, transparent), 0.3cqi 0.3cqi 0 rgb(0 0 0 / 0.6);
-  }
-
-  .arc-attract-coin {
-    width: 1em;
-    height: 1em;
-    color: #ffc93a;
-    filter: drop-shadow(0 0 4px rgb(255 190 40 / 0.7));
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -1875,8 +1865,12 @@
 
   @container media-root (width < 26rem) {
     .media-arcade .arc-small {
-      padding-inline: calc(var(--arc-apron) * 0.3);
+      padding-inline: calc(var(--media-spacing) * 2);
       gap: calc(var(--media-spacing) * 1);
+    }
+
+    .media-arcade > * {
+      --arc-btn: 44px;
     }
   }
 
@@ -1969,5 +1963,503 @@
       forced-color-adjust: none;
       background: Highlight;
     }
+  }
+
+  /* ============================================================================================================= */
+  /* Arcade features: coin, level select, how to play, 8-bit secret, scores, curved CRT, captions, cartridges       */
+  /* ============================================================================================================= */
+  .arc-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* ---- New front-row buttons: Levels and How to play are green, Turbo purple. */
+  .media-arcade .video-controls-bottom .arc-btn-turbo {
+    --arc-cap: var(--arc-img-btn-purple, radial-gradient(circle at 50% 45%, #8a3df0 0 52%, #d6dcd7 54% 64%, #6c756d 66% 70%, transparent 72%));
+    --arc-cap-lit: var(--arc-img-btn-purple-lit, radial-gradient(circle at 50% 45%, #f1dcff 0 18%, #b46bff 40% 52%, #d6dcd7 54% 64%, #6c756d 66% 70%, transparent 72%));
+    --arc-bloom: rgb(176 96 255 / 0.6);
+    --arc-blink: 6;
+  }
+
+  .media-arcade .video-controls-bottom .arc-btn-turbo[data-active]::before { opacity: 1; }
+  .media-arcade .video-controls-bottom .arc-btn-turbo > * { color: rgb(24 4 44 / 0.9); }
+  .media-arcade .video-controls-bottom .arc-btn-levels { --arc-blink: 3; }
+  .media-arcade .video-controls-bottom .arc-btn-help { --arc-blink: 9; }
+  .media-arcade .video-controls-bottom :is(.arc-btn-levels, .arc-btn-help)[aria-expanded="true"]::before { opacity: 1; }
+
+  .media-arcade .arc-small {
+    flex-wrap: wrap;
+    row-gap: calc(var(--media-spacing) * 1.5);
+  }
+
+  /* Phones: the front face takes two rows of buttons. */
+  @container media-root (width < 30rem) {
+    .media-arcade > * {
+      --arc-apron: calc(var(--media-spacing) * 30);
+    }
+  }
+
+  /* ---- Level select and How to play: cards on the tube (Video.js dialogs, confined to the player). */
+  .media-arcade .arc-sheet-backdrop {
+    z-index: 45;
+    border-radius: var(--arc-radius);
+    inset: calc(var(--arc-top) + var(--arc-pad)) calc(var(--arc-side) + var(--arc-pad)) var(--arc-bottom);
+    background: rgb(0 0 0 / 0.55);
+    backdrop-filter: blur(2px);
+  }
+
+  /* The card covers the tube (it is portalled to the player, so the screen tokens apply). */
+  .media-arcade .media-dialog-popup.arc-sheet {
+    z-index: 50;
+    inset: calc(var(--arc-top) + var(--arc-pad)) calc(var(--arc-side) + var(--arc-pad)) var(--arc-bottom);
+    width: auto;
+    max-width: none;
+    max-height: none;
+    transform: none;
+    align-content: start;
+    overflow: auto;
+    padding: calc(var(--media-spacing) * 5);
+    border-radius: 12px;
+    background:
+      repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.12) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at 50% 0%, #10301c, #050c07 75%);
+    box-shadow: 0 0 0 2px var(--arc-green), 0 0 26px color-mix(in srgb, var(--arc-green) 45%, transparent), 0 18px 40px rgb(0 0 0 / 0.6);
+    color: var(--arc-text);
+  }
+
+  .media-arcade .arc-sheet-title {
+    margin: 0 0 calc(var(--media-spacing) * 4);
+    padding-inline-end: 48px;
+    font-family: "Silkscreen", var(--arc-font-display);
+    font-size: clamp(16px, 2.2vw, 26px);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--arc-green);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--arc-green) 70%, transparent);
+  }
+
+  .media-arcade .arc-sheet-close {
+    position: absolute;
+    top: calc(var(--media-spacing) * 3);
+    inset-inline-end: calc(var(--media-spacing) * 3);
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    color: var(--arc-green);
+    background: rgb(255 255 255 / 0.04);
+  }
+
+  .media-arcade .arc-levels {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: calc(var(--media-spacing) * 3);
+  }
+
+  .media-arcade .arc-level {
+    display: grid;
+    gap: 6px;
+    padding: 8px;
+    border: 0;
+    border-radius: 8px;
+    background: rgb(255 255 255 / 0.04);
+    color: var(--arc-text);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  }
+
+  .media-arcade .arc-level:is(:hover, :focus-visible),
+  .media-arcade .arc-level[data-current] {
+    background: var(--arc-green-wash);
+    box-shadow: inset 0 0 0 2px var(--arc-green), 0 0 14px color-mix(in srgb, var(--arc-green) 40%, transparent);
+  }
+
+  .media-arcade .arc-level:focus-visible {
+    outline: 3px solid var(--arc-green);
+    outline-offset: 2px;
+  }
+
+  .media-arcade .arc-level-shot {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 6px;
+    background: radial-gradient(ellipse, #12351f, #040905);
+  }
+
+  .media-arcade .arc-level-sprite {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: 0 0;
+    background-repeat: no-repeat;
+  }
+
+  .media-arcade .arc-level-shot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.18) 0 1px, transparent 1px 3px);
+  }
+
+  .media-arcade .arc-level-number {
+    position: absolute;
+    z-index: 1;
+    left: 6px;
+    top: 6px;
+    padding: 2px 6px;
+    background: rgb(0 0 0 / 0.75);
+    color: var(--arc-green);
+    font-family: "Silkscreen", var(--arc-font-display);
+    font-size: 12px;
+  }
+
+  .media-arcade .arc-level-name {
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .media-arcade .arc-level-time {
+    color: var(--arc-green);
+    font-family: var(--arc-font-seg);
+    font-size: 11px;
+  }
+
+  .media-arcade .arc-howto-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: calc(var(--media-spacing) * 6);
+  }
+
+  .media-arcade .arc-howto-head {
+    margin: 0 0 calc(var(--media-spacing) * 2);
+    font-family: "Silkscreen", var(--arc-font-display);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--arc-green);
+    text-transform: uppercase;
+  }
+
+  .media-arcade .arc-howto-list {
+    margin: 0;
+    display: grid;
+    gap: 6px;
+  }
+
+  .media-arcade .arc-howto-list div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .media-arcade .arc-howto-list dt {
+    min-width: 7.5em;
+  }
+
+  .media-arcade .arc-howto-list dd {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .media-arcade .arc-howto-list kbd,
+  .media-arcade .arc-howto-stick {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 1px solid #2e3a2c;
+    border-bottom-width: 3px;
+    border-radius: 4px;
+    background: #121a14;
+    color: var(--arc-green);
+    font: 600 12px/1.4 var(--arc-font);
+    white-space: nowrap;
+  }
+
+  /* ---- 8-bit secret: the film redrawn in big pixels, a colour-cycling marquee and a banner. */
+  .media-arcade .arc-pixel {
+    position: absolute;
+    z-index: 2;
+    inset: calc(var(--arc-top) + var(--arc-pad)) calc(var(--arc-side) + var(--arc-pad)) var(--arc-bottom);
+    width: calc(100% - (var(--arc-side) + var(--arc-pad)) * 2);
+    height: calc(100% - var(--arc-top) - var(--arc-pad) - var(--arc-bottom));
+    border-radius: var(--arc-radius);
+    image-rendering: pixelated;
+    pointer-events: none;
+    background: #000;
+  }
+
+  .media-arcade[data-secret-fallback] .video-controls-content::before {
+    background-image:
+      linear-gradient(90deg, rgb(0 0 0 / 0.35) 1px, transparent 1px),
+      linear-gradient(rgb(0 0 0 / 0.35) 1px, transparent 1px);
+    background-size: 8px 8px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .media-arcade[data-secret] .arc-neon-sign {
+      animation: arc-rainbow 2.4s linear infinite;
+    }
+  }
+
+  @keyframes arc-rainbow {
+    to { filter: hue-rotate(360deg); }
+  }
+
+  .media-arcade .arc-banner {
+    position: absolute;
+    z-index: 46;
+    left: 50%;
+    top: calc(var(--arc-top) + var(--arc-pad) + 24px);
+    translate: -50% 0;
+    padding: 10px 18px;
+    border-radius: 6px;
+    background: rgb(0 0 0 / 0.85);
+    box-shadow: 0 0 0 2px var(--arc-green), 0 0 20px color-mix(in srgb, var(--arc-green) 60%, transparent);
+    color: var(--arc-green);
+    font-family: "Silkscreen", var(--arc-font-display);
+    font-size: clamp(12px, 1.6vw, 20px);
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .media-arcade .arc-banner {
+      animation: arc-blink 0.5s steps(1) 4;
+    }
+  }
+
+  /* ---- Attract loop: a short silent clip from the film behind the prompt. */
+  .media-arcade .arc-attract {
+    isolation: isolate;
+  }
+
+  .media-arcade .arc-attract-loop {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.75) saturate(1.1);
+  }
+
+  /* ---- Curved CRT: the shader canvas takes the tube; the video stays underneath as the media. */
+  .media-arcade .arc-crt-shader {
+    position: absolute;
+    z-index: 1;
+    inset: calc(var(--arc-top) + var(--arc-pad)) calc(var(--arc-side) + var(--arc-pad)) var(--arc-bottom);
+    width: calc(100% - (var(--arc-side) + var(--arc-pad)) * 2);
+    height: calc(100% - var(--arc-top) - var(--arc-pad) - var(--arc-bottom));
+    border-radius: var(--arc-radius);
+    pointer-events: none;
+  }
+
+  .media-arcade[data-crt] > video {
+    opacity: 0;
+  }
+
+  .media-arcade[data-crt] .video-controls-content::before {
+    background-image: none;
+  }
+
+  /* ---- Arcade captions: a retro dialogue box with a typewriter reveal; native cues hidden while it's on. */
+  .media-arcade[data-arcade-captions] video::cue {
+    color: transparent;
+    background: transparent;
+    text-shadow: none;
+  }
+
+  .media-arcade .arc-captions {
+    position: absolute;
+    z-index: 21;
+    left: 50%;
+    bottom: calc(var(--arc-bottom) + 24px);
+    translate: -50% 0;
+    max-width: min(80%, 40rem);
+    padding: 10px 16px;
+    border: 3px solid var(--arc-green);
+    border-radius: 4px;
+    background: rgb(4 10 6 / 0.88);
+    box-shadow: 0 0 0 3px #000, 0 0 16px color-mix(in srgb, var(--arc-green) 40%, transparent);
+    color: #f2ffee;
+    font-family: "Silkscreen", var(--arc-font);
+    font-size: clamp(13px, 1.5vw, 20px);
+    line-height: 1.35;
+    text-align: center;
+    white-space: pre-line;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .media-arcade .arc-captions-text {
+      display: inline-block;
+      animation: arc-typewriter calc(var(--arc-chars, 20) * 28ms) steps(var(--arc-chars, 20), jump-end) both;
+    }
+  }
+
+  @keyframes arc-typewriter {
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
+  }
+
+  .media-arcade:fullscreen .arc-captions {
+    bottom: 22%;
+  }
+
+  /* ---- Cartridges: one public token recolours the cabinet paint (the art and the panel), never the film or logos. */
+  .media-arcade .arc-top {
+    background: none;
+    isolation: isolate;
+  }
+
+  .media-arcade .arc-top::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      var(--arc-img-hood-l, none) left top / auto 100% no-repeat,
+      var(--arc-img-hood-r, none) right top / auto 100% no-repeat,
+      var(--arc-img-hood-m, none) center top / 100% 100% no-repeat;
+    filter: var(--arc-cabinet-filter, none); /* public token: set it on the player or an ancestor */
+  }
+
+  .media-arcade .arc-body,
+  .media-arcade .video-controls-bottom::before,
+  .media-arcade .video-controls-bottom::after {
+    filter: var(--arc-cabinet-filter, none); /* public token: set it on the player or an ancestor */
+  }
+
+  /* ---- Audio-reactive: the sign, speakers and lit buttons pulse with the film's sound. */
+  .media-arcade .arc-neon {
+    filter:
+      brightness(calc(1 + var(--arc-level, 0) * 0.7))
+      drop-shadow(0 0 2px var(--arc-neon-glow))
+      drop-shadow(0 0 calc(8px + var(--arc-level, 0) * 14px) color-mix(in srgb, var(--arc-neon-glow) 70%, transparent));
+  }
+
+  .media-arcade .video-controls-bottom .media-button::before {
+    filter: brightness(calc(1 + var(--arc-level, 0) * 0.5));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .media-arcade .arc-top,
+    .media-arcade .video-controls-bottom {
+      --arc-level: 0 !important;
+    }
+  }
+
+  /* ---- Scrub preview: the storyboard frame in a tiny CRT. */
+  .media-arcade .media-slider-thumbnail {
+    border-radius: 10px;
+    box-shadow:
+      0 0 0 2px var(--arc-green),
+      0 0 0 4px var(--arc-black),
+      0 0 18px color-mix(in srgb, var(--arc-green) 55%, transparent);
+  }
+
+  /* ---- Checkbox items in the Arcade submenu share the radio items' look. */
+  .media-arcade .media-menu-checkbox-item[aria-checked="false"] .media-menu-radio-icon {
+    opacity: 0.18;
+  }
+
+  @media (forced-colors: active) {
+    .media-arcade[data-crt] > video {
+      opacity: 1;
+    }
+
+    .media-arcade .arc-crt-shader,
+    .media-arcade .arc-pixel {
+      display: none;
+    }
+  }
+
+  /* ---- Arcade options card: big switches on the screen. */
+  .media-arcade .arc-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: calc(var(--media-spacing) * 3);
+  }
+
+  .media-arcade .arc-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 64px;
+    padding: 12px 16px;
+    border: 0;
+    border-radius: 10px;
+    background: rgb(255 255 255 / 0.04);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+    color: var(--arc-text);
+    font: 600 15px/1.2 var(--arc-font);
+    text-align: start;
+    cursor: pointer;
+  }
+
+  .media-arcade .arc-option:hover {
+    background: rgb(255 255 255 / 0.07);
+  }
+
+  .media-arcade .arc-option:focus-visible {
+    outline: 3px solid var(--arc-green);
+    outline-offset: 2px;
+  }
+
+  .media-arcade .arc-option[aria-checked="true"] {
+    background: var(--arc-green-wash);
+    box-shadow: inset 0 0 0 2px var(--arc-green), 0 0 14px color-mix(in srgb, var(--arc-green) 35%, transparent);
+  }
+
+  .media-arcade .arc-option-icon {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    color: var(--arc-green);
+  }
+
+  .media-arcade .arc-option-label {
+    flex: 1;
+  }
+
+  /* A toggle like a panel switch: the knob slides and lights. */
+  .media-arcade .arc-option-switch {
+    flex: none;
+    position: relative;
+    width: 50px;
+    height: 26px;
+    border-radius: 13px;
+    background: #050a06;
+    box-shadow: inset 0 2px 4px #000, 0 0 0 1px rgb(255 255 255 / 0.12);
+  }
+
+  .media-arcade .arc-option-knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #f2f5f2, #8d968e 70%);
+    box-shadow: 0 2px 3px rgb(0 0 0 / 0.6);
+    transition: translate 0.18s ease-out, background 0.18s ease-out;
+  }
+
+  .media-arcade .arc-option[aria-checked="true"] .arc-option-knob {
+    translate: 24px 0;
+    background: radial-gradient(circle at 35% 30%, #eaffd6, var(--arc-green) 70%);
+    box-shadow: 0 0 10px var(--arc-green), 0 2px 3px rgb(0 0 0 / 0.6);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .media-arcade .arc-option-knob { transition: none; }
   }
 }

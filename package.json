@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@videojs/core": "10.3.0",
+    "@videojs/mux-data": "^10.3.0",
     "@videojs/react": "10.3.0",
     "cn": "^0.4.0",
     "react": "^19.3.0"

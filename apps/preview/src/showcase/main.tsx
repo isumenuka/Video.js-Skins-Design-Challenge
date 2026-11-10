@@ -1,24 +1,32 @@
-import { StrictMode, useLayoutEffect, useRef } from 'react';
+import { type CSSProperties, StrictMode, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import '@/skin.css';
 import './showcase.css';
 import { FilmCredit, Player } from '../frame/player';
 
-const KEYS: [string, string][] = [
-  ['Space / K', 'Play or pause'],
-  ['← →', 'Skip 10 s'],
-  ['↑ ↓', 'Volume'],
-  ['M', 'Mute'],
-  ['C', 'Captions'],
-  ['F', 'Fullscreen'],
-  ['I', 'Picture-in-picture'],
-];
+/**
+ * Game cartridges: each recolours the cabinet through the skin's public tokens, `--arc-cabinet-filter` (the paint)
+ * and `--media-accent-color` (the phosphor).
+ */
+const CARTRIDGES = [
+  { id: 'green', label: 'Green', accent: '#7cff3a', filter: 'none' },
+  { id: 'red', label: 'Red', accent: '#ff4d5e', filter: 'hue-rotate(-150deg) saturate(1.2)' },
+  { id: 'blue', label: 'Blue', accent: '#3fc8ff', filter: 'hue-rotate(70deg) saturate(1.1)' },
+  { id: 'gold', label: 'Gold', accent: '#ffc93a', filter: 'hue-rotate(-105deg) saturate(1.6) brightness(1.15)' },
+] as const;
+type Cartridge = (typeof CARTRIDGES)[number]['id'];
+const CARTRIDGE_KEY = 'arcade-cartridge';
 
-const STICKS: [string, string][] = [
-  ['Left stick', 'Hold to scrub, tap to skip 5 s'],
-  ['Right stick', 'Hold up or down for volume'],
-];
+function readCartridge(): Cartridge {
+  try {
+    const saved = localStorage.getItem(CARTRIDGE_KEY);
+    if (CARTRIDGES.some((c) => c.id === saved)) return saved as Cartridge;
+  } catch {
+    /* storage unavailable */
+  }
+  return 'green';
+}
 
 const MAX_WIDTH = 1040;
 const MIN_ZOOM = 0.45;
@@ -85,6 +93,16 @@ function useFitStage() {
 
 function Showcase() {
   const { cell, stage } = useFitStage();
+  const [cartridge, setCartridge] = useState<Cartridge>(readCartridge);
+  const cart = CARTRIDGES.find((c) => c.id === cartridge)!;
+  useEffect(() => {
+    document.documentElement.dataset.cartridge = cartridge;
+    try {
+      localStorage.setItem(CARTRIDGE_KEY, cartridge);
+    } catch {
+      /* storage unavailable: the choice just isn't remembered */
+    }
+  }, [cartridge]);
   return (
     <>
       <picture className="sc-bg" aria-hidden="true">
@@ -97,33 +115,41 @@ function Showcase() {
         <h1 className="sc-visually-hidden">Arcade, a Video.js 10 skin</h1>
 
         <div className="sc-stage-cell" ref={cell}>
-          <section className="sc-stage" aria-label="Video player" ref={stage}>
+          <section
+            className="sc-stage"
+            aria-label="Video player"
+            ref={stage}
+            style={{ '--media-accent-color': cart.accent, '--arc-cabinet-filter': cart.filter } as CSSProperties}
+          >
             <Player />
           </section>
         </div>
 
-        <section className="sc-keys-bar" aria-label="Controls">
-          <dl className="sc-keys">
-            {STICKS.map(([key, action]) => (
-              <div key={key}>
-                <dt>
-                  <kbd className="sc-stick">{key}</kbd>
-                </dt>
-                <dd>{action}</dd>
-              </div>
+        <details className="sc-drawer">
+          <summary>
+            <span>Cartridges</span>
+            <svg className="sc-drawer-chevron" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
+              <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="2" />
+            </svg>
+          </summary>
+          <section className="sc-keys-bar" aria-label="Cartridges">
+          <fieldset className="sc-carts">
+            <legend>Cartridge</legend>
+            {CARTRIDGES.map((c) => (
+              <label key={c.id} style={{ '--sc-cart': c.accent } as CSSProperties}>
+                <input
+                  type="radio"
+                  name="cartridge"
+                  value={c.id}
+                  checked={cartridge === c.id}
+                  onChange={() => setCartridge(c.id)}
+                />
+                <span>{c.label}</span>
+              </label>
             ))}
-          </dl>
-          <dl className="sc-keys">
-            {KEYS.map(([key, action]) => (
-              <div key={key}>
-                <dt>
-                  <kbd>{key}</kbd>
-                </dt>
-                <dd>{action}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
+          </fieldset>
+          </section>
+        </details>
 
         <footer className="sc-footer">
           <p title="Film: Sintel (CC) Blender Foundation | durian.blender.org · CC BY 3.0. Streamed by Mux. Cabinet and background art generated with invideo AI. Fonts: Anton, Chakra Petch and DSEG7 (SIL OFL).">

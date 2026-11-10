@@ -133,6 +133,29 @@ The state audit passes 41 of 41 checks, with no console errors:
 - **Accent:** the token recolours the rim.
 - **Accessibility scan:** axe clean.
 
+## Game features (round 3)
+- **Level select:** `arcade/levels.tsx`. A Video.js Dialog listing chapters as levels, with storyboard frames. Arrow keys and Enter.
+- **Turbo:** `arcade/turbo.tsx`. Cycles 1×, 1.5×, 2×. Quality is in Settings.
+- **Arcade options:** `arcade/options.tsx`. Settings → Arcade opens a Video.js Dialog card on the tube with four switches (`role="switch"`).
+- **Curved CRT:** `arcade/crt-shader.tsx`. A WebGL barrel, phosphor mask and scanlines; off by default.
+- **8-bit secret:** `arcade/secret.tsx`. Typing the Konami code toggles a 64-colour pixel canvas and a rainbow marquee, announced in a live region.
+- **Sound and haptics:**
+  - `arcade/sfx.ts`: Web Audio synthesis, created only after a gesture, silent while muted.
+  - `arcade/feedback.tsx`: hooks for the panel.
+  - Both toggle on the Arcade options card.
+- **Arcade captions:** `arcade/arcade-captions.tsx`. A DOM dialogue box with a typewriter; the native cues are hidden only while it's on.
+- **How to play:** `arcade/how-to-play.tsx`, opened by the `?` key or button. It names each action with Video.js labels.
+- **Audio-reactive:** `--arc-level` (from the oscilloscope) drives the neon sign, speakers and button glow.
+- **Attract loop:** `VideoSkin attractLoop` prop. The preview passes Mux's animated preview.
+- **Cartridges:** a public `--arc-cabinet-filter` token, plus `--media-accent-color`.
+- **Mux Data:** `<MuxData />` in the preview player.
+- **i18n:** `arcade/i18n.ts`. Text descriptors, with Spanish, read through `useArcadeTranslator()`.
+
+**Verified:**
+- 25 feature checks (`scratchpad/shots/features.mjs`), plus the 41-check audit;
+- the page doesn't scroll at 6 window sizes;
+- no console errors.
+
 ## Media
 - *Sintel* on Mux, public playback ID `fNEeWPY4UUEkfCFd9617w8gvYFEsFOv72rPQj3qKG700`.
 - English captions and 8 chapters are served from `apps/preview/public/`.

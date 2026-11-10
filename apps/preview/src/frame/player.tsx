@@ -1,3 +1,4 @@
+import { MuxData } from '@videojs/react/extensions/mux-data';
 import { MuxVideo } from '@videojs/react/media/mux-video';
 import { VideoPlayer } from '@videojs/react/video';
 import type { CSSProperties } from 'react';
@@ -24,16 +25,21 @@ export const FILM = {
 
 const SRC = `https://stream.mux.com/${FILM.playbackId}.m3u8`;
 const POSTER = `https://image.mux.com/${FILM.playbackId}/thumbnail.webp?time=${FILM.posterTime}`;
+/** A short silent loop from the film for the cabinet's attract screen (Mux's animated preview). */
+const ATTRACT = `https://image.mux.com/${FILM.playbackId}/animated.webp?start=300&end=306&width=640&fps=15`;
+/** Mux Data: Mux-hosted playback needs no environment key (views go to the environment that owns the playback ID). */
+const MUX_DATA_ENV_KEY = (import.meta.env.VITE_MUX_DATA_ENV_KEY as string | undefined) || undefined;
 
 /** `media` carries the workbench's playback options: autoplay, muted, loop, and preload. */
 export function Player({ media }: { media?: PlaybackProps }) {
   return (
     <VideoPlayer poster={POSTER} title={FILM.title}>
-      <VideoSkin style={{ '--arc-screen-ratio': FILM.aspect } as CSSProperties}>
+      <VideoSkin style={{ '--arc-screen-ratio': FILM.aspect } as CSSProperties} attractLoop={ATTRACT}>
         <MuxVideo {...media} src={SRC} playsInline crossOrigin="">
           {FILM.captions && <track kind="captions" srcLang="en" label="English" src={FILM.captions} />}
           {FILM.chapters && <track kind="chapters" srcLang="en" label="Chapters" src={FILM.chapters} default />}
         </MuxVideo>
+        <MuxData {...(MUX_DATA_ENV_KEY ? { envKey: MUX_DATA_ENV_KEY } : {})} />
       </VideoSkin>
     </VideoPlayer>
   );

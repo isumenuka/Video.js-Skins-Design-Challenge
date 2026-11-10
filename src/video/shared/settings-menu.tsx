@@ -17,6 +17,9 @@ import { QualityRadioGroup } from '@videojs/react/ui/quality-radio-group';
 
 import { cn } from '@/lib/resolve-class-name';
 
+import { arcadeText, useArcadeTranslator } from '../arcade/i18n';
+import { openArcadeOptions } from '../arcade/options';
+
 import { Button } from './button';
 import { RadioItem } from './menu-item';
 import { ButtonTooltip } from './tooltip';
@@ -156,6 +159,31 @@ function CaptionsMenu() {
   );
 }
 
+/** A joystick, for the Arcade submenu. */
+function JoystickIcon() {
+  return (
+    <svg className={'media-menu-trigger-icon'} viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor"
+      strokeWidth="2" aria-hidden="true" focusable="false">
+      <circle cx="10" cy="5" r="2.5" />
+      <path d="M10 8v6M4 14h12v3H4z" />
+    </svg>
+  );
+}
+
+/** Arcade: opens the skin's options as a card on the screen, like Level select. */
+function ArcadeMenu() {
+  const t = useArcadeTranslator();
+  return (
+    <Menu.Item className={'media-menu-item'} onClick={() => openArcadeOptions()}>
+      <JoystickIcon />
+      <span>{t(arcadeText.arcade)}</span>
+      <span className={'media-menu-hint'}>
+        <MenuChevron />
+      </span>
+    </Menu.Item>
+  );
+}
+
 export function SettingsMenu() {
   return (
     <Menu.Root side="top" align="center">
@@ -173,6 +201,7 @@ export function SettingsMenu() {
           <AudioTrackMenu />
           <PlaybackRateMenu />
           <CaptionsMenu />
+          <ArcadeMenu />
         </Menu.Content>
       </Menu.Popup>
     </Menu.Root>
