@@ -96,7 +96,7 @@
     --arc-apron: calc(var(--media-spacing) * 19); /* the front face: small buttons and coin doors */
     --arc-bottom: calc(var(--arc-pad) + var(--arc-ledge) + var(--arc-panel) + var(--arc-apron));
     --arc-radius: calc(var(--media-spacing) * 7); /* the tube's curve */
-    --arc-btn: 48px; /* small buttons (the render includes its chrome ring) */
+    --arc-btn: 58px; /* small buttons (the render includes its chrome ring) */
     --arc-btn-seek: 58px;
     --arc-btn-play: 76px;
     --arc-icon: 20px;
@@ -112,6 +112,7 @@
       --arc-pad: calc(var(--media-spacing) * 3.5);
       --arc-panel: calc(var(--media-spacing) * 42);
       --arc-apron: calc(var(--media-spacing) * 17);
+      --arc-btn: 52px;
       --arc-btn-seek: 52px;
       --arc-btn-play: 66px;
       --arc-stick-w: calc(var(--media-spacing) * 19);
@@ -137,7 +138,7 @@
 
   @container media-root (width < 26rem) {
     .media-arcade > * {
-      --arc-btn: 44px;
+      --arc-btn: 48px;
       --arc-btn-seek: 50px;
       --arc-btn-play: 62px;
     }
@@ -245,23 +246,19 @@
     pointer-events: none;
   }
 
-  /* Cabinet body: the green powder-coat between hood and panel, rounded side posts with chrome T-molding. */
+  /* Cabinet body: the green powder-coat between hood and panel, with rounded, shaded side posts. */
   .arc-body {
     position: absolute;
     inset: 0;
     border-radius: 16px 16px 8px 8px;
     background:
       linear-gradient(90deg,
-        rgb(255 255 255 / 0.12) 0, rgb(0 0 0 / 0.42) var(--arc-side), transparent calc(var(--arc-side) + 18px),
-        transparent calc(100% - var(--arc-side) - 18px), rgb(0 0 0 / 0.42) calc(100% - var(--arc-side)), rgb(255 255 255 / 0.08) 100%),
+        rgb(0 0 0 / 0.25) 0, rgb(0 0 0 / 0.42) var(--arc-side), transparent calc(var(--arc-side) + 18px),
+        transparent calc(100% - var(--arc-side) - 18px), rgb(0 0 0 / 0.42) calc(100% - var(--arc-side)), rgb(0 0 0 / 0.25) 100%),
       linear-gradient(180deg, rgb(0 0 0 / 0.5), transparent 22%, transparent 78%, rgb(0 0 0 / 0.4)),
       var(--arc-img-material, none) 0 0 / 256px 256px,
       #1a3b27;
     box-shadow:
-      inset 3px 0 0 #d6dcd7,
-      inset -3px 0 0 #d6dcd7,
-      inset 5px 0 0 #5b645d,
-      inset -5px 0 0 #5b645d,
       0 30px 60px rgb(0 0 0 / 0.6),
       0 0 0 1px var(--arc-black);
   }
@@ -307,10 +304,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-inline: calc(var(--media-spacing) * 4);
+    padding-inline: 0;
     border-radius: calc(var(--media-spacing) * 1.5);
     background:
-      radial-gradient(60% 90% at 50% 50%, color-mix(in srgb, var(--arc-green) 16%, transparent), transparent 75%),
+      radial-gradient(28% 90% at 32% 50%, rgb(255 120 30 / 0.14), transparent 75%),
+      radial-gradient(40% 90% at 62% 50%, rgb(255 255 255 / 0.07), transparent 75%),
       repeating-linear-gradient(115deg, rgb(255 255 255 / 0.025) 0 2px, transparent 2px 9px),
       radial-gradient(ellipse at 50% 40%, #0c2214, #030805 78%);
     box-shadow:
@@ -333,40 +331,96 @@
 
   /* The neon sign: each mark is a tube — a wide soft bloom, the coloured tube and a thin white-hot core. Widths are
      in screen pixels (non-scaling strokes), so the tubes stay crisp at every cabinet size. */
+  /* The ticker: four copies of the sign in a row, scrolling left by half the row (two copies), forever. */
+  .arc-ticker {
+    flex: none;
+    display: flex;
+    align-self: stretch;
+    align-items: center;
+    width: max-content;
+  }
+
+  .arc-ticker-run {
+    flex: none;
+    display: flex;
+    align-items: center;
+    padding-inline-end: calc(var(--arc-top) * 1.2); /* the gap between one pass and the next */
+  }
+
   .arc-neon-sign {
-    height: 88%;
+    flex: none;
+    height: calc(var(--arc-top) * 0.34); /* about 60% of the marquee window */
+    aspect-ratio: 2160 / 270; /* the viewBox */
     width: auto;
-    max-width: 100%;
     overflow: visible;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .arc-marquee {
+      justify-content: flex-start;
+    }
+
+    .arc-ticker {
+      animation: arc-ticker 16s linear infinite;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .arc-ticker-run:not(:first-child) {
+      display: none;
+    }
+
+    .arc-ticker-run {
+      padding-inline-end: 0;
+    }
+  }
+
+  @keyframes arc-ticker {
+    from { translate: 0 0; }
+    to { translate: -50% 0; }
   }
 
   .arc-neon path {
     fill: none;
+    fill-rule: evenodd;
     stroke-linejoin: round;
     stroke-linecap: round;
     vector-effect: non-scaling-stroke;
   }
 
+  /* Each mark in its real colours: Video.js in its sunset stripes, Mux and the sparkle in white. */
+  .arc-neon {
+    --arc-neon-tube: #f4f6f4;
+    --arc-neon-core: #ffffff;
+    --arc-neon-glow: rgb(235 240 255);
+    filter:
+      drop-shadow(0 0 2px var(--arc-neon-glow))
+      drop-shadow(0 0 8px color-mix(in srgb, var(--arc-neon-glow) 70%, transparent));
+  }
+
+  .arc-neon-vjs {
+    --arc-neon-tube: url(#arc-neon-sunset);
+    --arc-neon-core: #fff3d6;
+    --arc-neon-glow: #ff7a1a;
+  }
+
   .arc-neon-bloom {
-    stroke: var(--arc-green);
+    stroke: var(--arc-neon-tube);
     stroke-width: 9px;
     opacity: 0.22;
   }
 
+  /* Filled with the mark's colour, edged by the tube. */
   .arc-neon-tube {
-    stroke: var(--arc-green);
-    stroke-width: 2.6px;
+    fill: var(--arc-neon-tube);
+    stroke: var(--arc-neon-tube);
+    stroke-width: 2px;
   }
 
   .arc-neon-core {
-    stroke: color-mix(in oklab, var(--arc-green) 25%, white);
+    stroke: var(--arc-neon-core);
     stroke-width: 1px;
-  }
-
-  .arc-neon {
-    filter:
-      drop-shadow(0 0 2px var(--arc-green))
-      drop-shadow(0 0 8px color-mix(in srgb, var(--arc-green) 75%, transparent));
+    opacity: 0.85;
   }
 
   /* Neon flicker: mostly steady, with irregular buzzing dips. Each mark has its own rhythm. */
@@ -511,7 +565,7 @@
   }
 
   /* ============================================================================================================= */
-  /* Attract mode (before the first play): a lit screen that types the title, flashes, and points at start          */
+  /* Attract mode (before the first play): the poster, dimmed, with a blinking "insert coin" style prompt         */
   /* ============================================================================================================= */
   .arc-attract {
     position: absolute;
@@ -520,73 +574,39 @@
     container-type: inline-size;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 5cqi;
-    padding: 6cqi 8cqi;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 7cqi;
     background:
-      radial-gradient(90% 120% at 30% 35%, color-mix(in oklab, var(--arc-green) 55%, white), var(--arc-green) 55%, color-mix(in oklab, var(--arc-green) 72%, black));
-    color: color-mix(in oklab, var(--arc-ink) 88%, var(--arc-green));
+      repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.16) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at 50% 45%, transparent 35%, rgb(0 0 0 / 0.55)),
+      linear-gradient(to top, rgb(0 0 0 / 0.65), transparent 40%);
   }
 
-  .arc-attract::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.07) 0 1px, transparent 1px 3px);
-  }
-
-  /* Pixel letters, typed in and then flashed, on a loop. */
-  .arc-attract-title {
-    align-self: flex-start;
-    max-width: 70%;
-    font-family: "Silkscreen", var(--arc-font-display);
-    font-size: 14cqi;
-    line-height: 0.95;
-    text-transform: uppercase;
-    overflow-wrap: anywhere;
-    opacity: 0.88;
-    text-shadow: 0.6cqi 0.6cqi 0 rgb(0 0 0 / 0.12);
-  }
-
-  .arc-attract-cue {
+  .arc-attract-prompt {
     display: flex;
     align-items: center;
-    gap: 2.4cqi;
+    gap: 2cqi;
+    padding: 1.2cqi 2.6cqi;
     font-family: "Silkscreen", var(--arc-font-display);
-    font-size: 4.6cqi;
+    font-size: max(12px, 3.4cqi);
     line-height: 1;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    opacity: 0.88;
+    color: var(--arc-green);
+    text-shadow: 0 0 6px color-mix(in srgb, var(--arc-green) 80%, transparent), 0.3cqi 0.3cqi 0 rgb(0 0 0 / 0.6);
   }
 
-  .arc-attract-arrow {
-    width: 9cqi;
-    height: auto;
-  }
-
-  .arc-attract-arrow:dir(rtl) {
-    scale: -1 1;
-  }
-
-  .arc-attract-cursor {
-    width: 0.6em;
-    height: 0.9em;
-    background: currentColor;
+  .arc-attract-coin {
+    width: 1em;
+    height: 1em;
+    color: #ffc93a;
+    filter: drop-shadow(0 0 4px rgb(255 190 40 / 0.7));
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .arc-attract-title {
-      animation:
-        arc-type 6s steps(var(--arc-letters, 8), jump-end) infinite,
-        arc-flash 6s steps(1) infinite;
-    }
-
-    .arc-attract-cursor {
-      animation: arc-blink 1.1s steps(1) infinite;
-    }
-
-    .arc-attract-arrow {
-      animation: arc-nudge 1.1s ease-in-out infinite;
+    .arc-attract-prompt {
+      animation: arc-blink 1.2s steps(1) infinite;
     }
 
     /* The panel's buttons light one after another while the cabinet waits. */
@@ -596,26 +616,8 @@
     }
   }
 
-  @keyframes arc-type {
-    0% { clip-path: inset(0 100% 0 0); }
-    35%, 100% { clip-path: inset(0 0 0 0); }
-  }
-
-  @keyframes arc-flash {
-    0%, 70% { opacity: 0.88; }
-    72% { opacity: 0.15; }
-    75% { opacity: 0.88; }
-    78% { opacity: 0.15; }
-    81%, 94% { opacity: 0.88; }
-    96%, 100% { opacity: 0; }
-  }
-
   @keyframes arc-blink {
     50% { opacity: 0; }
-  }
-
-  @keyframes arc-nudge {
-    50% { translate: 0.8cqi 0; }
   }
 
   @keyframes arc-attract-blink {
@@ -623,28 +625,15 @@
     10%, 100% { opacity: 0; }
   }
 
-  /* While attracting, the start button sits where the arrow points: the screen's right side. */
+  /* While attracting, the poster is the picture: no title tag over it. Scaffold hides the start button on narrow
+     players; the attract screen keeps it. */
   .media-arcade:has(.arc-attract) .video-controls-center {
-    display: flex; /* Scaffold hides it on narrow players; the attract screen leaves room for it */
-    left: auto;
-    inset-inline-end: 12%;
-    transform: translateY(-50%);
-  }
-
-  .media-arcade:has(.arc-attract) .video-controls-center:dir(rtl) {
-    left: 12%;
+    display: flex;
   }
 
   .media-arcade:has(.arc-attract) .video-controls-backdrop,
   .media-arcade:has(.arc-attract) .media-title {
     display: none;
-  }
-
-  /* The lit screen lights the cabinet green. */
-  .media-arcade:has(.arc-attract) > * {
-    --arc-spill: var(--arc-green);
-    --arc-spill-start: var(--arc-green);
-    --arc-spill-end: var(--arc-green);
   }
 
   /* ============================================================================================================= */
@@ -1635,7 +1624,7 @@
   }
 
   /* ============================================================================================================= */
-  /* Fullscreen: the cabinet steps away and the panel becomes a HUD that hides with the controls.                   */
+  /* Fullscreen: the cabinet steps away and the panel becomes a compact HUD bar that hides with the controls.       */
   /* ============================================================================================================= */
   .media-arcade:fullscreen > * {
     --arc-top: 0px;
@@ -1645,9 +1634,21 @@
     --arc-panel: 0px;
     --arc-apron: 0px;
     --arc-radius: 0px;
-    --arc-stick-w: calc(var(--media-spacing) * 18);
-    --arc-stick-h: calc(var(--media-spacing) * 18);
-    --arc-lever: calc(var(--media-spacing) * 14);
+    --arc-btn: 40px;
+    --arc-btn-seek: 44px;
+    --arc-btn-play: 52px;
+    --arc-stick-w: 54px;
+    --arc-stick-h: 54px;
+    --arc-lever: 38px;
+  }
+
+  /* Touch: every target stays at least 44px. */
+  @media (pointer: coarse) {
+    .media-arcade:fullscreen > * {
+      --arc-btn: 44px;
+      --arc-btn-seek: 46px;
+      --arc-btn-play: 54px;
+    }
   }
 
   .media-arcade:fullscreen :is(.arc-frame, .arc-doors, .arc-glass, .arc-sparks) {
@@ -1656,17 +1657,18 @@
 
   .media-arcade:fullscreen .video-controls-bottom {
     top: auto;
-    bottom: calc(var(--media-spacing) * 4);
-    inset-inline: max(calc(var(--media-spacing) * 4), calc(50% - 44rem));
+    bottom: calc(var(--media-spacing) * 3);
+    inset-inline: max(calc(var(--media-spacing) * 3), calc(50% - 44rem));
     height: auto;
-    padding: calc(var(--media-spacing) * 3) calc(var(--media-spacing) * 4);
+    gap: calc(var(--media-spacing) * 1);
+    padding: calc(var(--media-spacing) * 2) calc(var(--media-spacing) * 4) calc(var(--media-spacing) * 2.5);
     border-radius: 14px;
     background:
       linear-gradient(180deg, rgb(255 255 255 / 0.06), transparent 40%),
       var(--arc-img-material, none) 0 0 / 256px 256px,
-      color-mix(in srgb, #173a28 88%, transparent);
+      color-mix(in srgb, #173a28 86%, transparent);
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 0 2px #c9d0ca, 0 0 0 3px #3a413b, 0 12px 30px rgb(0 0 0 / 0.5);
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.6), 0 0 0 2px color-mix(in srgb, var(--arc-green) 35%, #0c1a11), 0 12px 30px rgb(0 0 0 / 0.5);
     transition:
       opacity var(--media-duration-controls) ease-out,
       translate var(--media-duration-controls) ease-out;
@@ -1677,21 +1679,146 @@
     display: none;
   }
 
+  /* A slim seek strip on top. */
+  .media-arcade:fullscreen .video-controls-slider-row {
+    margin-inline: 0;
+  }
+
+  .media-arcade:fullscreen .media-time-slider {
+    height: calc(var(--media-spacing) * 5);
+  }
+
+  .media-arcade:fullscreen .media-time-slider-track {
+    height: 6px;
+  }
+
+  /* One row of controls: seek stick, transport and time, scope, then volume, mute and the small buttons. */
   .media-arcade:fullscreen .arc-panel {
-    grid-template-columns: auto 1fr auto auto;
-    grid-template-rows: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--media-spacing) * 1.5) calc(var(--media-spacing) * 3);
+  }
+
+  .media-arcade:fullscreen .arc-cluster {
+    gap: calc(var(--media-spacing) * 2);
+  }
+
+  .media-arcade:fullscreen .arc-center {
+    flex-direction: row;
+    gap: calc(var(--media-spacing) * 3);
+  }
+
+  .media-arcade:fullscreen .arc-transport {
+    gap: calc(var(--media-spacing) * 2);
+  }
+
+  .media-arcade:fullscreen .arc-readout {
+    height: 28px;
+    padding-inline: calc(var(--media-spacing) * 2);
+    font-size: 13px;
+  }
+
+  .media-arcade:fullscreen .arc-scope {
+    width: calc(var(--media-spacing) * 22);
+    height: 28px;
+  }
+
+  .media-arcade:fullscreen .arc-cluster-volume {
+    margin-inline-start: auto;
   }
 
   .media-arcade:fullscreen .arc-small {
     grid-column: auto;
     grid-row: auto;
     padding-inline: 0;
+    gap: calc(var(--media-spacing) * 1.5);
+  }
+
+  .media-arcade:fullscreen .arc-stick::before,
+  .media-arcade:fullscreen .arc-stick::after {
+    display: none; /* direction marks: too small to read at HUD size */
+  }
+
+  .media-arcade:fullscreen .arc-meter {
+    inset-inline-end: -6px;
+  }
+
+  .media-arcade:fullscreen .video-controls-center-button {
+    scale: 1.3;
   }
 
   .media-arcade:fullscreen .video-controls-content:not([data-visible]) .video-controls-bottom {
     opacity: 0;
     translate: 0 14px;
     pointer-events: none;
+  }
+
+  /* Narrow fullscreen (phones upright, small windows): two compact lines — stick, transport and time; then volume,
+     mute and the small buttons. */
+  @container media-root (width < 44rem) {
+    .media-arcade:fullscreen > * {
+      --arc-stick-w: 48px;
+      --arc-stick-h: 52px;
+      --arc-lever: 36px;
+    }
+
+    .media-arcade:fullscreen .video-controls-bottom {
+      inset-inline: calc(var(--media-spacing) * 2);
+      bottom: calc(var(--media-spacing) * 2);
+      padding-inline: calc(var(--media-spacing) * 2.5);
+    }
+
+    .media-arcade:fullscreen .arc-panel {
+      justify-content: space-between;
+      gap: calc(var(--media-spacing) * 1.5) calc(var(--media-spacing) * 2);
+    }
+
+    .media-arcade:fullscreen .arc-center {
+      gap: calc(var(--media-spacing) * 2);
+    }
+
+    .media-arcade:fullscreen .arc-cluster-volume {
+      margin-inline-start: 0;
+    }
+
+    .media-arcade:fullscreen .arc-small {
+      flex: 1 1 auto;
+      justify-content: flex-end;
+      gap: calc(var(--media-spacing) * 1);
+    }
+
+    .media-arcade:fullscreen .video-controls-center-button {
+      scale: 1;
+    }
+  }
+
+  @container media-root (width < 26rem) {
+    .media-arcade:fullscreen .arc-readout {
+      display: none; /* the slim strip and its hover tag still show the time */
+    }
+  }
+
+  /* Landscape phones: a short screen, so the bar squeezes further. */
+  @media (max-height: 480px) {
+    .media-arcade:fullscreen > * {
+      --arc-stick-w: 44px;
+      --arc-stick-h: 46px;
+      --arc-lever: 32px;
+    }
+
+    .media-arcade:fullscreen .video-controls-bottom {
+      bottom: calc(var(--media-spacing) * 1.5);
+      padding-block: calc(var(--media-spacing) * 1.5);
+    }
+
+    .media-arcade:fullscreen .media-time-slider {
+      height: calc(var(--media-spacing) * 4);
+    }
+
+    .media-arcade:fullscreen .video-controls-center-button {
+      scale: 1;
+    }
   }
 
   /* ============================================================================================================= */
@@ -1783,7 +1910,6 @@
     }
 
     .media-arcade .video-controls-content::before,
-    .arc-attract::after,
     .arc-glass {
       display: none;
     }

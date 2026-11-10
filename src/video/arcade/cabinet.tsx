@@ -3,7 +3,7 @@
 import { playText } from '@videojs/core/i18n/text/buttons';
 import { useTranslator } from '@videojs/react';
 import { usePlayer } from '@videojs/react/video';
-import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { MarqueeLogos } from './marquee';
 
@@ -61,29 +61,32 @@ export function ArcadeGlass() {
   );
 }
 
+/** A pixel coin, drawn for this skin. */
+function Coin() {
+  return (
+    <svg className={'arc-attract-coin'} viewBox="0 0 12 12" width="12" height="12" focusable="false">
+      <path d="M4 0h4v1h2v1h1v2h1v4h-1v2h-1v1H8v1H4v-1H2v-1H1V8H0V4h1V2h1V1h2z" fill="currentColor" />
+      <path d="M5 3h2v6H5z" fill="#000" opacity="0.45" />
+    </svg>
+  );
+}
+
 /**
- * Attract mode: before the first play the screen loops like a cabinet waiting for a player — the film's title types
- * itself out in pixel letters, flashes, and an arrow points at the start button while the panel's buttons blink in
- * turn. The only words are the media title and Video.js's own "Play"
- * label. It is decorative (`aria-hidden`, no pointer events): the real play button stays the control, and a tap on the
- * screen still plays through the skin's own gestures.
+ * Attract mode: before the first play the tube shows the film's poster (dimmed, with scanlines) and, like a cabinet
+ * waiting for a coin, a blinking pixel prompt at the bottom — a coin and Video.js's own translated "Play" label —
+ * while the panel's buttons blink in turn. Decorative (`aria-hidden`, no pointer events): the real play button stays
+ * the control, and a tap on the screen still plays through the skin's own gestures.
  */
 export function ArcadeAttract() {
   const started = usePlayer((s) => s.started);
-  const title = usePlayer((s) => s.title);
   const t = useTranslator();
   if (started) return null;
   return (
     <div className={'arc-attract'} aria-hidden="true">
-      <span className={'arc-attract-title'} style={{ '--arc-letters': (title || t(playText)).length } as CSSProperties}>
-        {title || t(playText)}
-      </span>
-      <span className={'arc-attract-cue'}>
-        <span className={'arc-attract-play'}>{t(playText)}</span>
-        <svg className={'arc-attract-arrow'} viewBox="0 0 48 24" width="48" height="24" focusable="false">
-          <path d="M2 12h40M32 3l10 9-10 9" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="square" />
-        </svg>
-        <span className={'arc-attract-cursor'} />
+      <span className={'arc-attract-prompt'}>
+        <Coin />
+        {t(playText)}
+        <Coin />
       </span>
     </div>
   );

@@ -42,16 +42,22 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: filter 0.6s ease;
+  /* Graded to the cabinet: the same deep forest green, a little softer and darker, so the room sits behind it. */
+  filter: saturate(0.85) brightness(0.62) contrast(1.05) blur(1.5px);
+  transform: scale(1.02); /* hides the blur's soft edge */
 }
 
+/* Light from the cabinet: a lime glow behind it, a pool of green light on the floor in front of it, and a vignette
+   that darkens the room towards the edges. */
 .sc-bg::after {
   content: "";
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 50% 45%, rgb(7 9 8 / 0.55), rgb(7 9 8 / 0.15) 70%),
-    linear-gradient(to bottom, rgb(7 9 8 / 0.2), rgb(7 9 8 / 0.75));
+    radial-gradient(38% 46% at 50% 44%, rgb(124 255 58 / 0.16), transparent 70%),
+    radial-gradient(42% 12% at 50% 92%, rgb(124 255 58 / 0.18), transparent 75%),
+    radial-gradient(ellipse at 50% 50%, transparent 40%, rgb(3 8 5 / 0.82) 100%),
+    linear-gradient(to bottom, rgb(4 10 6 / 0.35), rgb(4 10 6 / 0.15) 40%, rgb(4 10 6 / 0.55));
 }
 
 html.sc-tight body {

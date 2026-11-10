@@ -4,8 +4,9 @@ import { usePlayer } from '@videojs/react/video';
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 
 /*
- * The marquee's three marks (supplied by the user as one SVG), drawn as neon tubes: each outline is stroked three
- * times — a wide soft bloom, the coloured tube, and a thin white-hot core. Paths are the originals, cropped by the
+ * The marquee's three marks (supplied by the user as one SVG), drawn as neon tubes in their real colours — Video.js
+ * in its sunset stripes, Mux and the sparkle in white. Each outline is stroked three times: a wide soft bloom, the
+ * filled, glowing shape, and a thin hot edge. Paths are the originals, cropped by the
  * viewBox to the marks themselves (their coloured backing panels are dropped) and spaced a little further apart.
  */
 const VJS =
@@ -17,9 +18,9 @@ const MUX =
 const STAR =
   'M 1511 359 L 1511 363 L 1523 367 L 1525 369 L 1531 370 L 1533 372 L 1539 374 L 1540 376 L 1543 376 L 1551 381 L 1553 381 L 1568 391 L 1570 391 L 1571 393 L 1573 393 L 1576 396 L 1585 401 L 1586 403 L 1589 404 L 1595 410 L 1597 410 L 1598 412 L 1614 425 L 1627 438 L 1630 443 L 1637 450 L 1644 461 L 1646 462 L 1670 501 L 1671 506 L 1673 508 L 1675 514 L 1677 516 L 1678 521 L 1680 523 L 1680 526 L 1682 528 L 1683 535 L 1688 536 L 1688 359 Z M 1901 357 L 1725 357 L 1724 358 L 1724 366 L 1725 367 L 1724 369 L 1724 535 L 1725 536 L 1727 536 L 1729 534 L 1729 530 L 1734 521 L 1734 518 L 1736 517 L 1736 514 L 1739 507 L 1741 505 L 1746 493 L 1748 492 L 1749 488 L 1763 468 L 1765 463 L 1785 438 L 1803 420 L 1828 400 L 1833 398 L 1834 396 L 1840 393 L 1841 391 L 1843 391 L 1849 386 L 1851 386 L 1856 382 L 1860 381 L 1865 377 L 1870 376 L 1875 372 L 1878 372 L 1882 369 L 1885 369 L 1887 367 L 1890 367 L 1892 365 L 1901 362 Z M 1724 146 L 1724 313 L 1725 314 L 1724 323 L 1725 324 L 1901 324 L 1901 320 L 1899 318 L 1896 318 L 1872 308 L 1870 306 L 1862 303 L 1861 301 L 1853 298 L 1852 296 L 1850 296 L 1833 284 L 1831 284 L 1830 282 L 1827 281 L 1826 279 L 1824 279 L 1823 277 L 1809 267 L 1789 248 L 1772 228 L 1772 226 L 1770 225 L 1760 211 L 1760 209 L 1756 205 L 1751 197 L 1751 195 L 1748 192 L 1746 186 L 1744 185 L 1741 176 L 1739 175 L 1736 168 L 1736 165 L 1734 163 L 1731 156 L 1731 153 L 1729 151 L 1729 147 Z M 1688 146 L 1684 146 L 1677 166 L 1671 175 L 1671 178 L 1668 184 L 1666 185 L 1663 193 L 1658 201 L 1656 202 L 1653 209 L 1634 235 L 1630 238 L 1621 250 L 1596 272 L 1588 277 L 1587 279 L 1581 282 L 1580 284 L 1578 284 L 1569 291 L 1562 294 L 1561 296 L 1552 301 L 1540 306 L 1539 308 L 1534 309 L 1532 311 L 1529 311 L 1520 316 L 1516 316 L 1515 318 L 1511 318 L 1511 322 L 1512 323 L 1514 322 L 1515 323 L 1680 323 L 1681 322 L 1687 323 L 1688 322 Z';
 
-function NeonMark({ d, className, shift = 0 }: { d: string; className: string; shift?: number }) {
+function NeonMark({ d, className, transform }: { d: string; className: string; transform?: string }) {
   return (
-    <g className={`arc-neon ${className}`} transform={shift ? `translate(${shift} 0)` : undefined}>
+    <g className={`arc-neon ${className}`} transform={transform}>
       <path className={'arc-neon-bloom'} d={d} />
       <path className={'arc-neon-tube'} d={d} />
       <path className={'arc-neon-core'} d={d} />
@@ -27,14 +28,41 @@ function NeonMark({ d, className, shift = 0 }: { d: string; className: string; s
   );
 }
 
-/** The three marks as one neon sign. Decorative: the marquee is inside the `aria-hidden` cabinet frame. */
+function Sign() {
+  return (
+    <svg className={'arc-neon-sign'} viewBox="40 205 2160 270" preserveAspectRatio="xMidYMid meet" focusable="false">
+      <defs>
+        {/* The Video.js mark's own sunset stripes, top to bottom across the letters. */}
+        <linearGradient id="arc-neon-sunset" gradientUnits="userSpaceOnUse" x1="0" y1="239" x2="0" y2="445">
+          <stop offset="0" stopColor="#FFBF1F" />
+          <stop offset="0.35" stopColor="#FFA81B" />
+          <stop offset="0.6" stopColor="#FF6200" />
+          <stop offset="0.82" stopColor="#EB3132" />
+          <stop offset="1" stopColor="#C83368" />
+        </linearGradient>
+      </defs>
+      <NeonMark d={VJS} className={'arc-neon-vjs'} />
+      <NeonMark d={MUX} className={'arc-neon-mux'} transform="translate(160 0)" />
+      {/* The sparkle is drawn taller than the letters; scaled about its centre to their height. */}
+      <NeonMark d={STAR} className={'arc-neon-star'} transform="translate(320 0) translate(1706 341) scale(0.6) translate(-1706 -341)" />
+    </svg>
+  );
+}
+
+/**
+ * The marks as one neon sign that scrolls through the marquee window like a ticker. Four copies sit in a row and the
+ * row moves left by half its length, so the window is always full and the loop is seamless; under reduced motion it holds still, centred. Decorative: the marquee is inside the
+ * `aria-hidden` cabinet frame.
+ */
 export function MarqueeLogos() {
   return (
-    <svg className={'arc-neon-sign'} viewBox="40 130 2200 426" preserveAspectRatio="xMidYMid meet" focusable="false">
-      <NeonMark d={VJS} className={'arc-neon-vjs'} />
-      <NeonMark d={MUX} className={'arc-neon-mux'} shift={160} />
-      <NeonMark d={STAR} className={'arc-neon-star'} shift={320} />
-    </svg>
+    <span className={'arc-ticker'}>
+      {[0, 1, 2, 3].map((i) => (
+        <span key={i} className={'arc-ticker-run'}>
+          <Sign />
+        </span>
+      ))}
+    </span>
   );
 }
 
