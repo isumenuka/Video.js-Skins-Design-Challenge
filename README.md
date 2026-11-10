@@ -4,7 +4,7 @@
 - **Cabinet:** a lit neon marquee, a curved CRT tube, a control deck with two working joysticks and real arcade buttons,.
 - **Under the art:** every control is still a Video.js component, and every new one is a real, labelled, keyboard-operable control.
 
-Live demo: https://challenge-skin.vercel.app · Film: *Sintel* (CC BY 3.0, Blender Foundation), streamed by Mux.
+Live demo: https://arcade-skin.vercel.app · Film: *Sintel* (CC BY 3.0, Blender Foundation), streamed by Mux.
 
 ## What makes it different
 
