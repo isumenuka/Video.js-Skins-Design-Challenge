@@ -76,6 +76,8 @@
     /* ---------- The volume ---------- */
     :scope,
     :scope.media-video {
+      /* The A–Z drawers pull out past the cover. */
+      overflow: visible;
       display: grid;
       grid-template-columns: auto auto minmax(0, 1fr) auto;
       grid-template-rows: auto auto;
@@ -470,12 +472,16 @@
       height: 0;
       min-height: 100%;
       padding-block: 0.25rem;
+      z-index: 4;
     }
 
     .voca-thumb-tab {
+      position: relative;
       display: grid;
       place-items: center;
+      min-height: 0;
       margin-block: 1px;
+      padding: 0;
       border-radius: 0 0.5rem 0.5rem 0;
       background: linear-gradient(to right, var(--voca-paper-edge), var(--voca-paper-shade));
       color: var(--voca-ink-soft);
@@ -483,22 +489,98 @@
       font-size: clamp(0.4375rem, 0.9cqi, 0.6875rem);
       font-weight: 700;
       line-height: 1;
-      overflow: hidden;
+      cursor: pointer;
+      transition:
+        translate 380ms cubic-bezier(0.2, 0.8, 0.2, 1.2),
+        background-color 300ms ease-out,
+        box-shadow 300ms ease-out;
     }
 
     .voca-thumb-tab:nth-child(even) {
       margin-inline-start: 0.125rem;
     }
 
-    .voca-thumb-tab[data-reached] {
+    .voca-thumb-tab[aria-disabled="true"] {
+      cursor: default;
+      color: rgb(74 68 56 / 0.4);
+      background: linear-gradient(to right, #a9a59a, #cfcbbf);
+    }
+
+    @media (hover: hover) {
+      .voca-thumb-tab:not([aria-disabled="true"]):hover {
+        translate: 0.25rem 0;
+      }
+    }
+
+    .voca-thumb-tab:focus-visible {
+      outline: 2px solid var(--voca-foil);
+      outline-offset: 1px;
+      z-index: 2;
+    }
+
+    .voca-thumb-tab[data-heard] {
       background: linear-gradient(to right, var(--voca-gold-deep), var(--voca-gold-light));
       color: var(--voca-ink);
+    }
+
+    /* The pulled drawer: the tab slides out past the fore-edge with its word written on it. */
+    .voca-thumb-tab[data-popped] {
+      translate: 0.5rem 0;
+      z-index: 3;
+      background: linear-gradient(to right, var(--voca-gold), var(--voca-gold-light));
+      box-shadow: 0 0 14px rgb(224 184 77 / 0.75);
+    }
+
+    .voca-thumb-word {
+      position: absolute;
+      top: 50%;
+      left: calc(100% - 0.25rem);
+      display: flex;
+      align-items: center;
+      height: max(100%, 1.25rem);
+      padding: 0 0.6rem 0 0.5rem;
+      border-radius: 0 0.6rem 0.6rem 0;
+      background: linear-gradient(to right, var(--voca-gold-light), var(--voca-gold));
+      color: var(--voca-ink);
+      box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.55);
+      font-family: var(--voca-font-serif);
+      font-size: 0.8125rem;
+      font-style: italic;
+      font-weight: 700;
+      white-space: nowrap;
+      translate: 0 -50%;
+      transform-origin: left center;
+      animation: voca-drawer 4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      pointer-events: none;
+    }
+
+    @keyframes voca-drawer {
+      0% {
+        clip-path: inset(0 100% 0 0);
+        opacity: 0;
+      }
+      10% {
+        clip-path: inset(0 0 0 0);
+        opacity: 1;
+      }
+      85% {
+        clip-path: inset(0 0 0 0);
+        opacity: 1;
+      }
+      100% {
+        clip-path: inset(0 100% 0 0);
+        opacity: 0;
+      }
     }
 
     /* ---------- The open book, once there's room ---------- */
     @container media-root (width >= 52rem) {
       .voca-entry {
         display: flex;
+      }
+
+      .voca-word-slip {
+        display: none;
       }
 
       .voca-plate-frame,
@@ -994,6 +1076,404 @@
       color: var(--voca-gold-light);
       text-shadow: var(--voca-text-plate);
       text-wrap: balance;
+    }
+
+    /* ---------- The left page: Just heard + the glossary ---------- */
+    .voca-just-heard {
+      flex: none;
+      height: clamp(8.75rem, 19cqi, 12rem);
+      perspective: 1100px;
+    }
+
+    .voca-card {
+      height: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid rgb(23 19 12 / 0.18);
+      border-radius: 0.25rem;
+      background: linear-gradient(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.2));
+      box-shadow:
+        0 1px 0 rgb(255 255 255 / 0.8) inset,
+        0 6px 14px -10px rgb(23 19 12 / 0.6);
+      overflow: hidden;
+    }
+
+    .voca-card-kicker {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--voca-rubric);
+    }
+
+    .voca-card-time {
+      font-family: var(--voca-font-serif);
+      letter-spacing: 0;
+      color: var(--voca-ink-soft);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .voca-card-headword {
+      margin-top: 0.15rem;
+      font-family: var(--voca-font-serif);
+      font-weight: 700;
+      font-size: clamp(1.25rem, 2.9cqi, 2rem);
+      line-height: 1.1;
+      color: var(--voca-ink);
+    }
+
+    .voca-card-pos {
+      font-size: 0.55em;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--voca-ink-soft);
+    }
+
+    .voca-card-ipa {
+      margin-top: 0.1rem;
+      font-family: var(--voca-font-serif);
+      font-size: 0.8125rem;
+      color: var(--voca-cobalt);
+    }
+
+    .voca-card-definition {
+      margin-top: 0.35rem;
+      font-family: var(--voca-font-serif);
+      font-size: clamp(0.8125rem, 1.35cqi, 0.9375rem);
+      line-height: 1.35;
+      color: var(--voca-ink);
+    }
+
+    .voca-card-translation {
+      margin-top: 0.25rem;
+      font-family: var(--voca-font-serif);
+      font-size: 0.875rem;
+      color: var(--voca-ink-soft);
+    }
+
+    .voca-card-quote {
+      margin-top: 0.3rem;
+      padding-inline-start: 0.5rem;
+      border-inline-start: 2px solid var(--voca-gold);
+      font-family: var(--voca-font-serif);
+      font-size: 0.75rem;
+      font-style: italic;
+      color: var(--voca-ink-soft);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .voca-just-heard .voca-title-page {
+      height: 100%;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      text-align: center;
+      gap: 0.25rem;
+    }
+
+    .voca-glossary-count {
+      margin: 0.55rem 0 0.35rem;
+      text-align: center;
+      font-family: var(--voca-font-serif);
+      font-size: 0.75rem;
+      font-style: italic;
+      color: var(--voca-gold-ink);
+    }
+
+    .voca-glossary-count span {
+      font-style: normal;
+      font-weight: 700;
+      color: var(--voca-rubric);
+    }
+
+    .voca-glossary {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      padding-inline-end: 0.25rem;
+      /* Two columns of letters that scroll down together (CSS columns would overflow sideways instead). */
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+      align-content: start;
+      gap: 0.4rem 1rem;
+    }
+
+    .voca-glossary-section {
+      min-width: 0;
+    }
+
+    .voca-glossary-letter {
+      font-family: var(--voca-font-serif);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--voca-cobalt);
+      border-bottom: 1px solid rgb(31 48 255 / 0.25);
+      transition: color 300ms ease-out;
+    }
+
+    .voca-glossary-section[data-empty] .voca-glossary-letter {
+      color: rgb(23 19 12 / 0.2);
+      border-bottom-color: rgb(23 19 12 / 0.08);
+    }
+
+    .voca-glossary-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+      padding-block: 0.1rem;
+      font-size: 0.75rem;
+      line-height: 1.3;
+      animation: voca-ink 700ms ease-out both;
+    }
+
+    .voca-glossary-row dt b {
+      font-family: var(--voca-font-serif);
+      font-weight: 700;
+    }
+
+    .voca-leader {
+      flex: 1;
+      min-width: 0.75rem;
+      border-bottom: 1px dotted rgb(23 19 12 / 0.35);
+      translate: 0 -0.2em;
+    }
+
+    .voca-glossary-row dt {
+      white-space: nowrap;
+    }
+
+    .voca-glossary-row dd {
+      min-width: 0;
+      color: var(--voca-cobalt);
+      font-weight: 500;
+      text-align: end;
+      overflow-wrap: anywhere;
+    }
+
+    /* Ink being written: the row wipes in left to right behind a nib. */
+    @keyframes voca-ink {
+      from {
+        clip-path: inset(0 100% 0 0);
+      }
+      to {
+        clip-path: inset(0 0 0 0);
+      }
+    }
+
+    .voca-glossary-row[data-new] {
+      position: relative;
+      background: linear-gradient(to right, rgb(224 184 77 / 0.28), transparent);
+      border-radius: 0.2rem;
+    }
+
+    .voca-glossary-row[data-new]::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 0.35rem;
+      height: 0.35rem;
+      border-radius: 50%;
+      background: var(--voca-ink);
+      translate: -50% -50%;
+      animation: voca-nib 700ms ease-out both;
+    }
+
+    @keyframes voca-nib {
+      from {
+        left: 0;
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      to {
+        left: 100%;
+        opacity: 0;
+      }
+    }
+
+    /* ---------- Karaoke subtitles ---------- */
+    .voca-k {
+      position: relative;
+      color: rgb(255 255 255 / 0.5);
+      animation: voca-sweep 220ms ease-out var(--d, 0s) both;
+    }
+
+    @keyframes voca-sweep {
+      to {
+        color: #fff;
+      }
+    }
+
+    .voca-k[data-special] {
+      animation-name: voca-sweep-gold;
+    }
+
+    @keyframes voca-sweep-gold {
+      to {
+        color: var(--voca-gold-light);
+      }
+    }
+
+    /* The special word's gilt underline draws in, and a spark lands on it. */
+    .voca-k[data-special]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      bottom: -0.06em;
+      height: 0.08em;
+      border-radius: 0.04em;
+      background: var(--voca-gold);
+      box-shadow: 0 0 6px rgb(224 184 77 / 0.8);
+      transform-origin: left;
+      scale: 0 1;
+      animation: voca-underline 380ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0s) both;
+    }
+
+    @keyframes voca-underline {
+      to {
+        scale: 1 1;
+      }
+    }
+
+    .voca-k[data-special]::before {
+      content: "✦";
+      position: absolute;
+      top: -0.55em;
+      right: -0.35em;
+      font-size: 0.45em;
+      color: var(--voca-gold-light);
+      text-shadow: 0 0 6px rgb(224 184 77 / 0.9);
+      opacity: 0;
+      scale: 0;
+      animation: voca-spark 900ms cubic-bezier(0.2, 0.8, 0.2, 1.4) var(--d, 0s) both;
+    }
+
+    @keyframes voca-spark {
+      0% {
+        opacity: 0;
+        scale: 0;
+        rotate: -90deg;
+      }
+      50% {
+        opacity: 1;
+        scale: 1.4;
+      }
+      100% {
+        opacity: 0.9;
+        scale: 1;
+        rotate: 0deg;
+      }
+    }
+
+    .voca-subtitles[data-paused] .voca-k,
+    .voca-subtitles[data-paused] .voca-k::before,
+    .voca-subtitles[data-paused] .voca-k::after {
+      animation-play-state: paused;
+    }
+
+    /* ---------- The word slip (phones) ---------- */
+    .voca-word-slip {
+      grid-area: plate;
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      z-index: 4;
+      display: flex;
+      align-items: baseline;
+      gap: 0.35rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 0.25rem 0.6rem 0.6rem 0.25rem;
+      background: linear-gradient(to right, var(--voca-gold-light), var(--voca-gold));
+      color: var(--voca-ink);
+      box-shadow: 0 6px 16px -6px rgb(0 0 0 / 0.7);
+      font-family: var(--voca-font-serif);
+      font-size: 0.8125rem;
+      pointer-events: none;
+      animation: voca-slip 4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .voca-word-slip-spark {
+      color: var(--voca-rubric);
+    }
+
+    .voca-word-slip-sep {
+      color: var(--voca-gold-ink);
+    }
+
+    @keyframes voca-slip {
+      0% {
+        opacity: 0;
+        translate: -1rem 0;
+      }
+      10%,
+      85% {
+        opacity: 1;
+        translate: 0 0;
+      }
+      100% {
+        opacity: 0;
+        translate: 0 0;
+      }
+    }
+
+    @container media-root (width >= 52rem) {
+      .voca-word-slip {
+        display: none;
+      }
+    }
+
+    /* ---------- Reduced motion: the words are simply there ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      .voca-k {
+        animation: none;
+        color: #fff;
+      }
+
+      .voca-k[data-special] {
+        color: var(--voca-gold-light);
+      }
+
+      .voca-k[data-special]::after {
+        animation: none;
+        scale: 1 1;
+      }
+
+      .voca-k[data-special]::before {
+        animation: none;
+        opacity: 0.9;
+        scale: 1;
+      }
+
+      .voca-glossary-row,
+      .voca-glossary-row[data-new]::after {
+        animation: none;
+      }
+
+      .voca-thumb-tab {
+        transition: none;
+      }
+
+      .voca-thumb-word,
+      .voca-word-slip {
+        animation-name: voca-fade-hold;
+      }
+
+      @keyframes voca-fade-hold {
+        0%,
+        90% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
     }
 
     /* ---------- Phones ---------- */

@@ -55,6 +55,9 @@ body {
 }
 
 .lab-desk {
+  /* The A–Z drawers pull out past the volume; keep them from widening the page. */
+  overflow-x: clip;
+  overflow-clip-margin: 6rem;
   display: grid;
   justify-items: center;
   padding-block: 8px;

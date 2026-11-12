@@ -23,10 +23,11 @@ export function LabFooter() {
     <footer className="lab-footer">
       <p>
         <strong>The Living Encyclopedia</strong> is a Video.js 10 skin for Vocapedia, the free encyclopedia of
-        languages. The player is an open volume bound in Vocapedia cobalt. The film plays as an engraved plate on the
-        right page, and the left page turns to a new encyclopedia entry for each spoken line, with its translation and
-        the words worth keeping. The page edges are the timeline, with a silk ribbon as the bookmark, and play/pause is
-        a wax seal. On a phone the volume closes down to its gilt edge, and the picture fills the frame.
+        languages. The player is an open volume bound in Vocapedia cobalt, with the film as an engraved plate. As each
+        line is spoken, the subtitle sweeps word by word, and every word worth learning turns gold. Its A–Z thumb tab
+        pulls out with the word written on it, and the left page turns to its dictionary entry, then inks it into a
+        glossary that grows as you watch. The page edges are the timeline, with a silk ribbon as the bookmark, and
+        play/pause is a wax seal.
       </p>
       <p className="lab-credit">
         &ldquo;Sintel&rdquo; &copy; copyright Blender Foundation |{' '}

@@ -14,12 +14,18 @@ export interface Cue {
 }
 
 export interface Gloss {
-  /** Headword shown in the popover and the vocabulary list. */
+  /** The form the word is filed under: it decides the sort order and the A–Z tab. */
+  lemma: string;
+  /** The headword as printed. */
   term: string;
-  /** Translation into the learner's language. */
-  translation: string;
   /** Part of speech, abbreviated. */
   pos: string;
+  /** Pronunciation, in IPA. */
+  ipa: string;
+  /** A one-line English definition. */
+  definition: string;
+  /** Translation into the learner's language. */
+  translation: string;
 }
 
 export interface Lesson {
@@ -85,40 +91,51 @@ const raw: Array<[string, string, string, string]> = [
   ['00:10:26,200', '00:10:29,800', 'Scales...', 'Scales...'],
 ];
 
-const g = (term: string, translation: string, pos: string): Gloss => ({ term, translation, pos });
+/**
+ * Dictionary data for each special word: the form it's filed under, how it's said, what it means, and the French.
+ * `term` is how the headword prints; `lemma` is how it sorts and which A–Z tab it lives behind.
+ */
+const g = (lemma: string, term: string, pos: string, ipa: string, definition: string, translation: string): Gloss => ({
+  lemma,
+  term,
+  pos,
+  ipa,
+  definition,
+  translation,
+});
 
-const blade = g('blade', 'lame', 'n.');
-const dark = g('dark', 'sombre', 'adj.');
-const past = g('past', 'passé', 'n.');
-const shed = g('shed (blood)', 'verser, faire couler', 'v.');
-const innocent = g('innocent', 'innocent·e', 'adj.');
-const blood = g('blood', 'sang', 'n.');
-const fool = g('fool', 'idiot·e', 'n.');
-const traveling = g('to travel', 'voyager', 'v.');
-const alone = g('alone', 'seul·e', 'adj.');
-const unprepared = g('unprepared', 'sans préparation', 'adj.');
-const lucky = g('lucky', 'chanceux·se', 'adj.');
-const flowing = g('to flow', 'couler', 'v.');
-const brings = g('to bring', 'amener', 'v.');
-const land = g('land', 'terre', 'n.');
-const gatekeepers = g('gatekeeper', 'gardien·ne', 'n.');
-const searching = g('to search for', 'chercher', 'v.');
-const someone = g('someone', 'quelqu’un', 'pron.');
-const dear = g('dear', 'cher·ère', 'adj.');
-const kindred = g('kindred spirit', 'âme sœur', 'phrase');
-const dragon = g('dragon', 'dragon', 'n.');
-const dangerous = g('dangerous', 'dangereux·se', 'adj.');
-const quest = g('quest', 'quête', 'n.');
-const lone = g('lone', 'solitaire', 'adj.');
-const hunter = g('hunter', 'chasseur·esse', 'n.');
-const remember = g('to remember', 'se souvenir', 'v.');
-const almost = g('almost', 'presque', 'adv.');
-const still = g('still', 'encore ; immobile', 'adv./adj.');
-const night = g('night', 'nuit', 'n.');
-const failed = g('to fail', 'échouer', 'v.');
-const closer = g('close → closer', 'proche → plus proche', 'adj.');
-const scales = g('scales', 'écailles (le nom du dragon)', 'n.');
-const thank = g('thank you', 'merci', 'phrase');
+const blade = g('blade', 'blade', 'n.', '/bleɪd/', 'The flat, sharp cutting part of a sword or knife.', 'lame');
+const dark = g('dark', 'dark', 'adj.', '/dɑːk/', 'Hidden, troubling or evil; also, with little light.', 'sombre');
+const past = g('past', 'past', 'n.', '/pɑːst/', 'The time and events before now; someone’s history.', 'passé');
+const shed = g('shed', 'shed (blood)', 'v.', '/ʃed/', 'To cause blood to flow, by wounding or killing.', 'verser, faire couler');
+const innocent = g('innocent', 'innocent', 'adj.', '/ˈɪn.ə.sənt/', 'Having done nothing wrong; not guilty.', 'innocent·e');
+const blood = g('blood', 'blood', 'n.', '/blʌd/', 'The red liquid that flows through the body.', 'sang');
+const fool = g('fool', 'fool', 'n.', '/fuːl/', 'A person who acts without good sense.', 'idiot·e');
+const travel = g('travel', 'to travel', 'v.', '/ˈtræv.əl/', 'To go from one place to another, often far.', 'voyager');
+const alone = g('alone', 'alone', 'adj.', '/əˈləʊn/', 'Without anyone else; by yourself.', 'seul·e');
+const unprepared = g('unprepared', 'unprepared', 'adj.', '/ˌʌn.prɪˈpeəd/', 'Not ready for what is going to happen.', 'sans préparation');
+const lucky = g('lucky', 'lucky', 'adj.', '/ˈlʌk.i/', 'Having good things happen by chance.', 'chanceux·se');
+const flow = g('flow', 'to flow', 'v.', '/fləʊ/', 'To move along steadily, as a liquid does.', 'couler');
+const bring = g('bring', 'to bring', 'v.', '/brɪŋ/', 'To make someone come to a place.', 'amener');
+const land = g('land', 'land', 'n.', '/lænd/', 'A country or region; the ground of a place.', 'terre');
+const gatekeeper = g('gatekeeper', 'gatekeeper', 'n.', '/ˈɡeɪtˌkiː.pər/', 'Someone who guards a gate or a way in.', 'gardien·ne');
+const search = g('search for', 'to search for', 'v.', '/sɜːtʃ fɔː/', 'To look carefully in order to find someone.', 'chercher');
+const someone = g('someone', 'someone', 'pron.', '/ˈsʌm.wʌn/', 'A person who is not named or known.', 'quelqu’un');
+const dear = g('dear', 'dear', 'adj.', '/dɪər/', 'Loved very much; precious.', 'cher·ère');
+const kindred = g('kindred spirit', 'kindred spirit', 'phr.', '/ˌkɪn.drəd ˈspɪr.ɪt/', 'A person who feels and thinks as you do.', 'âme sœur');
+const dragon = g('dragon', 'dragon', 'n.', '/ˈdræɡ.ən/', 'A huge winged reptile of legend that breathes fire.', 'dragon');
+const dangerous = g('dangerous', 'dangerous', 'adj.', '/ˈdeɪn.dʒər.əs/', 'Able to harm or kill you.', 'dangereux·se');
+const quest = g('quest', 'quest', 'n.', '/kwest/', 'A long, hard search for something.', 'quête');
+const lone = g('lone', 'lone', 'adj.', '/ləʊn/', 'Alone; the only one.', 'solitaire');
+const hunter = g('hunter', 'hunter', 'n.', '/ˈhʌn.tər/', 'A person who chases and catches animals.', 'chasseur·esse');
+const remember = g('remember', 'to remember', 'v.', '/rɪˈmem.bər/', 'To keep something in your mind.', 'se souvenir');
+const almost = g('almost', 'almost', 'adv.', '/ˈɔːl.məʊst/', 'Very nearly, but not quite.', 'presque');
+const still = g('still', 'still', 'adv./adj.', '/stɪl/', 'Even now; or, not moving at all.', 'encore ; immobile');
+const night = g('night', 'night', 'n.', '/naɪt/', 'The dark part of the day, when people sleep.', 'nuit');
+const fail = g('fail', 'to fail', 'v.', '/feɪl/', 'To not succeed in doing what you tried to do.', 'échouer');
+const close = g('close', 'close → closer', 'adj.', '/kləʊs/', 'Near in space or time.', 'proche → plus proche');
+const scales = g('scales', 'scales', 'n.', '/skeɪlz/', 'The small hard plates on a reptile’s skin — and the dragon’s name.', 'écailles');
+const thank = g('thank you', 'thank you', 'phr.', '/ˈθæŋk juː/', 'What you say to show you are grateful.', 'merci');
 
 export const sintelLesson: Lesson = {
   title: 'English 101: Sintel — A Dragon’s Tale',
@@ -140,20 +157,19 @@ export const sintelLesson: Lesson = {
     blood,
     "blood's": blood,
     fool,
-    traveling,
+    traveling: travel,
     alone,
     unprepared,
     lucky,
-    flowing,
-    brings,
+    flowing: flow,
+    brings: bring,
     land,
     lands: land,
-    gatekeepers,
-    searching,
+    gatekeepers: gatekeeper,
+    searching: search,
     someone,
     dear,
     kindred,
-    spirit: kindred,
     dragon,
     dangerous,
     quest,
@@ -163,8 +179,8 @@ export const sintelLesson: Lesson = {
     almost,
     still,
     night,
-    failed,
-    closer,
+    failed: fail,
+    closer: close,
     scales,
     thank,
   },
@@ -188,8 +204,7 @@ const VOCAPEDIA = 'https://vocapedia.base44.app';
 
 /** Vocapedia's search finds the entry, or offers to write it when the encyclopedia has none yet. */
 export function vocapediaUrl(gloss: Gloss, languageCode: string) {
-  const term = gloss.term.replace(/^to /, '').replace(/\s*\(.*\)$/, '').split(' → ')[0];
-  return `${VOCAPEDIA}/search?q=${encodeURIComponent(term)}&language=${languageCode.toLowerCase()}`;
+  return `${VOCAPEDIA}/search?q=${encodeURIComponent(gloss.lemma)}&language=${languageCode.toLowerCase()}`;
 }
 
 export const vocapediaHome = VOCAPEDIA;
@@ -215,4 +230,59 @@ export function formatTime(seconds: number) {
   const s = Math.max(0, Math.floor(seconds));
   const m = Math.floor(s / 60);
   return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+}
+
+/** The A–Z tab a word lives behind. */
+export function letterOf(gloss: Gloss) {
+  return gloss.lemma.charAt(0).toUpperCase();
+}
+
+export interface TimedToken {
+  text: string;
+  word: boolean;
+  /** When the karaoke sweep reaches this word, in media seconds. */
+  start: number;
+  gloss?: Gloss;
+}
+
+/**
+ * Word timings for one line. Sintel's subtitles are timed per line, not per word, so the line's duration is spread
+ * across its words by length: close enough for a reading sweep.
+ */
+export function wordTimings(lesson: Lesson, cue: Cue): TimedToken[] {
+  const tokens = tokenize(cue.native);
+  const weight = (text: string) => text.replace(/[^\p{L}']/gu, '').length + 1.5;
+  const total = tokens.reduce((sum, token) => sum + (token.word ? weight(token.text) : 0), 0) || 1;
+  const lead = Math.min(0.15, (cue.end - cue.start) * 0.05);
+  const span = (cue.end - cue.start) * 0.85 - lead;
+  let consumed = 0;
+  return tokens.map((token) => {
+    const start = cue.start + lead + (consumed / total) * span;
+    if (token.word) consumed += weight(token.text);
+    return { ...token, start, gloss: token.word ? glossFor(lesson, token.text) : undefined };
+  });
+}
+
+export interface Occurrence {
+  /** Position in the lesson's list of occurrences. */
+  index: number;
+  gloss: Gloss;
+  cueId: number;
+  time: number;
+}
+
+const occurrenceCache = new WeakMap<Lesson, Occurrence[]>();
+
+/** Every time a special word is spoken in the film, in order. */
+export function occurrences(lesson: Lesson): Occurrence[] {
+  const cached = occurrenceCache.get(lesson);
+  if (cached) return cached;
+  const list: Occurrence[] = [];
+  for (const cue of lesson.cues) {
+    for (const token of wordTimings(lesson, cue)) {
+      if (token.gloss) list.push({ index: list.length, gloss: token.gloss, cueId: cue.id, time: token.start });
+    }
+  }
+  occurrenceCache.set(lesson, list);
+  return list;
 }

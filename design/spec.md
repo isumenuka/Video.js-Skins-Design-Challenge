@@ -3,14 +3,19 @@
 Status: **built** (Video.js 10.3.0, React + plain CSS, from Scaffold; theme `data-theme="vocapedia"`).
 
 ## Concept
-Vocapedia calls itself "the free encyclopedia of languages", so the player *is* an encyclopedia: an open volume bound in Vocapedia cobalt.
-- **Left page, the Entry:** turns over for each spoken line. It sets the line as a headword, with the French translation and the words worth keeping.
-- **Right page, the Plate:** the film, as an engraved plate.
-- **Page edges, the timeline:** a silk ribbon marks your place. Each line of dialogue is a dog-ear on the edges, and A–Z thumb-index tabs gild as the film goes on.
-- **Cover:** the controls sit on the cover, led by a wax-seal play button.
+Vocapedia calls itself "the free encyclopedia of languages", so the player *is* an encyclopedia: an open volume bound in Vocapedia cobalt, and a dictionary that writes itself as the film speaks.
+
+- **Karaoke subtitles:** on the plate, the English line sweeps word by word. The timing is estimated from word length across each subtitle line. Special words turn gold, with an underline that draws in and a ✦ spark. The French line sits beneath.
+- **A–Z thumb index:** when a special word is spoken, its letter's tab pulls out past the fore-edge like a drawer, with the word written on it in gilt. Letters already heard stay gilt, and letters the film never uses are dimmed. Pressing a tab jumps to that letter's first word and opens the glossary there. It is one Tab stop; the arrow keys move between letters.
+- **Left page, "Your Glossary":**
+  - **Just heard:** the newest word as a full dictionary entry (headword, part of speech, IPA, definition, French, the line it came from). The card turns over like a page for each new word.
+  - **Glossary:** A–Z sections fill as you watch, each word inked in by a moving nib, with a "n of 32 words collected" count. The page is derived from playback time, so seeking back un-writes words.
+- **Seek bar:** the page edges, gilt where read, with a silk ribbon bookmark and a dog-ear for every line of dialogue.
+- **Play/pause:** a wax seal.
+- **Phones:** the book folds down to its gilt trim. A word slip ("✦ dragon · dragon") slides in at the corner of the plate.
 - **Art:** every ornament is CSS or inline SVG, with no images.
 
-**Submission blurb:** The Living Encyclopedia is a Video.js 10 skin for Vocapedia, the free encyclopedia of languages. The player is an open volume bound in Vocapedia cobalt. The film plays as an engraved plate on the right page, and the left page turns to a new encyclopedia entry for each spoken line, with its translation and the words worth keeping. The page edges are the timeline, with a silk ribbon as the bookmark, and play/pause is a wax seal. On a phone the volume closes down to its gilt edge, and the picture fills the frame.
+**Submission blurb:** The Living Encyclopedia is a Video.js 10 skin for Vocapedia, the free encyclopedia of languages. The player is an open volume bound in Vocapedia cobalt, with the film as an engraved plate. As each line is spoken, the subtitle sweeps word by word, and every word worth learning turns gold. Its A–Z thumb tab pulls out with the word written on it, and the left page turns to its dictionary entry, then inks it into a glossary that grows as you watch. The page edges are the timeline, with a silk ribbon as the bookmark, and play/pause is a wax seal.
 
 ## Palette (from vocapedia.base44.app's CSS)
 | Role | Value |
