@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/resolve-class-name';
 
-import { AutoPauseSwitch, NextLineButton, SubtitleModeGroup, SubtitlesToggle, Watermark } from '../lesson/lab-controls';
+import { SubtitlesToggle } from '../lesson/lab-controls';
 import { LiveButton } from './live-button';
 import { MuteButton } from './mute-button';
 import { AudioPlayButton, PlayButton } from './play-button';
@@ -47,7 +47,6 @@ export function ControlsRow({
         {audio ? <AudioPlayButton /> : <PlayButton />}
         {seekBackward}
         {seekForward}
-        {!audio && <NextLineButton />}
         {live && <LiveButton />}
         {!live && (
           <Time.Group className={'media-time-group'}>
@@ -61,8 +60,6 @@ export function ControlsRow({
       </Controls.Group>
 
       <Controls.Group className={cn('video-controls-group', 'video-controls-end')}>
-        {!audio && <SubtitleModeGroup />}
-        {!audio && <AutoPauseSwitch />}
         {captions}
         {rate}
         {menu ?? (audio && <VolumePopover />)}
@@ -83,6 +80,10 @@ export interface ControlsSlots extends ThumbnailSlot {
   seekForward?: ReactNode;
 }
 
+/**
+ * The controls sit on the volume's cover, below the open pages, so they never cover the picture: the page edges (seek
+ * bar) first, then the strip of buttons.
+ */
 export function ControlsContent({
   audio = false,
   captions,
@@ -92,20 +93,18 @@ export function ControlsContent({
   renderThumbnail,
   seekBackward,
   seekForward,
-  top,
-}: ControlsSlots & { audio?: boolean; live?: boolean; menu?: ReactNode; top?: ReactNode } = {}) {
+}: ControlsSlots & { audio?: boolean; live?: boolean; menu?: ReactNode } = {}) {
   return (
     <Controls.Content className={cn('video-controls-content', audio && 'audio-controls-content')}>
       <Tooltip.Provider>
-        {top && <Controls.Group className={'video-controls-top'}>{top}</Controls.Group>}
         <div
+          data-interactive
           className={cn(
             'video-controls-bottom',
             audio && 'audio-controls-bottom',
             !audio && 'video-controls-video-bottom'
           )}
         >
-          {!audio && <Watermark />}
           {!live && <TimeSlider audio={audio} renderThumbnail={renderThumbnail} />}
           <ControlsRow
             audio={audio}

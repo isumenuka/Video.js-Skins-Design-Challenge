@@ -13,7 +13,9 @@ import { cn } from '@/lib/resolve-class-name';
 import { VideoGestures } from './behaviors/gestures';
 import { VideoHotkeys } from './behaviors/hotkeys';
 import { VideoControls } from './controls';
+import { BookOrnaments, PlateCaption, ThumbIndex } from './lesson/book-ornaments';
 import { DualSubtitles } from './lesson/dual-subtitles';
+import { EntryPage } from './lesson/entry-page';
 import { ErrorDialog } from './shared/error-dialog';
 import { Indicators } from './shared/indicators';
 import { SeekIndicator } from './shared/seek-indicator';
@@ -34,9 +36,15 @@ export function VideoSkin({ children, className, renderPoster, renderThumbnail, 
       data-preset="video"
       {...props}
     >
+      {/* The open volume: the entry page, the spine, then the plate that holds the picture. */}
+      <EntryPage />
+      <BookOrnaments />
+      <div className="voca-plate-frame" aria-hidden="true" />
       {children}
       <Poster renderImage={renderPoster} />
       <DualSubtitles />
+      <PlateCaption />
+      <ThumbIndex />
       <ErrorDialog />
       <VideoControls renderThumbnail={renderThumbnail} />
 

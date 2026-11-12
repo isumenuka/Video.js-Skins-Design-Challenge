@@ -241,6 +241,30 @@ export const PauseLineIcon = (props: IconProps) => (
   </Icon>
 );
 
+/** A gilt corner ornament for the cover: a double rule that curls into a leaf. Drawn for the top-left corner. */
+export const Fleuron = (props: IconProps) => (
+  <svg viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" {...props}>
+    <path d="M4 60V12a8 8 0 0 1 8-8h48" strokeWidth="1.6" />
+    <path d="M10 60V18a8 8 0 0 1 8-8h42" strokeWidth="0.8" opacity="0.8" />
+    <path
+      d="M18 18c6-1 10 2 10 7 0 4-3 6-6 5-2.5-.8-2.8-4-.6-5 1.6-.7 3 .6 2.6 2"
+      strokeWidth="1.4"
+      strokeLinecap="round"
+    />
+    <path d="M28 25c5-6 12-8 20-7M25 28c-6 5-8 12-7 20" strokeWidth="1.1" strokeLinecap="round" />
+    <path d="M40 17.5c2.5-3 6-3.8 8.5-2-2.2 2.6-5.4 3.2-8.5 2ZM17.5 40c-3 2.5-3.8 6-2 8.5 2.6-2.2 3.2-5.4 2-8.5Z" fill="currentColor" stroke="none" />
+    <circle cx="4" cy="4" r="2.2" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+/** The emboss on the wax-seal play button: the Vocapedia V inside a ring of dots. */
+export const WaxSealMark = (props: IconProps) => (
+  <svg viewBox="0 0 48 48" width="48" height="48" fill="none" stroke="currentColor" aria-hidden="true" focusable="false" {...props}>
+    <circle cx="24" cy="24" r="19" strokeWidth="1.2" strokeDasharray="0.1 3.6" strokeLinecap="round" />
+    <circle cx="24" cy="24" r="15.5" strokeWidth="0.8" opacity="0.7" />
+  </svg>
+);
+
 /** The Vocapedia mark: a "V" cut from two strokes, after the site's logo. */
 export const VocapediaMark = (props: IconProps) => (
   <Icon strokeWidth={2.4} {...props}>

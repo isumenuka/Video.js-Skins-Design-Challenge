@@ -7,7 +7,7 @@ import { sintelLesson } from '@/video/lesson/lesson-data';
 import { VideoSkin } from '@/video/skin';
 
 import type { PlaybackProps } from '../shell/params';
-import { LabFooter, LabHeader, LabPanel } from './lab-page';
+import { LabFooter, LabHeader } from './lab-page';
 
 // What the preview plays: "Sintel" hosted on Mux (public playback ID, used for the challenge's Mux bonus).
 // Sintel © copyright Blender Foundation | durian.blender.org — licensed CC BY 3.0.
@@ -17,7 +17,7 @@ const POSTER = `https://image.mux.com/${PLAYBACK_ID}/thumbnail.webp?time=118`;
 
 /**
  * `media` carries the workbench's playback options: autoplay, muted, loop, and preload. The lesson provider sits
- * inside the player so both the skin and the page's transcript panel read and seek the same playback.
+ * inside the player so the skin's entry page and subtitles read the same playback.
  */
 export function Player({ media, style }: { media?: PlaybackProps; style?: CSSProperties }) {
   return (
@@ -25,15 +25,12 @@ export function Player({ media, style }: { media?: PlaybackProps; style?: CSSPro
       <LessonProvider lesson={sintelLesson}>
         <div className="lab">
           <LabHeader />
-          <div className="lab-main">
-            <div className="lab-stage">
-              <div className="preview-player" style={style}>
-                <VideoSkin>
-                  <MuxVideo {...media} src={SRC} playsInline crossOrigin="" />
-                </VideoSkin>
-              </div>
+          <div className="lab-desk">
+            <div className="preview-player" style={style}>
+              <VideoSkin>
+                <MuxVideo {...media} src={SRC} playsInline crossOrigin="" />
+              </VideoSkin>
             </div>
-            <LabPanel />
           </div>
           <LabFooter />
         </div>

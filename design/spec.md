@@ -1,48 +1,47 @@
-# Skin design spec — Vocapedia Language Lab
+# Skin design spec — Vocapedia: The Living Encyclopedia
 
 Status: **built** (Video.js 10.3.0, React + plain CSS, from Scaffold; theme `data-theme="vocapedia"`).
 
 ## Concept
-A player for learning a language from film, in the brand of Vocapedia (vocapedia.base44.app, "the free encyclopedia of languages"). The spoken line is set like a dictionary headword in Source Serif 4, with its translation beneath it. Every word worth learning is a button that opens its gloss, with a link to Vocapedia and a ☆ save. Sentence tools and a dialogue lane on the seek bar turn the player into a study desk.
+Vocapedia calls itself "the free encyclopedia of languages", so the player *is* an encyclopedia: an open volume bound in Vocapedia cobalt.
+- **Left page, the Entry:** turns over for each spoken line. It sets the line as a headword, with the French translation and the words worth keeping.
+- **Right page, the Plate:** the film, as an engraved plate.
+- **Page edges, the timeline:** a silk ribbon marks your place. Each line of dialogue is a dog-ear on the edges, and A–Z thumb-index tabs gild as the film goes on.
+- **Cover:** the controls sit on the cover, led by a wax-seal play button.
+- **Art:** every ornament is CSS or inline SVG, with no images.
 
-**Submission blurb:** Vocapedia Language Lab turns a Video.js 10 player into a study desk for learning a language from film. The spoken line is set in Source Serif like an encyclopedia headword, with the translation beneath it, and every word worth learning opens its gloss and its Vocapedia article. Repeat segment, replay sentence, and pause per line work on whole sentences, and each line of dialogue appears as a dash along the seek bar. Everything uses Vocapedia's cobalt on deep navy, on a near-opaque bar that stays readable over Sintel's snow and caves.
+**Submission blurb:** The Living Encyclopedia is a Video.js 10 skin for Vocapedia, the free encyclopedia of languages. The player is an open volume bound in Vocapedia cobalt. The film plays as an engraved plate on the right page, and the left page turns to a new encyclopedia entry for each spoken line, with its translation and the words worth keeping. The page edges are the timeline, with a silk ribbon as the bookmark, and play/pause is a wax seal. On a phone the volume closes down to its gilt edge, and the picture fills the frame.
 
-## Tokens (`src/video/vocapedia.css`)
-| Token | Value | Source |
-| --- | --- | --- |
-| Ground | `#020513` | site `--ground` |
-| Primary | `#1f30ff` cobalt | site `--cobalt` / `--primary` |
-| Focus / link | `#8fa0ff` periwinkle | site `--link` |
-| Glow | `#5b6bff` | site `--ring` |
-| Border | `hsl(224 38% 22%)` | site `--border` (lifted, derived) |
-| Text / muted | `hsl(222 25% 94%)` / `hsl(222 20% 72%)` | site foreground / muted (muted lifted for 4.5:1, derived) |
-| Saved star | `hsl(43 80% 62%)` | site `--chart-3` |
-| Type | Inter (UI), Source Serif 4 (spoken line) | site fonts |
-| Radius | 0.5rem controls, 0.375rem menus | site `--radius` |
+## Palette (from vocapedia.base44.app's CSS)
+| Role | Value |
+| --- | --- |
+| Cloth | cobalt `#1f30ff` → `#08105a` → navy `#040929` (ground `#020513`) |
+| Gilt | `hsl(43 74% 60%)` (site chart gold), light `#f6e3a1`, deep `#a57a24` |
+| Paper / edge | `#f0efe9` / `#e4e1d6` / `#b9b6ad` |
+| Ink / rubric | `#17130c` / `#8a2a20` |
+| Type | Source Serif 4 (headwords, time, folios), Inter (UI) |
 
-## Layout (source order = focus order)
-- **Top bar:** language chip (EN → Français) · Repeat segment (`aria-pressed`) · Replay sentence
-- **Over the video:** dual subtitles (the spoken line in serif with a dark text plate and a periwinkle glow, the translation in Inter). Glossed words are underlined buttons whose popover holds the gloss, a Vocapedia link and Save. The 🔊 button reads the line aloud with speech synthesis.
-- **Bar:** seek bar with the dialogue lane (each cue drawn as a dash; the active cue lights up) → Play (filled cobalt, the bar's one solid key) · −10 · +10 · Next sentence · time · mute + inline volume ‖ Native/Trans./Both radio group · Pause-per-line switch · Subtitles toggle · Settings (Speed 0.5–1.5 with an "Active" badge, Quality, Subtitles, Replay, Pause per line, Repeat) · Fullscreen
-- **Page (workbench `preview.html`):** header (logo · Language Lab pill · lesson title), Transcript/Vocabulary tabs (ARIA tabs; the active cue glows and auto-scrolls; click to seek), "Vocabulary from this scene", footer with the Sintel credit.
+## Layout
+`.media-skin` is a grid with the areas `"entry spine plate index" / "rail rail rail rail"`.
+- The media, poster, buffering indicator, indicators and subtitles share the `plate` area, inset by the printed margin.
+- `.video-controls-content` is `display: contents`, so the rail sits on the cover below the pages and never covers the picture.
+- **Focus order:** wax seal → −10 → +10 → (time toggle at narrow sizes) → mute → volume → subtitles → settings (Speed, Quality) → fullscreen.
 
-## Responsive (container queries on `media-root`)
-- ≥ 56rem: everything in the bar.
-- < 56rem: the Pause-per-line switch moves to Settings. < 46rem: Native/Trans./Both moves to Settings.
-- < 36rem: top chips go icon-only; their labels stay for screen readers.
-- < 34rem: volume shrinks to the mute button.
-- < 30rem (phones): the bar is one row (no ±10, no CC; double-tap and the arrow keys still seek); the top bar moves to Settings; subtitles sit just above the bar at smaller sizes.
+## Responsive (container queries)
+- **≥ 52rem:** the open book (entry 34cqi, spine, plate with margins and caption, thumb index, fleurons).
+- **< 52rem:** the trim. Only the cloth edge with its gilt rule shows around a full-bleed plate, and the rail stays below it.
+- **< 34rem:** volume shrinks to the mute button.
+- **< 30rem:** ±10 hides (double-tap and the arrow keys still seek), and the seal shrinks to 44px.
 
 ## Accessibility
-- 2px periwinkle focus ring on every control. Touch targets are 2.75rem under `pointer: coarse`.
-- The radio group and tabs use roving tabindex with arrow keys. Glosses close with Escape and return focus to the word.
-- The segmented group's arrow keys are handled natively and prevented, so the player's seek hotkeys don't also fire.
-- Reduced motion turns off glows, transitions, slide-ins, and smooth transcript scrolling. Reduced transparency and more contrast use solid surfaces. Forced colors are supported.
+- **Focus:** a gilt focus ring on the cloth and a cobalt ring on the paper menus. Touch targets are 44px under `pointer: coarse`.
+- **Entry page:** a labelled `section` holding the line and its translation. The plate subtitles are `aria-hidden`, since they duplicate it.
+- **Gestures:** the pages and rail are marked `data-interactive`, so clicking the paper doesn't toggle playback.
+- **Reduced motion:** the page turn becomes a fade and the ribbon stops swaying. Forced colors are handled.
 
 ## Media (submission info)
 - **Mux playback ID:** `fNEeWPY4UUEkfCFd9617w8gvYFEsFOv72rPQj3qKG700` (public). Keep the asset live through judging.
-- **Video:** "Sintel" © copyright Blender Foundation | durian.blender.org, CC BY 3.0. The credit appears in the page footer. The official EN/FR subtitles are in `src/video/lesson/lesson-data.ts`.
+- **Video:** "Sintel" © copyright Blender Foundation | durian.blender.org, CC BY 3.0. The credit is in the page footer and on the title page. The official EN/FR subtitles are in `src/video/lesson/lesson-data.ts`.
 
-## Known limits
-- Vocapedia has no English entries yet, so word links open Vocapedia's search for the term (`/search?q=…&language=en`), which offers to write the entry.
-- The Vite dev server fails while the project folder name contains `#`. `npm run build` works; preview with any static server on `dist/`, or rename the folder to use `npm run dev`.
+## Notes
+- The Vite dev server fails while the folder name contains `#`. Use `npm run build`, then `npx vite preview --port 4173`.

@@ -5,6 +5,7 @@ import {
   RestartIcon as RestartIconPrimitive,
   PlayIcon as PlayIconPrimitive,
   PauseIcon as PauseIconPrimitive,
+  WaxSealMark,
 } from '@/video/icons';
 import type { ClassValue } from 'cn';
 
@@ -27,6 +28,8 @@ export function PlayButton({
         className={(state) => cn('media-play-button', resolveClassName(className, state))}
         {...props}
       >
+        {/* The wax seal: a cobalt disc with a ring of embossed dots, pressed in on click. */}
+        <WaxSealMark className={'voca-seal-ring'} />
         <RestartIconPrimitive
           className={cn('media-button-icon-base', 'media-play-button-restart-icon', iconClassName)}
         />
