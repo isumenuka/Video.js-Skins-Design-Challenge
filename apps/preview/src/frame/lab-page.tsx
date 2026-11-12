@@ -25,8 +25,7 @@ export function LabFooter() {
         <strong>The Living Encyclopedia</strong> is a Video.js 10 skin for Vocapedia, the free encyclopedia of
         languages. The player is an open volume bound in Vocapedia cobalt, with the film as an engraved plate. As each
         line is spoken, the subtitle sweeps word by word, and every word worth learning turns gold. Its A–Z thumb tab
-        pulls out with the word written on it, and the left page turns to its dictionary entry, then inks it into a
-        glossary that grows as you watch. The page edges are the timeline, with a silk ribbon as the bookmark, and
+        pulls out with the word written on it, and the right page turns to its dictionary entry. The page edges are the timeline, with a silk ribbon as the bookmark, and
         play/pause is a wax seal.
       </p>
       <p className="lab-credit">

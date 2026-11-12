@@ -5,16 +5,19 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Fleuron } from '../icons';
-import { glossaryLetterId } from './entry-page';
 import { useLesson } from './lesson-context';
 import { formatTime, letterOf, type Occurrence } from './lesson-data';
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
-/** The gilt corner fleurons and the spine crease: pure decoration. */
+/**
+ * The binding, all decoration: marbled endpaper around the pages, the spine crease with its headbands, brass corner
+ * guards, gilt fleurons, and the leather title label on the top edge.
+ */
 export function BookOrnaments() {
   return (
     <>
+      <div className="voca-endpaper" aria-hidden="true" />
       <div className="voca-spine" data-interactive aria-hidden="true">
         <span className="voca-headband" />
         <span className="voca-headband voca-headband-tail" />
@@ -24,6 +27,16 @@ export function BookOrnaments() {
         <Fleuron className="voca-fleuron" data-corner="tr" />
         <Fleuron className="voca-fleuron" data-corner="bl" />
         <Fleuron className="voca-fleuron" data-corner="br" />
+        <span className="voca-corner" data-corner="tl" />
+        <span className="voca-corner" data-corner="tr" />
+        <span className="voca-corner" data-corner="bl" />
+        <span className="voca-corner" data-corner="br" />
+      </div>
+      <div className="voca-title-label" aria-hidden="true">
+        <span className="voca-title-label-mark">❦</span>
+        <span>Vocapedia</span>
+        <span className="voca-title-label-sub">A Dictionary in Moving Pictures · EN–FR</span>
+        <span className="voca-title-label-mark">❦</span>
       </div>
     </>
   );
@@ -32,7 +45,8 @@ export function BookOrnaments() {
 /**
  * The A–Z thumb index down the fore-edge. When a special word is spoken, its letter's tab slides out like a pulled
  * drawer with the word written on it. Tabs for words already heard stay gilt; letters the film never uses are dimmed.
- * Pressing a tab jumps to the first time one of its words is spoken and opens the glossary at that letter.
+ * Pressing a tab opens that letter's section on the dictionary page, every word under the letter in one place;
+ * pressing it again closes it.
  *
  * It's one Tab stop (a toolbar with a roving tabindex): the arrow keys move between letters. Their listener is
  * native and prevents the default, so the player's arrow-key seek hotkeys, which listen on the container, stay out.
@@ -87,16 +101,12 @@ export function ThumbIndex() {
   }, [byLetter]);
 
   if (!lab) return null;
-  const { heard, popped, seekTo } = lab;
+  const { heard, popped, openLetter, setOpenLetter } = lab;
   const poppedLetter = popped ? letterOf(popped.gloss) : undefined;
 
   const open = (letter: string) => {
-    const entry = byLetter.get(letter);
-    if (!entry) return;
-    seekTo(entry.first.time - 0.4);
-    const section = toolbarRef.current?.closest('.media-skin')?.querySelector<HTMLElement>(`#${glossaryLetterId(letter)}`);
-    const list = section?.closest<HTMLElement>('.voca-glossary');
-    if (section && list) list.scrollTo({ top: section.offsetTop - list.offsetTop, behavior: 'auto' });
+    if (!byLetter.has(letter)) return;
+    setOpenLetter(openLetter === letter ? null : letter);
   };
 
   return (
@@ -122,9 +132,10 @@ export function ThumbIndex() {
             className="voca-thumb-tab"
             tabIndex={index === focusIndex ? 0 : -1}
             aria-disabled={!entry || undefined}
+            aria-pressed={entry ? openLetter === letter : undefined}
             aria-label={
               entry
-                ? `${letter}: ${entry.words.join(', ')}. Jump to ${formatTime(entry.first.time)}`
+                ? `${letter}: ${entry.words.join(', ')}. Show the ${letter} words`
                 : `${letter}: no words in this film`
             }
             data-heard={wasHeard || undefined}

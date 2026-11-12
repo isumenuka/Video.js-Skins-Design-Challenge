@@ -192,6 +192,12 @@ export const SpeechIcon = (props: IconProps) => (
 
 /* Language-lab glyphs. */
 
+export const BookmarkIcon = ({ filled, ...props }: IconProps & { filled?: boolean }) => (
+  <Icon {...props}>
+    <path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-4.2-6.5 4.2v-16a1 1 0 0 1 1-1Z" fill={filled ? 'currentColor' : 'none'} />
+  </Icon>
+);
+
 export const RepeatIcon = (props: IconProps) => (
   <Icon {...props}>
     <path d="m17 2.5 3 3-3 3" />

@@ -1,7 +1,7 @@
 /** @jsxImportSource react */
 
 import { SeekButton as SeekButtonPrimitive } from '@videojs/react';
-import { SeekIcon as SeekIconPrimitive } from '@/video/icons';
+import { DogEarIcon } from '@/video/desk-icons';
 import type { ClassValue } from 'cn';
 
 import { cn, resolveClassName } from '@/lib/resolve-class-name';
@@ -29,23 +29,15 @@ export function SeekButton({
   return (
     <ButtonTooltip disabled={!tooltip}>
       <SeekButtonPrimitive
-        render={<Button />}
+        render={<Button className={'voca-desk-button'} />}
         className={(state) => cn(resolveClassName(className, state))}
         seconds={seconds}
       >
-        <div className={'media-seek-button-content'}>
-          <SeekIconPrimitive
-            className={cn('media-button-icon', backward && 'media-seek-button-backward-icon', iconClassName)}
-          />
-          <span
-            className={cn(
-              'media-seek-button-label',
-              backward ? 'media-seek-button-backward-label' : 'media-seek-button-forward-label'
-            )}
-          >
-            {Math.abs(seconds)}
-          </span>
-        </div>
+        {/* A dog-eared page corner, the seconds written on it. */}
+        <DogEarIcon
+          className={cn('voca-desk-icon', 'voca-dog-ear', iconClassName)}
+          direction={backward ? 'back' : 'forward'}
+        />
       </SeekButtonPrimitive>
     </ButtonTooltip>
   );

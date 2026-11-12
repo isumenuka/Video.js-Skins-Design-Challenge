@@ -286,3 +286,38 @@ export function occurrences(lesson: Lesson): Occurrence[] {
   occurrenceCache.set(lesson, list);
   return list;
 }
+
+/** One page of the "Just heard" card: a spoken line and the special words in it. */
+export interface LinePage {
+  /** Position in the lesson's list of pages. */
+  index: number;
+  cue: Cue;
+  /** The special words in the line, once each, in spoken order. */
+  words: Gloss[];
+  /** When the sweep reaches each of those words. */
+  wordTimes: number[];
+  /** When the first special word is spoken: the page turns then. */
+  firstTime: number;
+}
+
+const pageCache = new WeakMap<Lesson, LinePage[]>();
+
+/** The lines that hold special words, as pages, so the card turns once per line rather than once per word. */
+export function linePages(lesson: Lesson): LinePage[] {
+  const cached = pageCache.get(lesson);
+  if (cached) return cached;
+  const pages: LinePage[] = [];
+  for (const cue of lesson.cues) {
+    const words: Gloss[] = [];
+    const wordTimes: number[] = [];
+    for (const token of wordTimings(lesson, cue)) {
+      if (token.gloss && !words.includes(token.gloss)) {
+        words.push(token.gloss);
+        wordTimes.push(token.start);
+      }
+    }
+    if (words.length) pages.push({ index: pages.length, cue, words, wordTimes, firstTime: wordTimes[0] });
+  }
+  pageCache.set(lesson, pages);
+  return pages;
+}

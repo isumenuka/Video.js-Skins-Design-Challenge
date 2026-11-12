@@ -58,9 +58,17 @@ export function DualSubtitles() {
                     key={index}
                     className="voca-k"
                     data-special={token.gloss ? '' : undefined}
+                    // Hovering a gold word shows its translation; clicks on it don't toggle playback.
+                    data-interactive={token.gloss ? '' : undefined}
                     style={{ '--d': `${(token.start - anchor.time) / rate}s` } as CSSProperties}
                   >
                     {token.text}
+                    {token.gloss && (
+                      <span className="voca-k-tip" lang={lesson.translationLanguage.code.toLowerCase()}>
+                        <b>{token.gloss.translation}</b>
+                        <span className="voca-k-tip-pos">{token.gloss.pos}</span>
+                      </span>
+                    )}
                   </span>
                 ) : (
                   <span key={index}>{token.text}</span>

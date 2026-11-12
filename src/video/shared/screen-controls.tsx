@@ -16,6 +16,8 @@ import {
 
 import { cn } from '@/lib/resolve-class-name';
 
+import { ClosedBookIcon, OpenBookIcon } from '@/video/desk-icons';
+
 import { AirPlayButton } from './airplay-button';
 import { Button } from './button';
 import { ButtonTooltip } from './tooltip';
@@ -45,9 +47,9 @@ function PiPButton() {
 export function FullscreenButton() {
   return (
     <ButtonTooltip popupClassName={'media-tooltip-screen-popup'}>
-      <FullscreenButtonPrimitive render={<Button />} className={'media-fullscreen-button'}>
-        <FullscreenEnterIconPrimitive className={cn('media-button-icon', 'media-fullscreen-button-enter-icon')} />
-        <FullscreenExitIconPrimitive className={cn('media-button-icon', 'media-fullscreen-button-exit-icon')} />
+      <FullscreenButtonPrimitive render={<Button className={'voca-desk-button'} />} className={'media-fullscreen-button'}>
+        <OpenBookIcon className={cn('voca-desk-icon', 'media-fullscreen-button-enter-icon')} />
+        <ClosedBookIcon className={cn('voca-desk-icon', 'media-fullscreen-button-exit-icon')} />
       </FullscreenButtonPrimitive>
     </ButtonTooltip>
   );

@@ -1,5 +1,6 @@
 /** @jsxImportSource react */
 import { qualityText, settingsText, speedText } from '@videojs/core/i18n/text/menu';
+import { DialIcon } from '@/video/desk-icons';
 import { Text as TextPrimitive } from '@videojs/react';
 import { Menu } from '@videojs/react';
 import {
@@ -93,8 +94,8 @@ export function SettingsMenu() {
   return (
     <Menu.Root side="top" align="center">
       <ButtonTooltip label={<TextPrimitive token={settingsText.key}>{settingsText.text}</TextPrimitive>}>
-        <Menu.Trigger render={<Button />}>
-          <GearIconPrimitive className={'media-button-icon'} />
+        <Menu.Trigger render={<Button className={'voca-desk-button voca-dial-button'} />}>
+          <DialIcon className={'voca-desk-icon'} />
           <TextPrimitive className={'media-settings-button-label'} token={settingsText.key}>
             {settingsText.text}
           </TextPrimitive>

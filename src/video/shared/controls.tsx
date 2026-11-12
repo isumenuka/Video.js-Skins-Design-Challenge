@@ -1,13 +1,15 @@
 /** @jsxImportSource react */
 
-import { Time, Controls, Tooltip, VolumeSlider } from '@videojs/react';
+import { Time, Controls, Tooltip, VolumeSlider, MuteButton as MuteButtonPrimitive } from '@videojs/react';
+import { usePlayer } from '@videojs/react/video';
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/resolve-class-name';
 
-import { SubtitlesToggle } from '../lesson/lab-controls';
+import { InkwellIcon } from '../desk-icons';
+import { StudyMenu, SubtitlesToggle } from '../lesson/lab-controls';
+import { Button } from './button';
 import { LiveButton } from './live-button';
-import { MuteButton } from './mute-button';
 import { AudioPlayButton, PlayButton } from './play-button';
 import { FullscreenButton } from './screen-controls';
 import { TimeSlider } from './time-slider';
@@ -15,12 +17,19 @@ import { type ThumbnailSlot } from './time-slider';
 import { ButtonTooltip } from './tooltip';
 import { VolumePopover } from './volume-popover';
 
-/** Mute plus an inline slider; narrow players keep only the mute button. */
+/**
+ * The inkwell: its ink level is the volume, and pressing it corks the well (mute). The slider beside it is a line of
+ * ink drawn across the desk. Narrow players keep only the well.
+ */
 function InlineVolume() {
+  const volume = usePlayer((s) => s.volume) ?? 1;
+  const muted = usePlayer((s) => s.muted) ?? false;
   return (
     <div className={'voca-volume'}>
       <ButtonTooltip>
-        <MuteButton />
+        <MuteButtonPrimitive render={<Button className={'voca-desk-button voca-inkwell'} />}>
+          <InkwellIcon className={'voca-desk-icon'} level={volume} muted={muted} />
+        </MuteButtonPrimitive>
       </ButtonTooltip>
       <VolumeSlider.Root className={'voca-volume-slider'} orientation="horizontal" thumbAlignment="edge">
         <VolumeSlider.Track className={'voca-volume-slider-track'}>
@@ -49,23 +58,43 @@ export function ControlsRow({
         {seekForward}
         {live && <LiveButton />}
         {!live && (
-          <Time.Group className={'media-time-group'}>
-            <Time.Value className={'media-time-toggle'} type="current" toggle />
-            <Time.Value className={'media-time-current-value'} type="current" />
-            <Time.Separator className={'media-time-separator'} />
-            <Time.Value className={'media-time-duration-value'} type="duration" />
+          <Time.Group className={'media-time-group voca-pages'}>
+            <PageNumbers />
+            <span className={'voca-pages-time'}>
+              <Time.Value className={'media-time-current-value'} type="current" />
+              <Time.Separator className={'media-time-separator'} />
+              <Time.Value className={'media-time-duration-value'} type="duration" />
+            </span>
           </Time.Group>
         )}
         {!audio && <InlineVolume />}
       </Controls.Group>
 
+      <span className={'voca-desk-fleuron'} aria-hidden="true">
+        ❦
+      </span>
+
       <Controls.Group className={cn('video-controls-group', 'video-controls-end')}>
+        {!audio && <StudyMenu />}
         {captions}
         {rate}
         {menu ?? (audio && <VolumePopover />)}
         {!audio && <FullscreenButton />}
       </Controls.Group>
     </Controls.Group>
+  );
+}
+
+/** The time as page numbers, a page a second: "p. 150 of 887". The real time sits beneath it, and is what's read out. */
+function PageNumbers() {
+  const currentTime = usePlayer((s) => s.currentTime) ?? 0;
+  const duration = usePlayer((s) => s.duration) ?? 0;
+  return (
+    <span className={'voca-pages-number'} aria-hidden="true">
+      <span className={'voca-pages-p'}>p.</span> {Math.floor(currentTime) + 1}
+      <span className={'voca-pages-of'}> of </span>
+      {duration ? Math.ceil(duration) : '—'}
+    </span>
   );
 }
 

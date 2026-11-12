@@ -79,10 +79,10 @@
       /* The A–Z drawers pull out past the cover. */
       overflow: visible;
       display: grid;
-      grid-template-columns: auto auto minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) auto auto auto;
       grid-template-rows: auto auto;
       grid-template-areas:
-        "entry spine plate index"
+        "plate spine entry index"
         "rail rail rail rail";
       aspect-ratio: auto;
       /* The cover shows around the pages: wide on a desk, a slim gilt trim on a phone. */
@@ -102,6 +102,10 @@
         0 40px 80px -30px rgb(0 0 0 / 0.9),
         0 0 120px -40px rgb(31 48 255 / 0.55);
       font-family: var(--voca-font-ui);
+    }
+
+    :scope.media-container.media-video {
+      overflow: visible;
     }
 
     .voca-sr-only {
@@ -126,18 +130,18 @@
       --voca-plate-inset-bottom: 0px;
     }
 
-    /* ---------- Right page: the plate ---------- */
+    /* ---------- Left page: the plate ---------- */
     .voca-plate-frame {
       grid-area: plate;
       display: none;
-      border-radius: 2px 6px 6px 2px;
+      border-radius: 6px 2px 2px 6px;
       background:
-        linear-gradient(to right, rgb(23 19 12 / 0.22), transparent 2.5rem),
-        radial-gradient(140% 120% at 70% 30%, var(--voca-paper) 60%, var(--voca-paper-shade) 100%);
+        linear-gradient(to left, rgb(23 19 12 / 0.22), transparent 2.5rem),
+        radial-gradient(140% 120% at 30% 30%, var(--voca-paper) 60%, var(--voca-paper-shade) 100%);
       box-shadow:
-        2px 0 0 var(--voca-paper-shade),
-        4px 0 0 var(--voca-paper-edge),
-        5px 1px 0 var(--voca-paper-shade);
+        -2px 0 0 var(--voca-paper-shade),
+        -4px 0 0 var(--voca-paper-edge),
+        -5px 1px 0 var(--voca-paper-shade);
     }
 
     :scope > mux-video,
@@ -191,28 +195,161 @@
       font-weight: 600;
     }
 
-    /* ---------- Left page: the entry ---------- */
+    /* ---------- Right page: the dictionary ---------- */
     .voca-entry {
       grid-area: entry;
+      position: relative;
       display: none;
       /* The page takes the plate's height and never pushes it. */
       height: 0;
       min-height: 100%;
       width: 34cqi;
-      flex-direction: column;
-      padding: 1rem 1.25rem 0.75rem 1.4rem;
-      border-radius: 6px 2px 2px 6px;
       color: var(--voca-ink);
+      /* The turning leaf swings out over the spine and the plate. */
+      overflow: visible;
+      perspective: 2400px;
+      perspective-origin: 0% 50%;
+      z-index: 4;
+    }
+
+    .voca-page {
+      flex: 1;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 1.4rem 0.75rem 1.25rem;
+      border-radius: 2px 6px 6px 2px;
       background:
-        linear-gradient(to left, rgb(23 19 12 / 0.24), transparent 2.5rem),
-        radial-gradient(140% 120% at 30% 30%, var(--voca-paper) 60%, var(--voca-paper-shade) 100%);
+        linear-gradient(to right, rgb(23 19 12 / 0.24), transparent 2.5rem),
+        radial-gradient(140% 120% at 70% 30%, var(--voca-paper) 60%, var(--voca-paper-shade) 100%);
       box-shadow:
-        -2px 0 0 var(--voca-paper-shade),
-        -4px 0 0 var(--voca-paper-edge),
-        -5px 1px 0 var(--voca-paper-shade);
+        2px 0 0 var(--voca-paper-shade),
+        4px 0 0 var(--voca-paper-edge),
+        5px 1px 0 var(--voca-paper-shade);
       overflow: hidden;
-      perspective: 1100px;
-      z-index: 1;
+    }
+
+    /* ---------- The page turn ---------- */
+    .voca-leaf {
+      position: absolute;
+      inset: 0;
+      transform-style: preserve-3d;
+      transform-origin: left center;
+      pointer-events: none;
+      will-change: transform;
+      animation: voca-leaf-forward 650ms cubic-bezier(0.5, 0, 0.75, 0.4) both;
+    }
+
+    .voca-leaf[data-dir="back"] {
+      animation-name: voca-leaf-back;
+      animation-timing-function: cubic-bezier(0.25, 0.6, 0.5, 1);
+    }
+
+    /* Forward: the page lifts from its outer edge and stands up at the spine, edge-on, so it never crosses over the
+       film on the facing page. */
+    @keyframes voca-leaf-forward {
+      from {
+        transform: rotateY(0deg);
+      }
+      to {
+        transform: rotateY(-90deg);
+      }
+    }
+
+    /* Back: the previous leaf rises from the spine and lies down on this page. */
+    @keyframes voca-leaf-back {
+      from {
+        transform: rotateY(-90deg);
+      }
+      to {
+        transform: rotateY(0deg);
+      }
+    }
+
+    .voca-leaf-front,
+    .voca-leaf-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+    }
+
+    .voca-leaf-front {
+      display: flex;
+      box-shadow: 0 0 0 1px rgb(23 19 12 / 0.08);
+    }
+
+    /* The back of the leaf: plain paper, shaded toward the spine, which is now on its right. */
+    .voca-leaf-back {
+      transform: rotateY(180deg);
+      border-radius: 6px 2px 2px 6px;
+      background:
+        linear-gradient(to left, rgb(23 19 12 / 0.28), transparent 2.5rem),
+        radial-gradient(140% 120% at 30% 30%, var(--voca-paper) 55%, var(--voca-paper-shade) 100%);
+      box-shadow: 0 0 0 1px rgb(23 19 12 / 0.08);
+    }
+
+    /* Light falls off the leaf as it stands up, and comes back as it lies down. */
+    .voca-leaf-front::after,
+    .voca-leaf-back::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      animation: voca-leaf-shade 650ms linear both;
+    }
+
+    .voca-leaf[data-dir="back"] .voca-leaf-front::after {
+      animation-direction: reverse;
+    }
+
+    .voca-leaf-front::after {
+      background: linear-gradient(to left, rgb(23 19 12 / 0.45), rgb(23 19 12 / 0.1) 70%);
+    }
+
+    .voca-leaf-back::after {
+      background: linear-gradient(to right, rgb(23 19 12 / 0.45), rgb(23 19 12 / 0.1) 70%);
+    }
+
+    /* The leaf darkens as it stands up to the spine. */
+    @keyframes voca-leaf-shade {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* The page being uncovered sits in the leaf's shadow for a moment. */
+    .voca-entry[data-turning] > .voca-page {
+      position: relative;
+    }
+
+    .voca-entry[data-turning] > .voca-page::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgb(23 19 12 / 0.35), transparent 75%);
+      pointer-events: none;
+      animation: voca-uncover 650ms ease-out both;
+    }
+
+    @keyframes voca-uncover {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .voca-leaf,
+      .voca-entry[data-turning] > .voca-page::after {
+        display: none;
+      }
     }
 
     .voca-running-head {
@@ -233,13 +370,13 @@
       min-height: 0;
       overflow-y: auto;
       scrollbar-width: thin;
-      transform-origin: right center;
+      transform-origin: left center;
       animation: voca-page-turn var(--voca-turn) cubic-bezier(0.2, 0.75, 0.25, 1) both;
     }
 
     @keyframes voca-page-turn {
       0% {
-        transform: rotateY(-88deg);
+        transform: rotateY(88deg);
         opacity: 0;
         filter: brightness(0.75);
       }
@@ -1080,21 +1217,370 @@
 
     /* ---------- The left page: Just heard + the glossary ---------- */
     .voca-just-heard {
-      flex: none;
-      height: clamp(8.75rem, 19cqi, 12rem);
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      perspective: 1100px;
+    }
+
+    .voca-card-stage {
+      flex: 1;
+      min-height: 0;
       perspective: 1100px;
     }
 
     .voca-card {
       height: 100%;
-      padding: 0.6rem 0.75rem;
+      padding: 0.55rem 0.75rem;
       border: 1px solid rgb(23 19 12 / 0.18);
       border-radius: 0.25rem;
       background: linear-gradient(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0.2));
       box-shadow:
         0 1px 0 rgb(255 255 255 / 0.8) inset,
         0 6px 14px -10px rgb(23 19 12 / 0.6);
-      overflow: hidden;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+
+    /* ‹ 5 / 18 › — page back through earlier lines. */
+    .voca-card-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-family: var(--voca-font-serif);
+      font-size: 0.75rem;
+      color: var(--voca-ink-soft);
+    }
+
+    .voca-card-turn {
+      display: grid;
+      place-items: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 50%;
+      color: var(--voca-cobalt);
+      cursor: pointer;
+    }
+
+    .voca-card-turn:disabled {
+      color: rgb(23 19 12 / 0.25);
+      cursor: default;
+    }
+
+    @media (hover: hover) {
+      .voca-card-turn:not(:disabled):hover {
+        background-color: rgb(31 48 255 / 0.1);
+      }
+    }
+
+    .voca-card-turn-icon {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .voca-card-turn-back {
+      scale: -1 1;
+    }
+
+    .voca-card-count {
+      min-width: 3.25rem;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .voca-card-live {
+      margin-inline-start: auto;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background-color: var(--voca-cobalt);
+      color: #fff;
+      font: 600 0.6875rem/1.2 var(--voca-font-ui);
+      cursor: pointer;
+    }
+
+    .voca-card-live span {
+      color: #ff8a7a;
+    }
+
+    .voca-card-turn:focus-visible,
+    .voca-card-live:focus-visible,
+    .voca-glossary-word:focus-visible {
+      outline: 2px solid var(--voca-cobalt);
+      outline-offset: 2px;
+    }
+
+    @media (pointer: coarse) {
+      .voca-card-turn {
+        width: 2.75rem;
+        height: 2.75rem;
+      }
+    }
+
+    /* While the reader holds the page, a rubric ribbon hangs from the card. */
+    .voca-held-ribbon {
+      position: absolute;
+      top: 1.9rem;
+      /* Hangs off the card's spine-side edge, clear of the timecode. */
+      left: -0.55rem;
+      z-index: 2;
+      padding: 0.35rem 0.3rem 0.6rem;
+      background: var(--voca-rubric);
+      color: #fff3e0;
+      font-size: 0.5625rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
+      box-shadow: 0 2px 4px rgb(0 0 0 / 0.3);
+      pointer-events: none;
+    }
+
+    .voca-card-words {
+      display: grid;
+      gap: 0.35rem;
+      margin-top: 0.35rem;
+    }
+
+    .voca-card-word {
+      position: relative;
+      padding: 0.2rem 0 0.25rem 0.6rem;
+      border-top: 1px dotted rgb(23 19 12 / 0.25);
+      font-size: 0.75rem;
+      line-height: 1.35;
+      color: var(--voca-ink-soft);
+      transition: color 300ms ease-out;
+    }
+
+    /* The gold marker: the karaoke sweep has reached this word. */
+    .voca-card-word::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.45rem;
+      width: 0.25rem;
+      height: 0.9rem;
+      border-radius: 0.125rem;
+      background: rgb(23 19 12 / 0.15);
+      transition: background-color 300ms ease-out;
+    }
+
+    .voca-card-word[data-reached] {
+      color: var(--voca-ink);
+    }
+
+    .voca-card-word[data-reached]::before {
+      background: var(--voca-gold);
+    }
+
+    .voca-card-word .voca-card-pos {
+      font-size: 0.75rem;
+    }
+
+    .voca-card-word dt b {
+      font-family: var(--voca-font-serif);
+      font-size: 1.0625rem;
+      font-weight: 700;
+    }
+
+    .voca-card-word .voca-card-ipa {
+      display: inline;
+      margin: 0;
+      font-size: 0.75rem;
+    }
+
+    .voca-card-word dd {
+      font-family: var(--voca-font-serif);
+      font-size: 0.8125rem;
+    }
+
+    .voca-card-fr {
+      white-space: nowrap;
+    }
+
+    .voca-card-word[data-focus],
+    .voca-glossary-row[data-focus] {
+      animation: voca-flash 1.3s ease-out 2;
+    }
+
+    @keyframes voca-flash {
+      0%,
+      100% {
+        background-color: transparent;
+      }
+      30% {
+        background-color: rgb(224 184 77 / 0.45);
+      }
+    }
+
+    /* Glossary words are buttons that replay their line. */
+    .voca-glossary-word {
+      padding: 0;
+      border-radius: 0.15rem;
+      font-family: var(--voca-font-serif);
+      font-weight: 700;
+      color: var(--voca-ink);
+      text-align: start;
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-color: transparent;
+      text-underline-offset: 0.15em;
+    }
+
+    @media (hover: hover) {
+      .voca-glossary-word:hover {
+        color: var(--voca-cobalt);
+        text-decoration-color: currentColor;
+      }
+    }
+
+    /* ---------- A–Z letter section ---------- */
+    .voca-letter-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--voca-font-serif);
+      font-size: 0.8125rem;
+      font-style: italic;
+      color: var(--voca-ink-soft);
+    }
+
+    .voca-letter-initial {
+      display: grid;
+      place-items: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 0.25rem;
+      background: linear-gradient(135deg, var(--voca-gold-light), var(--voca-gold-deep));
+      color: var(--voca-ink);
+      font-size: 1.125rem;
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .voca-letter-word {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: 0.5rem;
+    }
+
+    .voca-letter-word dt,
+    .voca-letter-word dd {
+      grid-column: 1;
+    }
+
+    .voca-letter-word[data-unheard] {
+      opacity: 0.6;
+    }
+
+    .voca-letter-play {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      border: 1px solid rgb(31 48 255 / 0.35);
+      border-radius: 999px;
+      color: var(--voca-cobalt);
+      font: 600 0.6875rem/1 var(--voca-font-ui);
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+    }
+
+    @media (hover: hover) {
+      button.voca-letter-play:hover {
+        background: var(--voca-cobalt);
+        color: #fff;
+      }
+    }
+
+    .voca-letter-play:focus-visible {
+      outline: 2px solid var(--voca-cobalt);
+      outline-offset: 2px;
+    }
+
+    .voca-letter-play-icon {
+      width: 0.625rem;
+      height: 0.625rem;
+    }
+
+    @media (pointer: coarse) {
+      .voca-letter-play {
+        min-height: 2.75rem;
+      }
+    }
+
+    /* The tab whose section is open stands out from the edge. */
+    .voca-thumb-tab[aria-pressed="true"] {
+      translate: 0.35rem 0;
+      background: linear-gradient(to right, var(--voca-cobalt), #4f5dff);
+      color: #fff;
+      box-shadow: 0 0 10px rgb(31 48 255 / 0.6);
+    }
+
+    /* ---------- Study mode: a bookmark on the cover ---------- */
+    .voca-study-button {
+      width: auto;
+      min-width: var(--voca-control);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding-inline: 0.75rem;
+      border-radius: 999px;
+    }
+
+    .voca-study-label {
+      font-family: var(--voca-font-serif);
+      font-size: 0.875rem;
+      font-weight: 600;
+      font-variant: small-caps;
+      letter-spacing: 0.06em;
+    }
+
+    @container media-root (width < 40rem) {
+      .voca-study-button {
+        padding-inline: 0;
+        border-radius: 50%;
+      }
+
+      .voca-study-label {
+        display: none;
+      }
+    }
+
+    /* Paused in study mode: the wax seal glows, asking to be pressed to read on. */
+    @media (prefers-reduced-motion: no-preference) {
+      :scope:has(.voca-study-button[aria-pressed="true"]) .media-play-button[data-started][data-paused] {
+        animation: voca-seal-call 1.6s ease-in-out infinite;
+      }
+
+      @keyframes voca-seal-call {
+        0%,
+        100% {
+          box-shadow:
+            inset 0 -3px 6px rgb(0 0 0 / 0.35),
+            0 0 0 2px rgb(224 184 77 / 0.5);
+        }
+        50% {
+          box-shadow:
+            inset 0 -3px 6px rgb(0 0 0 / 0.35),
+            0 0 0 4px rgb(224 184 77 / 0.85),
+            0 0 24px 2px rgb(224 184 77 / 0.6);
+        }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .voca-card-word[data-focus],
+      .voca-glossary-row[data-focus] {
+        animation: none;
+        background-color: rgb(224 184 77 / 0.35);
+      }
     }
 
     .voca-card-kicker {
@@ -1372,6 +1858,72 @@
       }
     }
 
+    /* Hover a gold word to see its translation on a paper slip above it. */
+    .voca-k[data-special] {
+      pointer-events: auto;
+      cursor: help;
+    }
+
+    .voca-k-tip {
+      position: absolute;
+      bottom: calc(100% + 0.45em);
+      left: 50%;
+      z-index: 2;
+      display: flex;
+      align-items: baseline;
+      gap: 0.35em;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid var(--voca-gold-deep);
+      border-radius: 0.3rem;
+      background: var(--voca-paper);
+      color: var(--voca-ink);
+      box-shadow: 0 8px 18px -8px rgb(0 0 0 / 0.8);
+      font-family: var(--voca-font-serif);
+      font-size: clamp(0.8125rem, 0.55em, 1rem);
+      font-weight: 400;
+      line-height: 1.2;
+      text-shadow: none;
+      white-space: nowrap;
+      opacity: 0;
+      translate: -50% 0.25rem;
+      pointer-events: none;
+      transition:
+        opacity 150ms ease-out,
+        translate 150ms ease-out;
+    }
+
+    .voca-k-tip b {
+      color: var(--voca-cobalt);
+      font-weight: 700;
+    }
+
+    .voca-k-tip-pos {
+      font-style: italic;
+      color: var(--voca-ink-soft);
+    }
+
+    /* A small notch pointing down at the word. */
+    .voca-k-tip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      translate: -50% 0;
+      border: 0.35rem solid transparent;
+      border-top-color: var(--voca-paper);
+    }
+
+    .voca-k[data-special]:hover .voca-k-tip {
+      opacity: 1;
+      translate: -50% 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .voca-k-tip {
+        transition: none;
+      }
+    }
+
     .voca-subtitles[data-paused] .voca-k,
     .voca-subtitles[data-paused] .voca-k::before,
     .voca-subtitles[data-paused] .voca-k::after {
@@ -1551,6 +2103,636 @@
         color: CanvasText;
         padding-inline: 0.25em;
       }
+    }
+
+    /* =====================================================================================================
+       The old leather dictionary: grained cobalt leather, brass corner guards, a gilt title label, marbled
+       endpaper around a thick page block. The controls are set as a printed line on a paper strip.
+       ===================================================================================================== */
+
+    :scope,
+    :scope.media-video {
+      padding: clamp(0.375rem, 2.6%, 1.875rem) clamp(0.375rem, 2.6%, 1.875rem) 0;
+      background-color: #0a1466;
+      background-image:
+        /* leather grain: two offset fields of pores */
+        radial-gradient(circle at 30% 40%, rgb(255 255 255 / 0.05) 0.6px, transparent 1.2px),
+        radial-gradient(circle at 70% 70%, rgb(0 0 0 / 0.22) 0.8px, transparent 1.4px),
+        /* light pooling on the cover, darker toward the edges */
+        radial-gradient(120% 100% at 50% 0%, #1b2bd0 0%, #0c1789 45%, #060c47 80%, #030726 100%);
+      background-size:
+        5px 5px,
+        7px 7px,
+        100% 100%;
+      box-shadow:
+        /* tooled gilt rules */
+        inset 0 0 0 5px rgb(3 7 38 / 0.6),
+        inset 0 0 0 6px rgb(224 184 77 / 0.8),
+        inset 0 0 0 9px transparent,
+        inset 0 0 0 10px rgb(224 184 77 / 0.35),
+        /* the board's bevel */
+        inset 0 2px 0 rgb(255 255 255 / 0.12),
+        inset 0 -3px 6px rgb(0 0 0 / 0.5),
+        /* lying on the desk */
+        0 2px 0 #050a33,
+        0 6px 0 -1px #030620,
+        0 45px 80px -30px rgb(0 0 0 / 0.95),
+        0 0 140px -40px rgb(31 48 255 / 0.5);
+    }
+
+    /* ---------- Marbled endpaper, showing around the pages ---------- */
+    .voca-endpaper {
+      grid-column: 1 / -1;
+      grid-row: 1;
+      position: absolute;
+      inset: -0.7rem -0.55rem -0.7rem -0.7rem;
+      display: none;
+      border-radius: 4px;
+      background-color: #11206b;
+      background-image:
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgb(246 227 161 / 0.55), transparent 60%),
+        radial-gradient(ellipse 50% 35% at 75% 65%, rgb(143 160 255 / 0.55), transparent 60%),
+        radial-gradient(ellipse 40% 30% at 45% 85%, rgb(138 42 32 / 0.5), transparent 60%),
+        radial-gradient(ellipse 35% 25% at 85% 20%, rgb(246 227 161 / 0.4), transparent 60%),
+        repeating-radial-gradient(circle at 30% 40%, rgb(255 255 255 / 0.07) 0 2px, transparent 2px 9px),
+        repeating-radial-gradient(circle at 80% 70%, rgb(0 0 0 / 0.12) 0 3px, transparent 3px 11px);
+      box-shadow:
+        inset 0 0 0 1px rgb(224 184 77 / 0.4),
+        inset 0 0 18px rgb(3 7 38 / 0.6);
+      z-index: 0;
+    }
+
+    /* ---------- The page block: stacked leaves visible along the foot of each page ---------- */
+    .voca-plate-frame {
+      z-index: 1;
+    }
+
+    @container media-root (width >= 52rem) {
+      .voca-endpaper {
+        display: block;
+      }
+
+      .voca-plate-frame {
+        box-shadow:
+          -2px 0 0 var(--voca-paper-shade),
+          -4px 0 0 var(--voca-paper-edge),
+          -6px 0 0 var(--voca-paper-shade),
+          -7px 1px 0 var(--voca-paper-edge),
+          0 2px 0 var(--voca-paper-shade),
+          -2px 4px 0 var(--voca-paper-edge),
+          -4px 6px 0 var(--voca-paper-shade),
+          -6px 8px 0 var(--voca-paper-edge),
+          -6px 12px 14px -6px rgb(0 0 0 / 0.6);
+      }
+
+      .voca-page {
+        box-shadow:
+          2px 0 0 var(--voca-paper-shade),
+          4px 0 0 var(--voca-paper-edge),
+          6px 0 0 var(--voca-paper-shade),
+          7px 1px 0 var(--voca-paper-edge),
+          0 2px 0 var(--voca-paper-shade),
+          2px 4px 0 var(--voca-paper-edge),
+          4px 6px 0 var(--voca-paper-shade),
+          6px 8px 0 var(--voca-paper-edge),
+          6px 12px 14px -6px rgb(0 0 0 / 0.6);
+      }
+    }
+
+    /* ---------- Brass corner guards ---------- */
+    .voca-corner {
+      position: absolute;
+      width: clamp(1.75rem, 4.2cqi, 3.25rem);
+      aspect-ratio: 1;
+      background:
+        radial-gradient(circle at 26% 26%, #fff3c4 0 0.12rem, #8a6418 0.13rem 0.2rem, transparent 0.21rem),
+        linear-gradient(135deg, #f6e3a1 0%, #d3a446 30%, #9c7222 65%, #5f430f 100%);
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+      filter: drop-shadow(1px 2px 1px rgb(0 0 0 / 0.55));
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    .voca-corner[data-corner="tl"] {
+      top: -2px;
+      left: -2px;
+    }
+
+    .voca-corner[data-corner="tr"] {
+      top: -2px;
+      right: -2px;
+      scale: -1 1;
+    }
+
+    .voca-corner[data-corner="bl"] {
+      bottom: -2px;
+      left: -2px;
+      scale: 1 -1;
+    }
+
+    .voca-corner[data-corner="br"] {
+      bottom: -2px;
+      right: -2px;
+      scale: -1 -1;
+    }
+
+    /* The fleurons sit just inside the brass. */
+    .voca-fleuron[data-corner="tl"] {
+      top: 0.9rem;
+      left: 0.9rem;
+    }
+
+    .voca-fleuron[data-corner="tr"] {
+      top: 0.9rem;
+      right: 0.9rem;
+    }
+
+    .voca-fleuron[data-corner="bl"] {
+      bottom: 0.9rem;
+      left: 0.9rem;
+    }
+
+    .voca-fleuron[data-corner="br"] {
+      bottom: 0.9rem;
+      right: 0.9rem;
+    }
+
+    /* ---------- The title label, set into the top board ---------- */
+    .voca-title-label {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      z-index: 6;
+      display: none;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding: 0.3rem 1.1rem 0.35rem;
+      translate: -50% -55%;
+      border-radius: 0.25rem;
+      background: linear-gradient(#7a1f16, #5a150f);
+      box-shadow:
+        inset 0 0 0 1px rgb(246 227 161 / 0.85),
+        inset 0 0 0 3px #5a150f,
+        inset 0 0 0 4px rgb(246 227 161 / 0.45),
+        0 3px 8px -2px rgb(0 0 0 / 0.7);
+      color: var(--voca-gold-light);
+      font-family: var(--voca-font-serif);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-shadow: 0 1px 0 rgb(0 0 0 / 0.6);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .voca-title-label-sub {
+      font-size: 0.6875rem;
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: none;
+      color: rgb(246 227 161 / 0.85);
+    }
+
+    .voca-title-label-mark {
+      font-size: 0.75rem;
+      letter-spacing: 0;
+      color: var(--voca-gold);
+    }
+
+    @container media-root (width >= 52rem) {
+      .voca-title-label {
+        display: flex;
+      }
+    }
+
+    /* ---------- The scholar's desk: controls as objects on the leather ---------- */
+    .video-controls-bottom,
+    .video-controls-video-bottom {
+      gap: 0.35rem;
+      padding: 0.35rem 0.5rem 0.9rem;
+    }
+
+    .video-controls-row {
+      position: relative;
+      gap: 0.25rem 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+      min-height: 3.5rem;
+      padding-inline-start: 3.25rem;
+    }
+
+    .video-controls-group {
+      gap: 0.25rem;
+      align-items: center;
+    }
+
+    .video-controls-end {
+      margin-inline-start: 0;
+    }
+
+    /* A gilt fleuron parts the two halves of the desk. */
+    .voca-desk-fleuron {
+      margin-inline: auto 0.25rem;
+      color: var(--voca-gold);
+      font-size: 1.125rem;
+      opacity: 0.8;
+      text-shadow: 0 1px 0 rgb(0 0 0 / 0.5);
+    }
+
+    /* Each object sits in a shallow brass-rimmed recess pressed into the leather. */
+    .voca-desk-button {
+      width: 2.875rem;
+      min-width: 0;
+      height: 2.875rem;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: inherit;
+      background: radial-gradient(circle at 50% 40%, rgb(255 255 255 / 0.06), rgb(0 0 0 / 0.28) 70%);
+      box-shadow:
+        inset 0 2px 4px rgb(0 0 0 / 0.55),
+        inset 0 -1px 0 rgb(255 255 255 / 0.08),
+        0 0 0 1px rgb(224 184 77 / 0.35);
+      transition:
+        box-shadow 150ms ease-out,
+        background-color 150ms ease-out;
+    }
+
+    .voca-desk-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+      filter: drop-shadow(0 2px 1.5px rgb(0 0 0 / 0.55));
+      transition:
+        transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1.3),
+        filter 150ms ease-out;
+    }
+
+    @media (hover: hover) {
+      .voca-desk-button:hover {
+        background-color: rgb(246 227 161 / 0.1);
+        box-shadow:
+          inset 0 2px 4px rgb(0 0 0 / 0.5),
+          0 0 0 1px var(--voca-gold),
+          0 0 14px -2px rgb(224 184 77 / 0.6);
+      }
+
+      .voca-desk-button:hover .voca-desk-icon {
+        transform: translateY(-1px) scale(1.06);
+        filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.55));
+      }
+
+      /* A tactile response for each object. */
+      .voca-desk-button:hover .voca-dog-ear {
+        transform: rotate(-6deg) scale(1.06);
+      }
+
+      .voca-dial-button:hover .voca-dial-needle {
+        transform: rotate(40deg);
+      }
+
+      .voca-inkwell:hover .voca-desk-icon {
+        transform: rotate(-4deg) scale(1.06);
+      }
+    }
+
+    .voca-desk-button:active .voca-desk-icon {
+      transform: translateY(1px) scale(0.96);
+    }
+
+    .voca-desk-button:focus-visible {
+      outline: 2px solid var(--voca-foil);
+      outline-offset: 3px;
+      background-color: rgb(246 227 161 / 0.1);
+    }
+
+    /* Switched on: the recess is gilt-ringed and the object glows. */
+    .voca-desk-button[aria-pressed="true"],
+    .voca-desk-button[data-on] {
+      color: inherit;
+      background-color: rgb(246 227 161 / 0.12);
+      box-shadow:
+        inset 0 2px 4px rgb(0 0 0 / 0.45),
+        0 0 0 2px var(--voca-gold),
+        0 0 16px -2px rgb(224 184 77 / 0.75);
+    }
+
+    .voca-dial-needle {
+      transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1.4);
+    }
+
+    .voca-dial-button[aria-expanded="true"] .voca-dial-needle {
+      transform: rotate(135deg);
+    }
+
+    .media-fullscreen-button-enter-icon,
+    .media-fullscreen-button-exit-icon {
+      grid-area: 1 / 1;
+    }
+
+    /* The wax seal stays the first thing on the desk, a little larger than the rest. */
+    .media-button.media-play-button {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      translate: 0 -50%;
+      margin: 0;
+      width: 3.25rem;
+      min-width: 0;
+      height: 3.25rem;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 48% 52% 50% 50% / 52% 47% 53% 48%;
+      color: #fff;
+      background: radial-gradient(circle at 34% 28%, #5a68ff 0%, var(--voca-cobalt) 38%, #0d189a 78%, #070d5c 100%);
+      box-shadow:
+        inset 0 -3px 6px rgb(0 0 0 / 0.35),
+        inset 0 2px 3px rgb(255 255 255 / 0.25),
+        0 0 0 3px rgb(31 48 255 / 0.25),
+        0 5px 12px -3px rgb(0 0 0 / 0.7);
+    }
+
+    .media-button.media-play-button .media-button-icon-base {
+      width: 1.375rem;
+      height: 1.375rem;
+    }
+
+    @media (hover: hover) {
+      .media-button.media-play-button:hover {
+        color: #fff;
+        background: radial-gradient(circle at 34% 28%, #6b78ff 0%, #2f40ff 38%, #1220b0 78%, #070d5c 100%);
+        box-shadow:
+          inset 0 -3px 6px rgb(0 0 0 / 0.35),
+          inset 0 2px 3px rgb(255 255 255 / 0.3),
+          0 0 0 3px rgb(224 184 77 / 0.6),
+          0 0 22px -2px rgb(31 48 255 / 0.9);
+      }
+    }
+
+    .media-button.media-play-button:focus-visible {
+      outline: 2px solid var(--voca-foil);
+      outline-offset: 3px;
+    }
+
+    /* Page numbers: "p. 150 of 887" in gilt serif, with the clock time beneath in small print. */
+    .voca-pages {
+      display: grid;
+      justify-items: start;
+      gap: 0;
+      height: auto;
+      padding-inline: 0.5rem;
+      line-height: 1.1;
+    }
+
+    .voca-pages-number {
+      font-family: var(--voca-font-serif);
+      font-size: 1.0625rem;
+      font-weight: 700;
+      color: var(--voca-gold-light);
+      font-variant-numeric: tabular-nums oldstyle-nums;
+      text-shadow: 0 1px 0 rgb(0 0 0 / 0.6);
+      white-space: nowrap;
+    }
+
+    .voca-pages-p,
+    .voca-pages-of {
+      font-style: italic;
+      font-weight: 400;
+      color: rgb(246 227 161 / 0.75);
+    }
+
+    .voca-pages-time {
+      display: flex;
+      gap: 0.25rem;
+      font-family: var(--voca-font-ui);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: rgb(246 227 161 / 0.7);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .voca-pages-time .media-time-current-value,
+    .voca-pages-time .media-time-separator,
+    .voca-pages-time .media-time-duration-value {
+      display: inline;
+      opacity: 1;
+      color: inherit;
+    }
+
+    /* Volume: a line of ink drawn out from the well. */
+    .voca-volume {
+      gap: 0.4rem;
+    }
+
+    .voca-volume-slider-track {
+      height: 3px;
+      background-color: rgb(246 227 161 / 0.2);
+    }
+
+    .voca-volume-slider-fill {
+      background: linear-gradient(to right, #0a1466, #3a4bff);
+      box-shadow: 0 0 6px rgb(58 75 255 / 0.6);
+    }
+
+    .voca-volume-slider-thumb {
+      width: 0.625rem;
+      height: 0.875rem;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      background: radial-gradient(circle at 40% 35%, #6b78ff, #1f30ff 55%, #0a1466);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+    }
+
+    .voca-volume-slider-thumb:focus-visible {
+      outline: 2px solid var(--voca-foil);
+      outline-offset: 3px;
+    }
+
+    /* The quill's count of study modes on: a tiny gilt disc. */
+    .voca-study-button {
+      position: relative;
+    }
+
+    .voca-study-badge {
+      position: absolute;
+      top: -0.15rem;
+      right: -0.15rem;
+      display: grid;
+      place-items: center;
+      width: 1.05rem;
+      height: 1.05rem;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, var(--voca-gold-light), var(--voca-gold-deep));
+      color: var(--voca-ink);
+      font: 700 0.625rem/1 var(--voca-font-serif);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+    }
+
+    /* The study slip. */
+    .voca-study-popup {
+      min-width: 17rem;
+    }
+
+    .voca-study-heading {
+      padding: 0.25rem 0.5rem 0.35rem;
+      font-family: var(--voca-font-serif);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--voca-rubric);
+      border-bottom: 1px solid rgb(23 19 12 / 0.15);
+      margin-bottom: 0.25rem;
+    }
+
+    .voca-study-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding-block: 0.45rem;
+      cursor: pointer;
+    }
+
+    .voca-study-check {
+      flex: none;
+      display: grid;
+      place-items: center;
+      width: 1.1rem;
+      height: 1.1rem;
+      margin-top: 0.1rem;
+      border: 1.5px solid rgb(23 19 12 / 0.45);
+      border-radius: 0.2rem;
+      background: #fff;
+    }
+
+    .voca-study-item[aria-checked="true"] .voca-study-check {
+      border-color: var(--voca-cobalt);
+      background: var(--voca-cobalt);
+      color: #fff;
+    }
+
+    .voca-study-check-icon {
+      width: 0.8rem;
+      height: 0.8rem;
+    }
+
+    .voca-study-text {
+      display: grid;
+      gap: 0.1rem;
+    }
+
+    .voca-study-label {
+      font-family: var(--voca-font-serif);
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--voca-ink);
+    }
+
+    .voca-study-item[aria-checked="true"] .voca-study-label {
+      color: var(--voca-cobalt);
+    }
+
+    .voca-study-hint {
+      font-family: var(--voca-font-serif);
+      font-size: 0.75rem;
+      font-style: italic;
+      color: var(--voca-ink-soft);
+    }
+
+    /* Paused in study mode: the wax seal glows, asking to be pressed to read on. */
+    @media (prefers-reduced-motion: no-preference) {
+      :scope:has(.voca-study-button[data-pause]) .media-button.media-play-button[data-started][data-paused] {
+        animation: voca-seal-call 1.6s ease-in-out infinite;
+      }
+    }
+
+    /* ---------- Narrow desks ---------- */
+    @container media-root (width < 44rem) {
+      .voca-pages-time {
+        display: none;
+      }
+
+      .voca-pages-p {
+        display: none;
+      }
+
+      /* "151 / 888": the word gives way to a slash. */
+      .voca-pages-of {
+        font-size: 0;
+      }
+
+      .voca-pages-of::after {
+        content: " / ";
+        font-size: 1rem;
+      }
+    }
+
+    @container media-root (width < 30rem) {
+      .voca-seek-button {
+        display: none;
+      }
+
+      .voca-desk-fleuron {
+        display: none;
+      }
+
+      .video-controls-row {
+        padding-inline-start: 3rem;
+        justify-content: space-between;
+      }
+
+      .media-button.media-play-button {
+        width: 2.875rem;
+        height: 2.875rem;
+      }
+
+      .voca-desk-button {
+        width: 2.75rem;
+        height: 2.75rem;
+      }
+
+      .voca-desk-icon {
+        width: 2rem;
+        height: 2rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .voca-desk-icon,
+      .voca-dial-needle,
+      .voca-desk-button {
+        transition: none;
+      }
+    }
+
+    @media (forced-colors: active) {
+      .voca-desk-button[aria-pressed="true"],
+      .voca-desk-button[data-on] {
+        outline: 2px solid Highlight;
+      }
+    }
+
+    /* ---------- The poster stays inside the plate ---------- */
+    .media-poster,
+    .media-buffering-indicator,
+    .media-indicator-group,
+    .voca-subtitles {
+      width: auto;
+      height: auto;
+    }
+
+    .media-poster {
+      overflow: hidden;
+      border-radius: 2px;
+    }
+
+    .media-poster-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
   }
 }

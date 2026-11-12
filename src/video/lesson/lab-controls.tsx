@@ -4,12 +4,81 @@
 
 import { usePlayer } from '@videojs/react/video';
 
-import { CaptionsOffIcon, CaptionsOnIcon } from '../icons';
+import { Menu } from '@videojs/react';
+
+import { MagnifierIcon, QuillIcon } from '../desk-icons';
+import { CheckIcon } from '../icons';
 import { Button } from '../shared/button';
 import { ButtonTooltip } from '../shared/tooltip';
-import { useLesson } from './lesson-context';
+import { type StudyModes, useLesson } from './lesson-context';
 
-/** Shows or hides the subtitles on the plate. */
+const STUDY_MODES: Array<{ mode: keyof StudyModes; label: string; hint: string }> = [
+  { mode: 'pause', label: 'Pause after new words', hint: 'Stop at the end of each line worth learning.' },
+  { mode: 'repeat', label: 'Repeat each line twice', hint: 'Hear every line once more before moving on.' },
+  { mode: 'slow', label: 'Slow lines to 0.75×', hint: 'Speech slows down; the gaps between keep pace.' },
+];
+
+/**
+ * The quill: opens the study modes on a paper slip. It carries a drop of ink, and a count, when any mode is on.
+ * The menu is the Video.js Menu primitive, so it opens and closes from the keyboard and Escape returns focus here.
+ */
+export function StudyMenu() {
+  const lab = useLesson();
+  if (!lab) return null;
+  const { study, setStudy } = lab;
+  const count = STUDY_MODES.filter(({ mode }) => study[mode]).length;
+
+  return (
+    <Menu.Root side="top" align="center">
+      <ButtonTooltip label={count ? `Study modes · ${count} on` : 'Study modes'}>
+        <Menu.Trigger
+          render={
+            <Button
+              className="voca-desk-button voca-study-button"
+              aria-label={count ? `Study modes, ${count} on` : 'Study modes'}
+              data-on={count > 0 || undefined}
+              data-pause={study.pause || undefined}
+            />
+          }
+        >
+          <QuillIcon className="voca-desk-icon" inked={count > 0} />
+          {count > 0 && (
+            <span className="voca-study-badge" aria-hidden="true">
+              {count}
+            </span>
+          )}
+        </Menu.Trigger>
+      </ButtonTooltip>
+      <Menu.Popup className="media-popup media-popup-safe-area media-menu-popup voca-study-popup">
+        <Menu.Content className="media-menu-content">
+          <p className="voca-study-heading" aria-hidden="true">
+            ✒ Study
+          </p>
+          {STUDY_MODES.map(({ mode, label, hint }) => (
+            <Menu.CheckboxItem
+              key={mode}
+              className="media-menu-item voca-menu-checkbox voca-study-item"
+              checked={study[mode]}
+              onCheckedChange={(on) => setStudy(mode, on)}
+            >
+              <span className="voca-study-check" aria-hidden="true">
+                <Menu.ItemIndicator checked={study[mode]}>
+                  <CheckIcon className="voca-study-check-icon" />
+                </Menu.ItemIndicator>
+              </span>
+              <span className="voca-study-text">
+                <span className="voca-study-label">{label}</span>
+                <span className="voca-study-hint">{hint}</span>
+              </span>
+            </Menu.CheckboxItem>
+          ))}
+        </Menu.Content>
+      </Menu.Popup>
+    </Menu.Root>
+  );
+}
+
+/** The magnifying glass: shows or hides the subtitles on the plate. */
 export function SubtitlesToggle() {
   const lab = useLesson();
   if (!lab) return null;
@@ -17,12 +86,12 @@ export function SubtitlesToggle() {
   return (
     <ButtonTooltip label={subtitlesOn ? 'Hide subtitles' : 'Show subtitles'}>
       <Button
-        className="voca-subtitles-button"
+        className="voca-desk-button voca-subtitles-button"
         aria-label="Subtitles"
         aria-pressed={subtitlesOn}
         onClick={() => setSubtitlesOn(!subtitlesOn)}
       >
-        {subtitlesOn ? <CaptionsOnIcon className="media-button-icon" /> : <CaptionsOffIcon className="media-button-icon" />}
+        <MagnifierIcon className="voca-desk-icon" on={subtitlesOn} />
       </Button>
     </ButtonTooltip>
   );

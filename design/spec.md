@@ -7,15 +7,42 @@ Vocapedia calls itself "the free encyclopedia of languages", so the player *is* 
 
 - **Karaoke subtitles:** on the plate, the English line sweeps word by word. The timing is estimated from word length across each subtitle line. Special words turn gold, with an underline that draws in and a ✦ spark. The French line sits beneath.
 - **A–Z thumb index:** when a special word is spoken, its letter's tab pulls out past the fore-edge like a drawer, with the word written on it in gilt. Letters already heard stay gilt, and letters the film never uses are dimmed. Pressing a tab jumps to that letter's first word and opens the glossary there. It is one Tab stop; the arrow keys move between letters.
-- **Left page, "Your Glossary":**
-  - **Just heard:** the newest word as a full dictionary entry (headword, part of speech, IPA, definition, French, the line it came from). The card turns over like a page for each new word.
-  - **Glossary:** A–Z sections fill as you watch, each word inked in by a moving nib, with a "n of 32 words collected" count. The page is derived from playback time, so seeking back un-writes words.
+- **Right page, "Your Glossary"** (the film is the left page; the old A–Z glossary list was removed):
+  - **Just heard:** one page per spoken line, not per word, so it's readable while the film plays. The page turns as a line with special words begins. It quotes the line and lists each special word in it (headword, part of speech, IPA, definition, French), with a gold marker filling in as the karaoke sweep reaches each word.
+  - **Paging:** ‹ › buttons page back through earlier lines ("Earlier", with "● Back to live").
+  - **Hold:** while the pointer or keyboard focus is on the page, the card holds still and a rubric "Held" ribbon hangs from it. On release, it jumps to the live line.
+- **Study mode:** the "Study" bookmark on the cover pauses the video at the end of every line with special words. The wax seal glows until it's pressed to read on.
 - **Seek bar:** the page edges, gilt where read, with a silk ribbon bookmark and a dog-ear for every line of dialogue.
 - **Play/pause:** a wax seal.
 - **Phones:** the book folds down to its gilt trim. A word slip ("✦ dragon · dragon") slides in at the corner of the plate.
 - **Art:** every ornament is CSS or inline SVG, with no images.
 
-**Submission blurb:** The Living Encyclopedia is a Video.js 10 skin for Vocapedia, the free encyclopedia of languages. The player is an open volume bound in Vocapedia cobalt, with the film as an engraved plate. As each line is spoken, the subtitle sweeps word by word, and every word worth learning turns gold. Its A–Z thumb tab pulls out with the word written on it, and the left page turns to its dictionary entry, then inks it into a glossary that grows as you watch. The page edges are the timeline, with a silk ribbon as the bookmark, and play/pause is a wax seal.
+**Submission blurb:** The Living Encyclopedia is a Video.js 10 skin for Vocapedia, the free encyclopedia of languages. The player is an open volume bound in Vocapedia cobalt, with the film as an engraved plate. As each line is spoken, the subtitle sweeps word by word, and every word worth learning turns gold. Its A–Z thumb tab pulls out with the word written on it, and the right page turns to its dictionary entry. The page edges are the timeline, with a silk ribbon as the bookmark, and play/pause is a wax seal.
+
+## Latest interactions
+- **Page turn:** the whole right page turns like a real leaf on every change of line, letter section or ‹ › page. A copy of the old page swings over the spine with its paper back and shading, while the new page waits underneath. Going back brings a leaf over from the left. Under reduced motion the page simply changes.
+- **A–Z tabs open a section:** clicking a tab opens that letter's section on the dictionary page, listing every word under the letter in one place (definition, IPA, French, and a ▶ time button that replays its line). Words not heard yet are lighter. Clicking the tab again, or "✕ Close", turns back. The open tab shows in cobalt.
+- **Hover translation:** hovering a gold word in the subtitles shows a paper slip with its French and part of speech.
+- **Drawer labels:** long words in the pulled-out tabs are no longer clipped (the page clips at the window edge, not at the book).
+
+## The scholar's desk (controls)
+The controls are objects from a lexicographer's desk, set into brass-rimmed recesses in the leather, below the page-edge timeline. Each is an inline SVG (`src/video/desk-icons.tsx`) inside a real button with a tooltip and a gilt focus ring.
+
+| Control | Object |
+| --- | --- |
+| Play / pause | Cobalt wax seal |
+| −10 s / +10 s | Dog-eared page corners with "10" written on them |
+| Time | Page numbers, "p. 151 of 888" (a page a second), with the clock time beneath |
+| Mute / volume | An inkwell whose ink level is the volume (corked when muted), with a line of ink as the slider |
+| Subtitles | A magnifying glass over two lines of print (gilt-ringed when on) |
+| Study | A quill, which opens the study modes; inked, with a count, when any is on |
+| Settings | A brass compass-dial (the needle turns when open) |
+| Fullscreen | An open book (enter) / a closed book (exit) |
+
+**Study modes** (quill menu, all can be combined):
+- **Pause after new words:** stops at the end of each line with special words.
+- **Repeat each line twice:** plays every line once more before moving on.
+- **Slow lines to 0.75×:** slows the speech, then returns to the viewer's own speed between lines.
 
 ## Palette (from vocapedia.base44.app's CSS)
 | Role | Value |
