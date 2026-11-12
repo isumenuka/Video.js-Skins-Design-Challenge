@@ -8,6 +8,8 @@ import { playbackProps, playerStyles } from '../shell/params';
 import { initialParams, onParamsChange } from './frame';
 import { Player } from './player';
 
+const framed = window.self !== window.top;
+
 function Preview() {
   const [params, setParams] = useState(initialParams);
 
@@ -16,9 +18,11 @@ function Preview() {
   return (
     // The provider loads Video.js's built-in translations for the selected language.
     <I18nProvider locale={params.locale}>
-      <div className="preview-player" style={playerStyles(params) as CSSProperties}>
-        <Player media={playbackProps(params)} />
-      </div>
+      {/* Inside the workbench the options panel sizes the player; on its own, the player fills its column. */}
+      <Player
+        media={playbackProps(params)}
+        style={(framed ? playerStyles(params) : undefined) as CSSProperties | undefined}
+      />
     </I18nProvider>
   );
 }

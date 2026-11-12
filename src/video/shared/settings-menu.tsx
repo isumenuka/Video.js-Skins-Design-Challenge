@@ -9,13 +9,15 @@ import {
   SpeedIcon as SpeedIconPrimitive,
   CaptionsOffIcon as CaptionsOffIconPrimitive,
   GearIcon as GearIconPrimitive,
-} from '@videojs/react/icons/scaffold';
+} from '@/video/icons';
 import { AudioTrackRadioGroup } from '@videojs/react/ui/audio-track-radio-group';
 import { CaptionsRadioGroup } from '@videojs/react/ui/captions-radio-group';
 import { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-group';
 import { QualityRadioGroup } from '@videojs/react/ui/quality-radio-group';
 
 import { cn } from '@/lib/resolve-class-name';
+import { CheckIcon as CheckIconPrimitive } from '@/video/icons';
+import { type SubtitleMode, useLesson } from '@/video/lesson/lesson-context';
 
 import { Button } from './button';
 import { RadioItem } from './menu-item';
@@ -157,6 +159,87 @@ function CaptionsMenu() {
   );
 }
 
+const SUBTITLE_MODES: Array<{ value: SubtitleMode | 'off'; label: string }> = [
+  { value: 'native', label: 'Native' },
+  { value: 'translation', label: 'Translation' },
+  { value: 'both', label: 'Both' },
+  { value: 'off', label: 'Off' },
+];
+
+/** The lesson's subtitle and practice settings, which narrow players reach only through this menu. */
+function LessonMenu() {
+  const lab = useLesson();
+  if (!lab) return null;
+  const value = lab.subtitlesOn ? lab.mode : 'off';
+  const current = SUBTITLE_MODES.find((m) => m.value === value)!;
+
+  return (
+    <>
+      <Menu.Root>
+        <Menu.Trigger className={'media-menu-item'}>
+          <CaptionsOffIconPrimitive className={'media-menu-trigger-icon'} />
+          <span>Subtitles</span>
+          <span className={'media-menu-hint'}>
+            <span className={'media-menu-hint-label'}>{current.label}</span>
+            <MenuChevron />
+          </span>
+        </Menu.Trigger>
+        <Menu.Content className={'media-menu-content'}>
+          <Menu.Item className={'media-menu-back-item'}>
+            <MenuChevron back />
+            <span>Subtitles</span>
+          </Menu.Item>
+          <Menu.Separator className={'media-menu-separator'} />
+          <Menu.RadioGroup
+            className={'media-menu-radio-group'}
+            value={value}
+            onValueChange={(next) => {
+              if (next === 'off') {
+                lab.setSubtitlesOn(false);
+              } else {
+                lab.setMode(next as SubtitleMode);
+                lab.setSubtitlesOn(true);
+              }
+            }}
+          >
+            {SUBTITLE_MODES.map((mode) => (
+              <RadioItem key={mode.value} value={mode.value}>
+                <span>{mode.label}</span>
+              </RadioItem>
+            ))}
+          </Menu.RadioGroup>
+        </Menu.Content>
+      </Menu.Root>
+      <Menu.Item className={cn('media-menu-item', 'voca-menu-replay')} onSelect={lab.replay}>
+        <span className={'media-menu-trigger-icon'} aria-hidden="true" />
+        <span>Replay sentence</span>
+      </Menu.Item>
+      <Menu.CheckboxItem
+        className={cn('media-menu-item', 'voca-menu-checkbox')}
+        checked={lab.autoPause}
+        onCheckedChange={lab.setAutoPause}
+      >
+        <span className={'media-menu-trigger-icon'} aria-hidden="true" />
+        <span>Pause per line</span>
+        <Menu.ItemIndicator forceMount className={'media-menu-indicator'} checked={lab.autoPause}>
+          <CheckIconPrimitive className={'media-menu-radio-icon'} />
+        </Menu.ItemIndicator>
+      </Menu.CheckboxItem>
+      <Menu.CheckboxItem
+        className={cn('media-menu-item', 'voca-menu-checkbox')}
+        checked={lab.repeat}
+        onCheckedChange={lab.setRepeat}
+      >
+        <span className={'media-menu-trigger-icon'} aria-hidden="true" />
+        <span>Repeat segment</span>
+        <Menu.ItemIndicator forceMount className={'media-menu-indicator'} checked={lab.repeat}>
+          <CheckIconPrimitive className={'media-menu-radio-icon'} />
+        </Menu.ItemIndicator>
+      </Menu.CheckboxItem>
+    </>
+  );
+}
+
 export function SettingsMenu() {
   return (
     <Menu.Root side="top" align="center">
@@ -170,9 +253,10 @@ export function SettingsMenu() {
       </ButtonTooltip>
       <Menu.Popup keepMounted className={cn('media-popup', 'media-popup-safe-area', 'media-menu-popup')}>
         <Menu.Content className={'media-menu-content'}>
-          <QualityMenu />
-          <AudioTrackMenu />
           <PlaybackRateMenu />
+          <QualityMenu />
+          <LessonMenu />
+          <AudioTrackMenu />
           <CaptionsMenu />
         </Menu.Content>
       </Menu.Popup>

@@ -1,0 +1,1097 @@
+/*
+ * Vocapedia Language Lab — the brand layer over the Scaffold base.
+ * Colors come from vocapedia.base44.app: deep navy ground, cobalt primary, periwinkle links and focus.
+ * Type: Inter for the interface, Source Serif 4 for the spoken line, the way the encyclopedia sets its headwords.
+ */
+
+/* ---------- Tokens ---------- */
+@layer base.preset {
+  .media-skin[data-theme="vocapedia"] {
+    --voca-ground: #020513;
+    --voca-surface: rgb(4 8 28 / 0.94);
+    --voca-surface-solid: #050a1f;
+    --voca-chip: rgb(3 6 22 / 0.86);
+    --voca-border: hsl(224 38% 22%);
+    --voca-border-strong: hsl(228 60% 36%);
+    --voca-cobalt: #1f30ff;
+    --voca-cobalt-hover: #3546ff;
+    --voca-periwinkle: #8fa0ff;
+    --voca-periwinkle-soft: #c3ccff;
+    --voca-glow: #5b6bff;
+    --voca-text: hsl(222 25% 94%);
+    --voca-muted: hsl(222 20% 72%);
+    --voca-gold: hsl(43 80% 62%);
+    --voca-hover: rgb(143 160 255 / 0.14);
+    --voca-radius: 0.5rem;
+    --voca-radius-sm: 0.375rem;
+    --voca-control: 2.5rem;
+    --voca-glow-ring: 0 0 0 1px rgb(91 107 255 / 0.9), 0 0 18px rgb(31 48 255 / 0.45);
+    --voca-text-glow: 0 0 18px rgb(91 107 255 / 0.55);
+    --voca-text-plate: 0 1px 2px rgb(2 5 19 / 0.95), 0 0 8px rgb(2 5 19 / 0.85), 0 0 2px rgb(2 5 19);
+    --voca-font-ui: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --voca-font-serif: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+
+    /* The Video.js tokens the base styles read. */
+    --media-background: transparent;
+    --media-foreground: var(--voca-text);
+    --media-accent: var(--media-accent-color, var(--voca-cobalt));
+    --media-accent-foreground: var(--media-accent-text-color, #fff);
+    --media-primary: var(--media-accent);
+    --media-primary-foreground: #fff;
+    --media-muted: hsl(224 30% 24%);
+    --media-popover: var(--voca-surface-solid);
+    --media-popover-foreground: var(--voca-text);
+    --media-ring: var(--voca-periwinkle);
+    --media-button-highlight: var(--voca-hover);
+    --media-video-border-radius: var(--media-border-radius, 0.75rem);
+    --media-control-radius: var(--voca-radius);
+    --media-controls-radius: 0;
+    --media-menu-item-radius: var(--voca-radius-sm);
+    --media-popup-radius: var(--voca-radius);
+    --media-dialog-radius: 0.75rem;
+    --media-scrollbar-thumb-color: hsl(224 30% 34%);
+    --media-font-family: var(--voca-font-ui);
+
+    font-family: var(--voca-font-ui);
+    color: var(--voca-text);
+    background-color: var(--voca-ground);
+  }
+
+  /* Calmer surfaces when the viewer asks for less transparency or more contrast. */
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    .media-skin[data-theme="vocapedia"] {
+      --voca-surface: var(--voca-surface-solid);
+      --voca-chip: var(--voca-surface-solid);
+      --voca-muted: hsl(222 25% 84%);
+      --voca-border: hsl(224 40% 40%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .media-skin[data-theme="vocapedia"] {
+      --voca-glow-ring: 0 0 0 1px rgb(91 107 255 / 0.9);
+      --voca-text-glow: 0 0 0 transparent;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .media-skin[data-theme="vocapedia"] {
+      --voca-surface: Canvas;
+      --voca-chip: Canvas;
+      --voca-border: CanvasText;
+      --voca-cobalt: Highlight;
+      --voca-periwinkle: Highlight;
+      --voca-text: CanvasText;
+      --voca-muted: CanvasText;
+    }
+  }
+}
+
+@layer components {
+  @scope (.media-skin[data-theme="vocapedia"][data-preset="video"]) {
+    :scope {
+      overflow: hidden;
+      border-radius: var(--media-video-border-radius);
+      box-shadow: 0 0 0 1px var(--voca-border), 0 24px 60px -24px rgb(31 48 255 / 0.35);
+    }
+
+    .voca-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    /* ---------- Buttons ---------- */
+    .media-button {
+      width: var(--voca-control);
+      height: var(--voca-control);
+      border-radius: var(--voca-radius);
+      color: var(--voca-text);
+      transition:
+        background-color var(--media-duration-fast) ease-out,
+        color var(--media-duration-fast) ease-out;
+    }
+
+    @media (hover: hover) {
+      .media-button:hover {
+        background-color: var(--voca-hover);
+        color: #fff;
+      }
+    }
+
+    .media-button:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+      outline-offset: 2px;
+      background-color: var(--voca-hover);
+    }
+
+    .media-button[aria-pressed="true"] {
+      color: var(--voca-periwinkle);
+    }
+
+    .media-button-icon,
+    .media-button-icon-base {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    /* Play/pause is the one filled control: the cobalt key of the bar. */
+    .media-play-button {
+      background-color: var(--voca-cobalt);
+      color: #fff;
+      box-shadow: var(--voca-glow-ring);
+    }
+
+    @media (hover: hover) {
+      .media-play-button:hover {
+        background-color: var(--voca-cobalt-hover);
+      }
+    }
+
+    .media-play-button:focus-visible {
+      background-color: var(--voca-cobalt-hover);
+    }
+
+    /* Seek: the number sits in the middle of the arrow. */
+    .media-seek-button-content {
+      place-items: center;
+    }
+
+    .media-seek-button-label {
+      position: static;
+      grid-area: 1 / 1;
+      font-size: 0.5625rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .media-seek-button-backward-label,
+    .media-seek-button-forward-label {
+      left: auto;
+      right: auto;
+    }
+
+    .media-seek-button-content > .media-button-icon {
+      width: 1.375rem;
+      height: 1.375rem;
+    }
+
+    /* ---------- Tooltips and menus ---------- */
+    .media-tooltip-popup {
+      background-color: var(--voca-surface-solid);
+      color: var(--voca-text);
+      border: 1px solid var(--voca-border);
+      border-radius: var(--voca-radius-sm);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.3rem 0.55rem;
+    }
+
+    .media-menu-popup {
+      background-color: var(--voca-surface-solid);
+      color: var(--voca-text);
+      border: 1px solid var(--voca-border-strong);
+      border-radius: var(--voca-radius);
+      box-shadow: 0 16px 40px -12px rgb(0 0 0 / 0.7), 0 0 24px -8px rgb(31 48 255 / 0.4);
+      font-size: 0.8125rem;
+      padding: 0.25rem;
+    }
+
+    .media-menu-item,
+    .media-menu-back-item,
+    .media-menu-radio-item {
+      border-radius: var(--voca-radius-sm);
+      min-height: 2.25rem;
+    }
+
+    .media-menu-item[data-highlighted],
+    .media-menu-back-item[data-highlighted],
+    .media-menu-radio-item[data-highlighted] {
+      background-color: var(--voca-hover);
+    }
+
+    .media-menu-item:focus-visible,
+    .media-menu-back-item:focus-visible,
+    .media-menu-radio-item:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+      outline-offset: -2px;
+    }
+
+    .media-menu-radio-item[aria-checked="true"] {
+      color: var(--voca-periwinkle);
+      font-weight: 600;
+    }
+
+    .media-menu-radio-item[aria-checked="true"]::after {
+      content: "Active";
+      margin-inline-start: auto;
+      padding: 0.1rem 0.4rem;
+      border-radius: 0.25rem;
+      background: rgb(31 48 255 / 0.28);
+      border: 1px solid rgb(143 160 255 / 0.5);
+      color: var(--voca-periwinkle-soft);
+      font-size: 0.625rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .media-menu-hint-label {
+      color: var(--voca-muted);
+    }
+
+    .media-menu-separator {
+      background-color: var(--voca-border);
+    }
+
+    .voca-menu-checkbox {
+      cursor: pointer;
+    }
+
+    .voca-menu-checkbox[aria-checked="true"] {
+      color: var(--voca-periwinkle);
+    }
+
+    /* ---------- The control bar ---------- */
+    .video-controls-backdrop {
+      background-image: linear-gradient(to top, rgb(2 5 19 / 0.55), transparent 35%, transparent 75%, rgb(2 5 19 / 0.45));
+    }
+
+    .video-controls-bottom {
+      gap: 0.375rem;
+      padding: 0.5rem 0.75rem 0.625rem;
+      background-color: var(--voca-surface);
+      border-top: 1px solid var(--voca-border);
+      transition:
+        opacity var(--media-duration-controls) ease-out,
+        translate var(--media-duration-controls) ease-out;
+    }
+
+    @scope (.video-controls-content) {
+      &:not([data-visible]) .video-controls-bottom {
+        translate: 0 0.5rem;
+      }
+
+      &:not([data-visible]) .video-controls-top {
+        translate: 0 -0.5rem;
+      }
+    }
+
+    .video-controls-row {
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .video-controls-group {
+      gap: 0.25rem;
+    }
+
+    .video-controls-end {
+      gap: 0.375rem;
+      margin-inline-start: auto;
+    }
+
+    .media-time-group {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--voca-text);
+      padding-inline: 0.5rem;
+      height: var(--voca-control);
+      letter-spacing: 0.01em;
+    }
+
+    .media-time-duration-value,
+    .media-time-separator {
+      opacity: 1;
+      color: var(--voca-muted);
+    }
+
+    .media-time-toggle {
+      border-radius: var(--voca-radius-sm);
+      padding: 0.25rem;
+    }
+
+    .media-time-toggle:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+    }
+
+    /* Phones: one row of essentials. Seeking by ten seconds stays on double-tap and the arrow keys, and the
+       subtitle switch lives in Settings. */
+    @container media-root (width < 30rem) {
+      .voca-seek-button,
+      .voca-subtitles-button {
+        display: none;
+      }
+
+      .video-controls-row {
+        flex-wrap: nowrap;
+      }
+
+      .video-controls-group {
+        gap: 0;
+      }
+
+      .media-time-group {
+        padding-inline: 0.25rem;
+        font-size: 0.75rem;
+      }
+
+      .video-controls-bottom {
+        padding: 0.375rem 0.5rem 0.5rem;
+      }
+    }
+
+    /* Phones: the video is too short for chips and two subtitle lines at once. The top tools move to Settings
+       (repeat, replay), and the lines sit just above the bar. */
+    @container media-root (width < 30rem) {
+      .video-controls-top {
+        display: none;
+      }
+
+      :scope[data-controls-visible] .voca-subtitles {
+        bottom: calc(var(--voca-bar-height, 5rem) + 0.375rem);
+      }
+
+      .voca-subtitles {
+        bottom: 0.5rem;
+        padding-inline: 0.5rem;
+      }
+
+      .voca-subtitles-inner {
+        max-width: 100%;
+        gap: 0.125rem;
+      }
+
+      .voca-subtitles-native {
+        font-size: clamp(0.9375rem, 4.4cqi, 1.125rem);
+      }
+
+      .voca-subtitles-translation {
+        font-size: clamp(0.75rem, 3.4cqi, 0.875rem);
+      }
+
+      .voca-listen {
+        min-width: 1.75rem;
+        min-height: 1.75rem;
+      }
+    }
+
+    @container media-root (width < 22rem) {
+      .voca-next-button {
+        display: none;
+      }
+    }
+
+    /* ---------- Inline volume ---------- */
+    .voca-volume {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .voca-volume-slider {
+      position: relative;
+      display: none;
+      align-items: center;
+      width: 4.5rem;
+      height: var(--voca-control);
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    @container media-root (width >= 34rem) {
+      .voca-volume-slider {
+        display: flex;
+      }
+    }
+
+    .voca-volume-slider-track {
+      position: relative;
+      width: 100%;
+      height: 4px;
+      border-radius: 99px;
+      background-color: rgb(195 204 255 / 0.22);
+      overflow: hidden;
+    }
+
+    .voca-volume-slider-fill {
+      position: absolute;
+      inset-block: 0;
+      inset-inline-start: 0;
+      width: var(--media-slider-fill, 0%);
+      background: linear-gradient(to right, var(--voca-cobalt), var(--voca-periwinkle));
+      border-radius: inherit;
+    }
+
+    .voca-volume-slider-thumb {
+      position: absolute;
+      left: var(--media-slider-fill, 0%);
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 0 2px var(--voca-cobalt);
+      translate: -50% 0;
+      outline: none;
+    }
+
+    .voca-volume-slider-thumb:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+      outline-offset: 3px;
+    }
+
+    .voca-volume-slider[data-disabled] {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ---------- Seek bar with the dialogue lane ---------- */
+    .video-controls-slider-row {
+      padding-bottom: 0.375rem;
+    }
+
+    .media-time-slider {
+      height: 1.25rem;
+    }
+
+    .media-time-slider-track {
+      height: 4px;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .media-time-slider-track:before {
+      background-color: rgb(195 204 255 / 0.16);
+    }
+
+    .media-time-slider-buffer {
+      background-color: rgb(195 204 255 / 0.2);
+    }
+
+    .media-time-slider-fill {
+      background-color: var(--voca-cobalt);
+      background-image: linear-gradient(to right, var(--voca-cobalt), var(--voca-glow) 70%, var(--voca-periwinkle));
+    }
+
+    .media-time-slider-thumb {
+      width: 0.875rem;
+      height: 0.875rem;
+      border: 0;
+      border-radius: 50%;
+      background-color: #fff;
+      box-shadow:
+        0 0 0 3px var(--voca-cobalt),
+        0 0 14px rgb(91 107 255 / 0.8);
+      transition: scale var(--media-duration-fast) ease-out;
+    }
+
+    @scope (.media-time-slider) {
+      &:is([data-pointing], [data-dragging]) .media-time-slider-thumb {
+        scale: 1.2;
+      }
+    }
+
+    .media-time-slider-thumb:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+      outline-offset: 4px;
+    }
+
+    .media-time-slider-preview-meta {
+      background-color: var(--voca-surface-solid);
+      border: 1px solid var(--voca-border);
+      border-radius: var(--voca-radius-sm);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .media-slider-thumbnail {
+      border-radius: var(--voca-radius-sm);
+      border: 1px solid var(--voca-border-strong);
+    }
+
+    .voca-cue-marks {
+      position: absolute;
+      inset-inline: 0;
+      top: calc(50% + 6px);
+      height: 3px;
+      pointer-events: none;
+    }
+
+    .voca-cue-mark {
+      position: absolute;
+      top: 0;
+      height: 3px;
+      border-radius: 2px;
+      background-color: rgb(143 160 255 / 0.45);
+      transition: background-color var(--media-duration) ease-out;
+    }
+
+    .voca-cue-mark[data-current] {
+      background-color: var(--voca-periwinkle);
+    }
+
+    .voca-cue-mark[data-active] {
+      background-color: #fff;
+      box-shadow: 0 0 8px var(--voca-glow);
+    }
+
+    /* ---------- Segmented subtitle switch ---------- */
+    .voca-segmented {
+      display: none;
+      align-items: center;
+      gap: 2px;
+      padding: 3px;
+      border-radius: var(--voca-radius);
+      background-color: rgb(195 204 255 / 0.06);
+      border: 1px solid var(--voca-border);
+    }
+
+    .voca-segmented[data-disabled] {
+      opacity: 0.55;
+    }
+
+    .voca-segment {
+      min-height: 2rem;
+      padding-inline: 0.625rem;
+      border-radius: var(--voca-radius-sm);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--voca-muted);
+      cursor: pointer;
+      transition:
+        background-color var(--media-duration-fast) ease-out,
+        color var(--media-duration-fast) ease-out;
+    }
+
+    @media (hover: hover) {
+      .voca-segment:hover {
+        color: var(--voca-text);
+        background-color: var(--voca-hover);
+      }
+    }
+
+    .voca-segment[aria-checked="true"] {
+      background-color: var(--voca-cobalt);
+      color: #fff;
+      box-shadow: 0 0 12px -2px rgb(31 48 255 / 0.8);
+    }
+
+    .voca-segment:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+      outline-offset: 2px;
+    }
+
+    /* ---------- Pause-per-line switch ---------- */
+    .voca-switch {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: var(--voca-control);
+      padding-inline: 0.5rem;
+      border-radius: var(--voca-radius);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--voca-muted);
+      cursor: pointer;
+    }
+
+    @media (hover: hover) {
+      .voca-switch:hover {
+        color: var(--voca-text);
+      }
+    }
+
+    .voca-switch:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+      outline-offset: 2px;
+    }
+
+    .voca-switch-track {
+      position: relative;
+      width: 2.125rem;
+      height: 1.25rem;
+      border-radius: 99px;
+      background-color: rgb(195 204 255 / 0.18);
+      border: 1px solid var(--voca-border);
+      transition: background-color var(--media-duration) ease-out;
+    }
+
+    .voca-switch-thumb {
+      position: absolute;
+      top: 50%;
+      left: 2px;
+      width: 0.875rem;
+      height: 0.875rem;
+      border-radius: 50%;
+      background-color: var(--voca-text);
+      translate: 0 -50%;
+      transition: translate var(--media-duration) ease-out;
+    }
+
+    .voca-switch[aria-checked="true"] {
+      color: var(--voca-text);
+    }
+
+    .voca-switch[aria-checked="true"] .voca-switch-track {
+      background-color: var(--voca-cobalt);
+      border-color: var(--voca-glow);
+      box-shadow: 0 0 10px rgb(31 48 255 / 0.7);
+    }
+
+    .voca-switch[aria-checked="true"] .voca-switch-thumb {
+      translate: 0.875rem -50%;
+      background-color: #fff;
+    }
+
+    .voca-switch:where(:dir(rtl), [dir="rtl"], [dir="rtl"] *) .voca-switch-thumb {
+      left: auto;
+      right: 2px;
+    }
+
+    .voca-switch:where(:dir(rtl), [dir="rtl"], [dir="rtl"] *)[aria-checked="true"] .voca-switch-thumb {
+      translate: -0.875rem -50%;
+    }
+
+    /* The lab controls appear in the bar once there is room; narrower players reach them in Settings. */
+    @container media-root (width >= 46rem) {
+      .voca-segmented {
+        display: flex;
+      }
+    }
+
+    @container media-root (width >= 56rem) {
+      .voca-switch {
+        display: flex;
+      }
+    }
+
+    /* ---------- Top bar: language and sentence tools ---------- */
+    .video-controls-top {
+      justify-content: space-between;
+      padding: 0.75rem;
+      gap: 0.5rem;
+      transition:
+        opacity var(--media-duration-controls) ease-out,
+        translate var(--media-duration-controls) ease-out;
+    }
+
+    .voca-top-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .voca-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 2.25rem;
+      padding-inline: 0.625rem;
+      border-radius: var(--voca-radius);
+      background-color: var(--voca-chip);
+      border: 1px solid var(--voca-border);
+      color: var(--voca-text);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      backdrop-filter: blur(8px);
+    }
+
+    .voca-chip-button {
+      cursor: pointer;
+      transition:
+        border-color var(--media-duration-fast) ease-out,
+        background-color var(--media-duration-fast) ease-out;
+    }
+
+    @media (hover: hover) {
+      .voca-chip-button:hover {
+        border-color: var(--voca-border-strong);
+        background-color: rgb(16 24 70 / 0.9);
+      }
+    }
+
+    .voca-chip-button:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+      outline-offset: 2px;
+    }
+
+    .voca-chip-button[aria-pressed="true"] {
+      border-color: var(--voca-glow);
+      box-shadow: var(--voca-glow-ring);
+    }
+
+    .voca-chip-state {
+      color: var(--voca-muted);
+    }
+
+    .voca-chip-button[aria-pressed="true"] .voca-chip-state {
+      color: var(--voca-periwinkle);
+    }
+
+    .voca-chip-icon {
+      width: 1rem;
+      height: 1rem;
+      flex-shrink: 0;
+    }
+
+    .voca-language-code {
+      display: inline-grid;
+      place-items: center;
+      min-width: 1.75rem;
+      height: 1.25rem;
+      padding-inline: 0.25rem;
+      border-radius: 0.25rem;
+      background-color: var(--voca-cobalt);
+      color: #fff;
+      font-size: 0.6875rem;
+      font-weight: 700;
+    }
+
+    .voca-language-arrow {
+      color: var(--voca-periwinkle);
+    }
+
+    /* Narrow players: icon-only chips keep their names for assistive tech, and the language chip shows its code. */
+    @container media-root (width < 36rem) {
+      .voca-chip-button .voca-chip-label,
+      .voca-chip-state,
+      .voca-language-chip .voca-chip-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .voca-chip-button {
+        min-width: 2.25rem;
+        justify-content: center;
+        padding-inline: 0;
+      }
+
+      .voca-language-chip {
+        padding-inline: 0.375rem;
+      }
+    }
+
+    /* ---------- Watermark ---------- */
+    .voca-watermark {
+      position: absolute;
+      inset-inline-end: 0.75rem;
+      bottom: calc(100% + 0.5rem);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--voca-radius-sm);
+      background-color: var(--voca-chip);
+      border: 1px solid var(--voca-border);
+      color: var(--voca-text);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+    }
+
+    .voca-watermark-icon {
+      width: 0.875rem;
+      height: 0.875rem;
+      color: var(--voca-periwinkle);
+    }
+
+    .voca-watermark:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+      outline-offset: 2px;
+    }
+
+    @container media-root (width < 30rem) {
+      .voca-watermark {
+        display: none;
+      }
+    }
+
+    /* ---------- Dual subtitles ---------- */
+    .voca-subtitles {
+      position: absolute;
+      z-index: 20;
+      inset-inline: 0;
+      bottom: 1.25rem;
+      display: flex;
+      justify-content: center;
+      padding-inline: 1rem;
+      pointer-events: none;
+      opacity: 0;
+      translate: 0 0.25rem;
+      transition:
+        opacity var(--media-duration-slow) ease-out,
+        translate var(--media-duration-slow) ease-out,
+        bottom var(--media-duration-controls) ease-out;
+    }
+
+    :scope[data-controls-visible] .voca-subtitles {
+      bottom: calc(var(--voca-bar-height, 6.5rem) + 1.75rem);
+    }
+
+    .voca-subtitles[data-visible] {
+      opacity: 1;
+      translate: 0 0;
+    }
+
+    .voca-subtitles-inner {
+      display: grid;
+      justify-items: center;
+      gap: 0.25rem;
+      max-width: min(92%, 52rem);
+      text-align: center;
+    }
+
+    .voca-subtitles-native {
+      font-family: var(--voca-font-serif);
+      font-weight: 600;
+      font-size: clamp(1.0625rem, 3.6cqi, 2.125rem);
+      line-height: 1.25;
+      color: #fff;
+      text-shadow: var(--voca-text-plate), var(--voca-text-glow);
+      text-wrap: balance;
+    }
+
+    .voca-subtitles-translation {
+      font-family: var(--voca-font-ui);
+      font-weight: 500;
+      font-size: clamp(0.8125rem, 2.2cqi, 1.25rem);
+      line-height: 1.35;
+      color: var(--voca-periwinkle-soft);
+      text-shadow: var(--voca-text-plate);
+      text-wrap: balance;
+    }
+
+    .voca-subtitles[data-mode="translation"] .voca-subtitles-translation {
+      font-size: clamp(1rem, 3cqi, 1.75rem);
+      color: #fff;
+    }
+
+    .voca-line {
+      pointer-events: auto;
+    }
+
+    .voca-word-wrap {
+      position: relative;
+      display: inline;
+    }
+
+    .voca-word {
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      padding: 0;
+      background: none;
+      border-radius: 0.2em;
+      text-decoration: underline;
+      text-decoration-color: rgb(143 160 255 / 0.7);
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.18em;
+      transition:
+        color var(--media-duration-fast) ease-out,
+        text-decoration-color var(--media-duration-fast) ease-out;
+    }
+
+    @media (hover: hover) {
+      .voca-word:hover {
+        color: var(--voca-periwinkle-soft);
+        text-decoration-color: var(--voca-periwinkle);
+      }
+    }
+
+    .voca-word[aria-expanded="true"] {
+      color: var(--voca-periwinkle-soft);
+      text-decoration-color: #fff;
+    }
+
+    .voca-word[data-saved] {
+      text-decoration-color: var(--voca-gold);
+    }
+
+    .voca-word:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+      outline-offset: 3px;
+    }
+
+    .voca-gloss {
+      position: absolute;
+      bottom: calc(100% + 0.5rem);
+      left: 50%;
+      translate: -50% 0;
+      z-index: 2;
+      display: grid;
+      gap: 0.375rem;
+      width: max-content;
+      max-width: min(18rem, 80cqi);
+      padding: 0.375rem 0.625rem;
+      border-radius: var(--voca-radius-sm);
+      background-color: var(--voca-surface-solid);
+      border: 1px solid var(--voca-border-strong);
+      box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.8), 0 0 18px -6px rgb(31 48 255 / 0.6);
+      font-family: var(--voca-font-ui);
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.3;
+      color: var(--voca-text);
+      text-shadow: none;
+      text-align: start;
+      white-space: normal;
+    }
+
+    .voca-gloss[hidden] {
+      display: none;
+    }
+
+    .voca-gloss-pos,
+    .voca-gloss-dot {
+      color: var(--voca-muted);
+    }
+
+    .voca-gloss-translation {
+      color: var(--voca-periwinkle-soft);
+    }
+
+    .voca-gloss-actions {
+      display: flex;
+      gap: 0.375rem;
+    }
+
+    .voca-gloss-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      min-height: 2rem;
+      padding-inline: 0.5rem;
+      border-radius: var(--voca-radius-sm);
+      border: 1px solid var(--voca-border);
+      background-color: rgb(195 204 255 / 0.06);
+      color: var(--voca-text);
+      font: 600 0.75rem/1 var(--voca-font-ui);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    @media (hover: hover) {
+      .voca-gloss-action:hover {
+        border-color: var(--voca-glow);
+        background-color: var(--voca-hover);
+      }
+    }
+
+    .voca-gloss-action:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+      outline-offset: 2px;
+    }
+
+    .voca-gloss-action-icon {
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+
+    .voca-gloss-action[aria-pressed="true"] .voca-star {
+      color: var(--voca-gold);
+    }
+
+    .voca-listen {
+      display: inline-grid;
+      place-items: center;
+      width: 1.75em;
+      height: 1.75em;
+      min-width: 2rem;
+      min-height: 2rem;
+      margin-inline-start: 0.25em;
+      vertical-align: middle;
+      border-radius: 50%;
+      color: var(--voca-periwinkle);
+      cursor: pointer;
+      pointer-events: auto;
+      filter: drop-shadow(0 1px 2px rgb(2 5 19 / 0.9));
+    }
+
+    @media (hover: hover) {
+      .voca-listen:hover {
+        color: #fff;
+        background-color: rgb(31 48 255 / 0.35);
+      }
+    }
+
+    .voca-listen:focus-visible {
+      outline: 2px solid var(--voca-periwinkle);
+      outline-offset: 2px;
+    }
+
+    .voca-listen-icon {
+      width: 0.8em;
+      height: 0.8em;
+    }
+
+    /* ---------- Touch: comfortable targets ---------- */
+    @media (pointer: coarse) {
+      :scope {
+        --voca-control: 2.75rem;
+      }
+
+      .voca-chip,
+      .voca-segment,
+      .voca-gloss-action {
+        min-height: 2.75rem;
+      }
+
+      .voca-chip-button {
+        min-width: 2.75rem;
+      }
+    }
+
+    /* ---------- Fullscreen: scale the lab up with the screen ---------- */
+    :scope:fullscreen {
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    /* ---------- Reduced motion ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      .voca-subtitles,
+      .video-controls-bottom,
+      .video-controls-top,
+      .voca-switch-thumb,
+      .voca-switch-track,
+      .voca-cue-mark,
+      .media-time-slider-thumb {
+        transition: none;
+      }
+
+      .voca-subtitles,
+      .video-controls-bottom,
+      .video-controls-top {
+        translate: none !important;
+      }
+    }
+
+    @media (forced-colors: active) {
+      .voca-segment[aria-checked="true"],
+      .voca-language-code,
+      .media-play-button {
+        forced-color-adjust: none;
+        background-color: Highlight;
+        color: HighlightText;
+      }
+
+      .voca-subtitles-native,
+      .voca-subtitles-translation {
+        background-color: Canvas;
+        color: CanvasText;
+        padding-inline: 0.25em;
+      }
+    }
+  }
+}

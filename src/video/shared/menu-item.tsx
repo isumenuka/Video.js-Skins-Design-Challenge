@@ -1,7 +1,7 @@
 /** @jsxImportSource react */
 
 import { Menu as MenuPrimitive } from '@videojs/react';
-import { CheckIcon as CheckIconPrimitive } from '@videojs/react/icons/scaffold';
+import { CheckIcon as CheckIconPrimitive } from '@/video/icons';
 
 export function RadioItem({ children, ...props }: MenuPrimitive.RadioItemProps) {
   return (

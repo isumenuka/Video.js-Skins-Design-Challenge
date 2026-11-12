@@ -4,7 +4,7 @@ import { MuteButton as MuteButtonPrimitive } from '@videojs/react';
 import {
   VolumeOffIcon as VolumeOffIconPrimitive,
   VolumeHighIcon as VolumeHighIconPrimitive,
-} from '@videojs/react/icons/scaffold';
+} from '@/video/icons';
 
 import { cn, resolveClassName } from '@/lib/resolve-class-name';
 

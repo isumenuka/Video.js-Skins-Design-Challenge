@@ -4,6 +4,7 @@
 
 import '../styles/video/scaffold.css';
 import './skin.css';
+import './vocapedia.css';
 import { Container as ContainerPrimitive, Poster as PosterPrimitive, Slider as SliderPrimitive } from '@videojs/react';
 import type { ReactNode } from 'react';
 
@@ -12,6 +13,7 @@ import { cn } from '@/lib/resolve-class-name';
 import { VideoGestures } from './behaviors/gestures';
 import { VideoHotkeys } from './behaviors/hotkeys';
 import { VideoControls } from './controls';
+import { DualSubtitles } from './lesson/dual-subtitles';
 import { ErrorDialog } from './shared/error-dialog';
 import { Indicators } from './shared/indicators';
 import { SeekIndicator } from './shared/seek-indicator';
@@ -28,12 +30,13 @@ export function VideoSkin({ children, className, renderPoster, renderThumbnail, 
   return (
     <ContainerPrimitive
       className={cn('media-skin', 'media-container', 'media-video', className)}
-      data-theme="scaffold"
+      data-theme="vocapedia"
       data-preset="video"
       {...props}
     >
       {children}
       <Poster renderImage={renderPoster} />
+      <DualSubtitles />
       <ErrorDialog />
       <VideoControls renderThumbnail={renderThumbnail} />
 

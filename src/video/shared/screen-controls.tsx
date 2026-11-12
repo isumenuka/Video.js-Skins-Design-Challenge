@@ -12,7 +12,7 @@ import {
   PipExitIcon as PipExitIconPrimitive,
   FullscreenEnterIcon as FullscreenEnterIconPrimitive,
   FullscreenExitIcon as FullscreenExitIconPrimitive,
-} from '@videojs/react/icons/scaffold';
+} from '@/video/icons';
 
 import { cn } from '@/lib/resolve-class-name';
 
@@ -42,7 +42,7 @@ function PiPButton() {
   );
 }
 
-function FullscreenButton() {
+export function FullscreenButton() {
   return (
     <ButtonTooltip popupClassName={'media-tooltip-screen-popup'}>
       <FullscreenButtonPrimitive render={<Button />} className={'media-fullscreen-button'}>

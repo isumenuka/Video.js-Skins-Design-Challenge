@@ -5,6 +5,8 @@ import { TimeSlider as TimeSliderPrimitive } from '@videojs/react';
 
 import { cn } from '@/lib/resolve-class-name';
 
+import { CueMarks } from '../lesson/lab-controls';
+
 export function TimeSlider({ audio = false, renderThumbnail }: ThumbnailSlot & { audio?: boolean } = {}) {
   return (
     <div className={'video-controls-slider-row'}>
@@ -24,6 +26,7 @@ export function TimeSlider({ audio = false, renderThumbnail }: ThumbnailSlot & {
             </div>
           )}
         ></TimeSliderPrimitive.Chapters>
+        {!audio && <CueMarks />}
         <TimeSliderPrimitive.Thumb className={'media-time-slider-thumb'} />
 
         <TimeSliderPrimitive.Preview className={'media-time-slider-preview'}>

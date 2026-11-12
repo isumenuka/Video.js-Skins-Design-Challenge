@@ -1,15 +1,36 @@
 /** @jsxImportSource react */
 
-import { Time, Controls, BufferingIndicator, Tooltip } from '@videojs/react';
+import { Time, Controls, Tooltip, VolumeSlider } from '@videojs/react';
 import type { ReactNode } from 'react';
 
 import { cn } from '@/lib/resolve-class-name';
 
+import { AutoPauseSwitch, NextLineButton, SubtitleModeGroup, SubtitlesToggle, Watermark } from '../lesson/lab-controls';
 import { LiveButton } from './live-button';
+import { MuteButton } from './mute-button';
 import { AudioPlayButton, PlayButton } from './play-button';
+import { FullscreenButton } from './screen-controls';
 import { TimeSlider } from './time-slider';
 import { type ThumbnailSlot } from './time-slider';
+import { ButtonTooltip } from './tooltip';
 import { VolumePopover } from './volume-popover';
+
+/** Mute plus an inline slider; narrow players keep only the mute button. */
+function InlineVolume() {
+  return (
+    <div className={'voca-volume'}>
+      <ButtonTooltip>
+        <MuteButton />
+      </ButtonTooltip>
+      <VolumeSlider.Root className={'voca-volume-slider'} orientation="horizontal" thumbAlignment="edge">
+        <VolumeSlider.Track className={'voca-volume-slider-track'}>
+          <VolumeSlider.Fill className={'voca-volume-slider-fill'} />
+        </VolumeSlider.Track>
+        <VolumeSlider.Thumb className={'voca-volume-slider-thumb'} />
+      </VolumeSlider.Root>
+    </div>
+  );
+}
 
 export function ControlsRow({
   audio = false,
@@ -26,8 +47,8 @@ export function ControlsRow({
         {audio ? <AudioPlayButton /> : <PlayButton />}
         {seekBackward}
         {seekForward}
+        {!audio && <NextLineButton />}
         {live && <LiveButton />}
-        {!audio && <VolumePopover />}
         {!live && (
           <Time.Group className={'media-time-group'}>
             <Time.Value className={'media-time-toggle'} type="current" toggle />
@@ -36,12 +57,16 @@ export function ControlsRow({
             <Time.Value className={'media-time-duration-value'} type="duration" />
           </Time.Group>
         )}
+        {!audio && <InlineVolume />}
       </Controls.Group>
 
-      <Controls.Group className={'video-controls-group'}>
+      <Controls.Group className={cn('video-controls-group', 'video-controls-end')}>
+        {!audio && <SubtitleModeGroup />}
+        {!audio && <AutoPauseSwitch />}
         {captions}
         {rate}
         {menu ?? (audio && <VolumePopover />)}
+        {!audio && <FullscreenButton />}
       </Controls.Group>
     </Controls.Group>
   );
@@ -61,7 +86,6 @@ export interface ControlsSlots extends ThumbnailSlot {
 export function ControlsContent({
   audio = false,
   captions,
-  center = false,
   live = false,
   menu,
   rate,
@@ -69,24 +93,11 @@ export function ControlsContent({
   seekBackward,
   seekForward,
   top,
-}: ControlsSlots & { audio?: boolean; center?: boolean; live?: boolean; menu?: ReactNode; top?: ReactNode } = {}) {
+}: ControlsSlots & { audio?: boolean; live?: boolean; menu?: ReactNode; top?: ReactNode } = {}) {
   return (
     <Controls.Content className={cn('video-controls-content', audio && 'audio-controls-content')}>
       <Tooltip.Provider>
         {top && <Controls.Group className={'video-controls-top'}>{top}</Controls.Group>}
-        {center && (
-          <BufferingIndicator className={'video-controls-buffering'}>
-            <Controls.Group className={'video-controls-center'}>
-              {seekBackward}
-              <PlayButton
-                className={cn('video-controls-center-button', 'video-controls-center-play')}
-                iconClassName={'video-controls-center-play-icon'}
-                tooltip={false}
-              />
-              {seekForward}
-            </Controls.Group>
-          </BufferingIndicator>
-        )}
         <div
           className={cn(
             'video-controls-bottom',
@@ -94,15 +105,16 @@ export function ControlsContent({
             !audio && 'video-controls-video-bottom'
           )}
         >
+          {!audio && <Watermark />}
           {!live && <TimeSlider audio={audio} renderThumbnail={renderThumbnail} />}
           <ControlsRow
             audio={audio}
-            captions={captions}
+            captions={captions ?? (!audio && <SubtitlesToggle />)}
             live={live}
             menu={menu}
             rate={rate}
-            seekBackward={center ? undefined : seekBackward}
-            seekForward={center ? undefined : seekForward}
+            seekBackward={seekBackward}
+            seekForward={seekForward}
           />
         </div>
       </Tooltip.Provider>
