@@ -7,7 +7,7 @@ import { sintelLesson } from '@/video/lesson/lesson-data';
 import { VideoSkin } from '@/video/skin';
 
 import type { PlaybackProps } from '../shell/params';
-import { LabFooter, LabHeader } from './lab-page';
+import { LabCredit } from './lab-page';
 
 // What the preview plays: "Sintel" hosted on Mux (public playback ID, used for the challenge's Mux bonus).
 // Sintel © copyright Blender Foundation | durian.blender.org — licensed CC BY 3.0.
@@ -24,7 +24,6 @@ export function Player({ media, style }: { media?: PlaybackProps; style?: CSSPro
     <VideoPlayer poster={POSTER} defaultPlaybackRates={[0.5, 0.75, 1, 1.25, 1.5]}>
       <LessonProvider lesson={sintelLesson}>
         <div className="lab">
-          <LabHeader />
           <div className="lab-desk">
             <div className="preview-player" style={style}>
               <VideoSkin>
@@ -32,7 +31,7 @@ export function Player({ media, style }: { media?: PlaybackProps; style?: CSSPro
               </VideoSkin>
             </div>
           </div>
-          <LabFooter />
+          <LabCredit />
         </div>
       </LessonProvider>
     </VideoPlayer>

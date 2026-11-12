@@ -179,7 +179,7 @@ function PageFace({
 }) {
   const { lesson, occurrences, pages, currentTime, focusLemma } = lab;
   const native = lesson.nativeLanguage;
-  const translation = lesson.translationLanguage;
+  const translation = lab.translation;
   const page = index >= 0 ? pages[index] : undefined;
   const isLive = index === liveIndex;
 
@@ -258,12 +258,12 @@ function PageFace({
                         <span className="voca-card-ipa">{gloss.ipa}</span>
                       </dt>
                       <dd>
-                        {gloss.definition}{' '}
+                        <span lang={translation.code.toLowerCase()}>{lab.defineIn(gloss)}</span>{' '}
                         <span className="voca-card-fr">
                           <abbr className="voca-entry-label" title={translation.name}>
                             {translation.code}.
                           </abbr>{' '}
-                          <i lang={translation.code.toLowerCase()}>{gloss.translation}</i>
+                          <i lang={translation.code.toLowerCase()}>{lab.wordIn(gloss)}</i>
                         </span>
                       </dd>
                     </div>
@@ -298,7 +298,7 @@ function PageFace({
 function LetterFace({ lab, letter, interactive = false }: { lab: LessonState; letter: string; interactive?: boolean }) {
   const { lesson, pages, heard, focusLemma, playWord, setOpenLetter } = lab;
   const native = lesson.nativeLanguage;
-  const translation = lesson.translationLanguage;
+  const translation = lab.translation;
 
   // Each word under this letter, once, with the line it's first spoken in.
   const entries: Array<{ gloss: Gloss; start: number }> = [];
@@ -354,12 +354,12 @@ function LetterFace({ lab, letter, interactive = false }: { lab: LessonState; le
                     <span className="voca-card-ipa">{gloss.ipa}</span>
                   </dt>
                   <dd>
-                    {gloss.definition}{' '}
+                    <span lang={translation.code.toLowerCase()}>{lab.defineIn(gloss)}</span>{' '}
                     <span className="voca-card-fr">
                       <abbr className="voca-entry-label" title={translation.name}>
                         {translation.code}.
                       </abbr>{' '}
-                      <i lang={translation.code.toLowerCase()}>{gloss.translation}</i>
+                      <i lang={translation.code.toLowerCase()}>{lab.wordIn(gloss)}</i>
                     </span>
                   </dd>
                   {interactive ? (

@@ -5,7 +5,16 @@
 import { usePlayer } from '@videojs/react/video';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { type Cue, type Lesson, type LinePage, linePages, type Occurrence, occurrences } from './lesson-data';
+import { type Cue, type Gloss, type Lesson, type LinePage, linePages, type Occurrence, occurrences } from './lesson-data';
+import {
+  cueText,
+  glossText,
+  isLangCode,
+  type LangCode,
+  TRANSLATION_LANGUAGES,
+  type TranslationLanguage,
+} from './translations';
+import { definitionIn } from './definitions';
 
 /** How long a tab stays pulled out after its word is spoken. */
 const POP_SECONDS = 4;
@@ -41,9 +50,29 @@ export interface LessonState {
   /** The A–Z section open on the dictionary page, if any. */
   openLetter: string | null;
   setOpenLetter: (letter: string | null) => void;
+  /** The language of the translation line and the dictionary; English is always the spoken line. */
+  translation: TranslationLanguage;
+  setTranslation: (code: LangCode) => void;
+  /** A spoken line, in the chosen translation language. */
+  lineIn: (cue: Cue) => string;
+  /** A word, in the chosen translation language. */
+  wordIn: (gloss: Gloss) => string;
+  /** A word's short definition, written in the chosen translation language. */
+  defineIn: (gloss: Gloss) => string;
   subtitlesOn: boolean;
   setSubtitlesOn: (on: boolean) => void;
   seekTo: (time: number, play?: boolean) => void;
+}
+
+const LANGUAGE_KEY = 'vocapedia-lab:translation';
+
+function readLanguage(): LangCode {
+  try {
+    const saved = localStorage.getItem(LANGUAGE_KEY);
+    return isLangCode(saved) ? saved : 'FR';
+  } catch {
+    return 'FR';
+  }
 }
 
 export interface StudyModes {
@@ -77,6 +106,19 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
   }, []);
   const [focusLemma, setFocusLemma] = useState<string | undefined>();
   const [openLetter, setOpenLetter] = useState<string | null>(null);
+  const [translationCode, setTranslationCode] = useState<LangCode>(readLanguage);
+  const setTranslation = useCallback((code: LangCode) => {
+    setTranslationCode(code);
+    try {
+      localStorage.setItem(LANGUAGE_KEY, code);
+    } catch {
+      // Storage can be blocked; the choice still holds for this visit.
+    }
+  }, []);
+  const translation = TRANSLATION_LANGUAGES.find((l) => l.code === translationCode) ?? TRANSLATION_LANGUAGES[0];
+  const lineIn = useCallback((cue: Cue) => cueText(cue, translationCode), [translationCode]);
+  const wordIn = useCallback((gloss: Gloss) => glossText(gloss, translationCode), [translationCode]);
+  const defineIn = useCallback((gloss: Gloss) => definitionIn(gloss, translationCode), [translationCode]);
 
   const { cues } = lesson;
   const all = useMemo(() => occurrences(lesson), [lesson]);
@@ -211,6 +253,11 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
       playWord,
       openLetter,
       setOpenLetter,
+      translation,
+      setTranslation,
+      lineIn,
+      wordIn,
+      defineIn,
       subtitlesOn,
       setSubtitlesOn,
       seekTo,
@@ -227,6 +274,11 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
       livePage,
       openLetter,
       pages,
+      translation,
+      setTranslation,
+      lineIn,
+      wordIn,
+      defineIn,
       paused,
       playWord,
       popped,

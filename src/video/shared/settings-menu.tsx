@@ -13,6 +13,9 @@ import { PlaybackRateRadioGroup } from '@videojs/react/ui/playback-rate-radio-gr
 import { QualityRadioGroup } from '@videojs/react/ui/quality-radio-group';
 
 import { cn } from '@/lib/resolve-class-name';
+import { SpeechIcon } from '@/video/icons';
+import { useLesson } from '@/video/lesson/lesson-context';
+import { isLangCode, TRANSLATION_LANGUAGES } from '@/video/lesson/translations';
 
 import { Button } from './button';
 import { RadioItem } from './menu-item';
@@ -54,6 +57,50 @@ function QualityMenu() {
           ></QualityRadioGroup.Options>
         </Menu.Content>
       </QualityRadioGroup.Root>
+    </Menu.Root>
+  );
+}
+
+/** The language of the translation line beneath the spoken English, and of the dictionary. */
+function TranslationMenu() {
+  const lab = useLesson();
+  if (!lab) return null;
+  const { translation, setTranslation } = lab;
+  return (
+    <Menu.Root>
+      <Menu.Trigger className={'media-menu-item'}>
+        <SpeechIcon className={'media-menu-trigger-icon'} />
+        <span>Translation</span>
+        <span className={'media-menu-hint'}>
+          <span className={'media-menu-hint-label'}>{translation.name}</span>
+          <MenuChevron />
+        </span>
+      </Menu.Trigger>
+      <Menu.Content className={'media-menu-content'}>
+        <Menu.Item className={'media-menu-back-item'}>
+          <MenuChevron back />
+          <span>Translation</span>
+        </Menu.Item>
+        <Menu.Separator className={'media-menu-separator'} />
+        <Menu.RadioGroup
+          className={'media-menu-radio-group'}
+          value={translation.code}
+          onValueChange={(code) => {
+            if (isLangCode(code)) setTranslation(code);
+          }}
+        >
+          {TRANSLATION_LANGUAGES.map((language) => (
+            <RadioItem key={language.code} value={language.code}>
+              <span className={'voca-lang-option'}>
+                <span lang={language.code.toLowerCase()}>{language.name}</span>
+                <span className={'voca-lang-code'} aria-hidden="true">
+                  {language.code}
+                </span>
+              </span>
+            </RadioItem>
+          ))}
+        </Menu.RadioGroup>
+      </Menu.Content>
     </Menu.Root>
   );
 }
@@ -103,6 +150,7 @@ export function SettingsMenu() {
       </ButtonTooltip>
       <Menu.Popup keepMounted className={cn('media-popup', 'media-popup-safe-area', 'media-menu-popup')}>
         <Menu.Content className={'media-menu-content'}>
+          <TranslationMenu />
           <PlaybackRateMenu />
           <QualityMenu />
         </Menu.Content>

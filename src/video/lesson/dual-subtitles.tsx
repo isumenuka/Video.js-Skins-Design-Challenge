@@ -64,8 +64,8 @@ export function DualSubtitles() {
                   >
                     {token.text}
                     {token.gloss && (
-                      <span className="voca-k-tip" lang={lesson.translationLanguage.code.toLowerCase()}>
-                        <b>{token.gloss.translation}</b>
+                      <span className="voca-k-tip" lang={lab.translation.code.toLowerCase()}>
+                        <b>{lab.wordIn(token.gloss)}</b>
                         <span className="voca-k-tip-pos">{token.gloss.pos}</span>
                       </span>
                     )}
@@ -75,8 +75,8 @@ export function DualSubtitles() {
                 )
               )}
             </p>
-            <p className="voca-subtitles-translation" lang={lesson.translationLanguage.code.toLowerCase()}>
-              {cue.translation}
+            <p className="voca-subtitles-translation" lang={lab.translation.code.toLowerCase()}>
+              {lab.lineIn(cue)}
             </p>
           </div>
         )}
@@ -96,7 +96,7 @@ function WordSlip() {
       <span className="voca-word-slip-spark">✦</span>
       <b>{popped.gloss.lemma}</b>
       <span className="voca-word-slip-sep">·</span>
-      <span lang="fr">{popped.gloss.translation}</span>
+      <span lang={lab!.translation.code.toLowerCase()}>{lab!.wordIn(popped.gloss)}</span>
     </p>
   );
 }

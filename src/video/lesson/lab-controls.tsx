@@ -102,18 +102,27 @@ export function CueMarks() {
   const lab = useLesson();
   const duration = usePlayer((s) => s.duration) ?? 0;
   if (!lab || !duration) return null;
-  const { lesson, currentCue, activeCue } = lab;
+  const { lesson, currentCue, activeCue, currentTime, pages } = lab;
   return (
     <div className="voca-cue-marks" aria-hidden="true">
-      {lesson.cues.map((cue) => (
-        <span
-          key={cue.id}
-          className="voca-cue-mark"
-          data-active={cue.id === activeCue?.id || undefined}
-          data-current={cue.id === currentCue?.id || undefined}
-          style={{ insetInlineStart: `${(cue.start / duration) * 100}%` }}
-        />
-      ))}
+      {lesson.cues.map((cue) => {
+        const isCurrent = cue.id === currentCue?.id;
+        // The line being spoken shows its word to learn on the tab, when it has one.
+        const word = isCurrent ? pages.find((p) => p.cue.id === cue.id)?.words[0]?.lemma : undefined;
+        return (
+          <span
+            key={cue.id}
+            className="voca-cue-mark"
+            data-active={cue.id === activeCue?.id || undefined}
+            data-current={isCurrent || undefined}
+            data-passed={(!isCurrent && cue.end <= currentTime) || undefined}
+            data-learn={pages.some((p) => p.cue.id === cue.id) || undefined}
+            style={{ insetInlineStart: `${(cue.start / duration) * 100}%` }}
+          >
+            {word && <span className="voca-cue-word">{word}</span>}
+          </span>
+        );
+      })}
     </div>
   );
 }

@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Fleuron } from '../icons';
+import { ContraLogo, MuxLogo, VideoJsLogo } from '../partner-logos';
 import { useLesson } from './lesson-context';
 import { formatTime, letterOf, type Occurrence } from './lesson-data';
 
@@ -33,10 +34,18 @@ export function BookOrnaments() {
         <span className="voca-corner" data-corner="br" />
       </div>
       <div className="voca-title-label" aria-hidden="true">
-        <span className="voca-title-label-mark">❦</span>
-        <span>Vocapedia</span>
-        <span className="voca-title-label-sub">A Dictionary in Moving Pictures · EN–FR</span>
-        <span className="voca-title-label-mark">❦</span>
+        <span className="voca-title-label-name">
+          <span className="voca-title-label-mark">❦</span>
+          Vocapedia
+          <span className="voca-title-label-mark">❦</span>
+        </span>
+        <span className="voca-title-label-logos">
+          <VideoJsLogo className="voca-partner voca-partner-vjs" />
+          <span className="voca-title-label-dot">·</span>
+          <MuxLogo className="voca-partner voca-partner-mux" />
+          <span className="voca-title-label-dot">·</span>
+          <ContraLogo className="voca-partner voca-partner-contra" />
+        </span>
       </div>
     </>
   );

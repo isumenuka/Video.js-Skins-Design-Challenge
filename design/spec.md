@@ -44,6 +44,11 @@ The controls are objects from a lexicographer's desk, set into brass-rimmed rece
 - **Repeat each line twice:** plays every line once more before moving on.
 - **Slow lines to 0.75×:** slows the speech, then returns to the viewer's own speed between lines.
 
+## Translation language
+English is always the spoken line. **Settings (the brass dial) → Translation** chooses the line beneath it from eight languages, all from Sintel's official subtitles (durian.blender.org, CC BY 3.0): Français, Español, Deutsch, Italiano, Português, Nederlands, Polski, Русский. The source files were mixed encodings (UTF-8, Latin-1, Mac Roman) and are converted to UTF-8 in `src/video/lesson/sintel-translations.ts`.
+
+The whole dictionary follows the choice: the subtitle line, the line-page and A–Z entries (the `ES.` / `DE.` … labels), the hover slips, the phone word slip, the running head and the cover's "EN–XX" label. Word translations for the 32 special words are in `src/video/lesson/translations.ts`. The choice is remembered in this browser (`localStorage`, with a fallback when storage is blocked), and `lang` attributes switch with it for screen readers.
+
 ## Palette (from vocapedia.base44.app's CSS)
 | Role | Value |
 | --- | --- |

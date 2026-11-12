@@ -13,10 +13,16 @@
   --lab-font-serif: "Source Serif 4", "Source Serif Pro", Georgia, serif;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  /* The A–Z drawers pull out past the volume; clip at the window edge so they never widen the page. */
-  overflow-x: clip;
+  /* One screen, no scrolling: the volume is sized to fit the window. The A–Z drawers pull out past it and are
+     clipped at the window edge. */
+  overflow: hidden;
   background:
     /* the reading lamp */
     radial-gradient(70rem 40rem at 50% 18rem, rgb(246 227 161 / 0.07), transparent 65%),
@@ -29,8 +35,10 @@ body {
 
 .preview-page {
   box-sizing: border-box;
-  min-height: 100vh;
-  padding: 16px;
+  height: 100vh;
+  height: 100dvh;
+  /* Room above for the title label that sits on the top board. */
+  padding: 34px 16px 8px;
 }
 
 .preview-page *,
@@ -50,21 +58,37 @@ body {
 }
 
 .lab {
-  max-width: 78rem;
-  margin: 0 auto;
+  height: 100%;
   display: grid;
-  gap: 24px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 6px;
 }
 
 .lab-desk {
+  min-height: 0;
   display: grid;
-  justify-items: center;
-  padding-block: 8px;
+  place-items: center;
 }
 
+/* The open volume is about twice as wide as it is tall, so its width follows the window's height as well. */
 .preview-player {
-  width: 100%;
-  max-width: var(--preview-player-width, 72rem);
+  width: min(100%, var(--preview-player-width, 72rem), calc((100dvh - 80px) * 2.05));
+}
+
+.lab-credit {
+  margin: 0;
+  text-align: center;
+  font-size: 0.6875rem;
+  color: var(--lab-muted);
+}
+
+.lab-credit a {
+  color: var(--lab-periwinkle);
+}
+
+.lab-credit a:focus-visible {
+  outline: 2px solid var(--lab-periwinkle);
+  outline-offset: 2px;
 }
 
 /* The aspect ratio option overrides the skin's own; `auto` lets the media's intrinsic size decide. */
