@@ -2,22 +2,31 @@
 
 'use client';
 
+import { usePlayer } from '@videojs/react/video';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { ChevronIcon, PlayIcon } from '../icons';
 import { type LessonState, useLesson } from './lesson-context';
 import { formatTime, type Gloss, letterOf } from './lesson-data';
 
-/** What the dictionary page shows: a spoken line's page (-1 is the title page), or an A–Z letter section. */
-type View = { kind: 'page'; index: number } | { kind: 'letter'; letter: string };
+/**
+ * What the dictionary page shows: a spoken line's page (-1 is the title page), an A–Z letter section, the "How to
+ * read this volume" guide, or the Finis colophon when the film ends.
+ */
+type View =
+  | { kind: 'page'; index: number }
+  | { kind: 'letter'; letter: string }
+  | { kind: 'guide' }
+  | { kind: 'finis' };
 
-const viewKey = (view: View) => (view.kind === 'page' ? `p${view.index}` : `l${view.letter}`);
+const viewKey = (view: View) =>
+  view.kind === 'page' ? `p${view.index}` : view.kind === 'letter' ? `l${view.letter}` : view.kind;
 
-/** Opening a letter turns forward, closing it turns back; pages and letters each turn in reading order. */
+/** Opening a letter, the guide or the colophon turns forward, closing turns back; pages turn in reading order. */
 function turnDirection(from: View, to: View): 'forward' | 'back' {
   if (from.kind === 'page' && to.kind === 'page') return to.index > from.index ? 'forward' : 'back';
   if (from.kind === 'letter' && to.kind === 'letter') return to.letter > from.letter ? 'forward' : 'back';
-  return to.kind === 'letter' ? 'forward' : 'back';
+  return to.kind === 'page' ? 'back' : 'forward';
 }
 
 interface Turn {
@@ -64,7 +73,36 @@ export function EntryPage() {
 
   const shownIndex = viewIndex ?? (frozenIndex ?? liveIndex);
   const openLetter = lab?.openLetter ?? null;
-  const view: View = openLetter ? { kind: 'letter', letter: openLetter } : { kind: 'page', index: shownIndex };
+  const ended = usePlayer((s) => s.ended) ?? false;
+
+  // The guide opens from the ⓘ button or the ? key anywhere in the player, and closes the same way.
+  const [guideOpen, setGuideOpen] = useState(false);
+  useEffect(() => {
+    const skin = sectionRef.current?.closest<HTMLElement>('.media-skin');
+    if (!skin) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('input, textarea, [contenteditable="true"]')) return;
+      if (event.key === '?' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        event.preventDefault();
+        setGuideOpen((open) => !open);
+      } else if (event.key === 'Escape' && guideRef.current) {
+        setGuideOpen(false);
+      }
+    };
+    skin.addEventListener('keydown', onKeyDown);
+    return () => skin.removeEventListener('keydown', onKeyDown);
+  }, []);
+  const guideRef = useRef(guideOpen);
+  guideRef.current = guideOpen;
+
+  const view: View = guideOpen
+    ? { kind: 'guide' }
+    : ended
+      ? { kind: 'finis' }
+      : openLetter
+        ? { kind: 'letter', letter: openLetter }
+        : { kind: 'page', index: shownIndex };
   const key = viewKey(view);
 
   // Start a turn whenever the view changes. A layout effect, so the leaf covers the page in the same frame the new
@@ -110,7 +148,11 @@ export function EntryPage() {
       }}
     >
       <div className="voca-page">
-        {baseView.kind === 'letter' ? (
+        {baseView.kind === 'guide' ? (
+          <GuideFace lab={lab} onClose={() => setGuideOpen(false)} />
+        ) : baseView.kind === 'finis' ? (
+          <FinisFace lab={lab} interactive />
+        ) : baseView.kind === 'letter' ? (
           <LetterFace lab={lab} letter={baseView.letter} interactive />
         ) : (
           <PageFace
@@ -120,6 +162,7 @@ export function EntryPage() {
             nav={nav}
             following={viewIndex === null && frozenIndex === null}
             held={held && viewIndex === null}
+            onGuide={() => setGuideOpen(true)}
           />
         )}
       </div>
@@ -136,7 +179,11 @@ export function EntryPage() {
           }}
         >
           <div className="voca-page voca-leaf-front">
-            {leafView.kind === 'letter' ? (
+            {leafView.kind === 'guide' ? (
+              <GuideFace lab={lab} />
+            ) : leafView.kind === 'finis' ? (
+              <FinisFace lab={lab} />
+            ) : leafView.kind === 'letter' ? (
               <LetterFace lab={lab} letter={leafView.letter} />
             ) : (
               <PageFace lab={lab} index={leafView.index} liveIndex={liveIndex} />
@@ -169,6 +216,7 @@ function PageFace({
   nav,
   following = false,
   held = false,
+  onGuide,
 }: {
   lab: LessonState;
   index: number;
@@ -176,6 +224,7 @@ function PageFace({
   nav?: Nav;
   following?: boolean;
   held?: boolean;
+  onGuide?: () => void;
 }) {
   const { lesson, occurrences, pages, currentTime, focusLemma } = lab;
   const native = lesson.nativeLanguage;
@@ -230,6 +279,7 @@ function PageFace({
                   <span aria-hidden="true">●</span> Back to live
                 </button>
               )}
+              {onGuide && <GuideButton onClick={onGuide} />}
             </nav>
 
             {/* Announced only while the page follows playback. */}
@@ -380,6 +430,138 @@ function LetterFace({ lab, letter, interactive = false }: { lab: LessonState; le
             </dl>
           </article>
         </div>
+      </div>
+    </>
+  );
+}
+
+/** The ⓘ that opens "How to read this volume". */
+function GuideButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button type="button" className="voca-guide-button" onClick={onClick} aria-label="How to read this volume (?)">
+      <span aria-hidden="true">i</span>
+    </button>
+  );
+}
+
+const GUIDE_KEYS: Array<[string, string]> = [
+  ['Space · K', 'Play or pause'],
+  ['← · →', 'Back or forward 10 seconds'],
+  ['↑ · ↓', 'Volume'],
+  ['M', 'Mute'],
+  ['F', 'Full page'],
+  ['?', 'This guide'],
+  ['Esc', 'Close a menu or this page'],
+];
+
+const GUIDE_PARTS: Array<[string, string]> = [
+  ['The ribbon', 'drag the brass clip to turn to any moment; each tab is a spoken line.'],
+  ['A–Z tabs', 'a tab pulls out when its word is spoken; press one to read every word under that letter.'],
+  ['The quill', 'study modes: pause after new words, repeat each line, slow lines down.'],
+  ['The inkwell', 'its ink is the volume; press it to cork the sound.'],
+  ['The compass', 'settings: translation language, speed and quality.'],
+  ['Double-tap', 'the left or right of the picture to go back or forward.'],
+];
+
+/** "How to read this volume": the keys, the gestures, and what each object on the desk does. */
+function GuideFace({ lab, onClose }: { lab: LessonState; onClose?: () => void }) {
+  const { lesson, translation } = lab;
+  return (
+    <>
+      <header className="voca-running-head" aria-hidden="true">
+        <span>Vocapedia</span>
+        <span>
+          Dictionary · {lesson.nativeLanguage.code}–{translation.code}
+        </span>
+      </header>
+      <div className="voca-just-heard">
+        <nav className="voca-card-nav" aria-label={onClose ? 'How to read this volume' : undefined}>
+          <span className="voca-letter-title">
+            <span className="voca-letter-initial" aria-hidden="true">
+              ?
+            </span>
+            <span>How to read this volume</span>
+          </span>
+          {onClose && (
+            <button type="button" className="voca-card-live" onClick={onClose}>
+              <span aria-hidden="true">✕</span> Close
+            </button>
+          )}
+        </nav>
+        <div className="voca-card-stage">
+          <article className="voca-card voca-guide">
+            <h2 className="voca-guide-heading">Keys</h2>
+            <dl className="voca-guide-keys">
+              {GUIDE_KEYS.map(([keys, what]) => (
+                <div key={keys} className="voca-guide-row">
+                  <dt>
+                    {keys.split(' · ').map((k, i) => (
+                      <kbd key={i}>{k}</kbd>
+                    ))}
+                  </dt>
+                  <dd>{what}</dd>
+                </div>
+              ))}
+            </dl>
+            <h2 className="voca-guide-heading">On the desk</h2>
+            <dl className="voca-guide-parts">
+              {GUIDE_PARTS.map(([part, what]) => (
+                <div key={part} className="voca-guide-row">
+                  <dt>{part}</dt>
+                  <dd>{what}</dd>
+                </div>
+              ))}
+            </dl>
+          </article>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/** The colophon when the film ends: Finis, the words collected, and a way to read it again. */
+function FinisFace({ lab, interactive = false }: { lab: LessonState; interactive?: boolean }) {
+  const { heard, pages, translation, seekTo, lesson } = lab;
+  const total = new Set(pages.flatMap((p) => p.words.map((w) => w.lemma))).size;
+  return (
+    <>
+      <header className="voca-running-head" aria-hidden="true">
+        <span>Vocapedia</span>
+        <span>
+          Dictionary · {lesson.nativeLanguage.code}–{translation.code}
+        </span>
+      </header>
+      <div className="voca-just-heard">
+        <article className="voca-card voca-finis">
+          <p className="voca-finis-kicker">Here the volume closes</p>
+          <h2 className="voca-finis-title">Finis</h2>
+          <svg className="voca-finis-seal" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+            <path
+              d="M32 4c4 3 7 1 10 3s3 6 6 8 6 1 7 5-1 6 1 9 4 4 3 8-5 4-6 7 0 7-3 9-6 0-9 2-4 5-8 5-5-3-9-3-6 3-9 1-2-6-5-8-6-1-7-5 1-6-1-9-4-4-3-8 5-4 6-7 0-7 3-9 6 0 9-2 4-5 8-5Z"
+              fill="url(#voca-finis-gilt)"
+            />
+            <defs>
+              <radialGradient id="voca-finis-gilt" cx="0.35" cy="0.3" r="0.8">
+                <stop offset="0" stopColor="#f6e3a1" />
+                <stop offset="0.55" stopColor="#d3a446" />
+                <stop offset="1" stopColor="#8a6418" />
+              </radialGradient>
+            </defs>
+            <circle cx="32" cy="32" r="17" fill="none" stroke="#7a5a16" strokeWidth="1.2" strokeDasharray="0.5 3" strokeLinecap="round" />
+            <path d="M23 22 32 43l9-21" fill="none" stroke="#5f430f" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <p className="voca-finis-count">
+            You collected <b>{heard.size}</b> of {total} words
+          </p>
+          <p className="voca-finis-note">
+            Read in {lesson.nativeLanguage.name}, with notes in <span lang={translation.code.toLowerCase()}>{translation.name}</span>.
+          </p>
+          {interactive && (
+            <button type="button" className="voca-finis-again" onClick={() => seekTo(0)}>
+              ↺ Read again
+            </button>
+          )}
+        </article>
       </div>
     </>
   );

@@ -75,6 +75,22 @@ body {
   width: min(100%, var(--preview-player-width, 72rem), calc((100dvh - 80px) * 2.05));
 }
 
+/* Short windows (a phone held sideways): the folded "trim" book is the picture plus the desk, so its width follows
+   the height that's left once the desk is accounted for. */
+@media (max-height: 560px) {
+  .preview-page {
+    padding: 8px 16px 4px;
+  }
+
+  .preview-player {
+    width: min(100%, calc((100dvh - 210px) * 1.78));
+  }
+
+  .lab-credit {
+    font-size: 0.625rem;
+  }
+}
+
 .lab-credit {
   margin: 0;
   text-align: center;

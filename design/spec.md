@@ -49,6 +49,20 @@ English is always the spoken line. **Settings (the brass dial) → Translation**
 
 The whole dictionary follows the choice: the subtitle line, the line-page and A–Z entries (the `ES.` / `DE.` … labels), the hover slips, the phone word slip, the running head and the cover's "EN–XX" label. Word translations for the 32 special words are in `src/video/lesson/translations.ts`. The choice is remembered in this browser (`localStorage`, with a fallback when storage is blocked), and `lang` attributes switch with it for screen readers.
 
+## Finishing touches
+- **The cover opens:** on load, the cobalt-leather cover (gilt title, fleurons) swings open over the spine, showing its marbled inside. It's skipped under reduced motion and in fullscreen.
+- **Finis:** when the film ends, the dictionary turns to a colophon with a gilt wax seal, "You collected N of 32 words", and "Read again".
+- **How to read this volume:** the ⓘ on the dictionary page, or the ? key, turns to a page of keys, gestures and what each desk object does. Esc or ✕ closes it.
+- **Seek previews:** hovering the ribbon shows the Mux storyboard frame as a tiny engraved plate, with the time caption.
+- **Loading:** a quill writes a line of ink, with "turning the page…".
+- **Errors:** an "Erratum" slip pasted askew into the book, with a cobalt OK button. Its focus is trapped and Esc closes it.
+
+## Accessibility audit (Playwright)
+- **Keyboard:** the Tab order follows the visual layout (A–Z toolbar → seek ribbon → seal → ±10 → mute → volume → quill → magnifier → dial → book → credit links). Every control has a visible ring.
+- **Contrast:** the subtitles sit on a soft dark backing (made solid under reduced transparency or more contrast), and words not yet swept stay at 72% white.
+- **Touch:** on coarse pointers the 13px A–Z tabs fold away (the word slip announces words instead), and every button is at least 40px; the volume handle is enlarged.
+- **Sizes:** checked at 390×844, 844×390 (landscape phone, now fits without scrolling), 768×1024, 1180×820 tablet, 1366×768, 1440×900, 2560×1440 and fullscreen.
+
 ## Palette (from vocapedia.base44.app's CSS)
 | Role | Value |
 | --- | --- |

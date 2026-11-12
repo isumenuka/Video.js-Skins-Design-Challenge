@@ -2,6 +2,7 @@
 
 import { Poster as PosterPrimitive } from '@videojs/react';
 import { BufferingIndicator as BufferingIndicatorPrimitive, Controls } from '@videojs/react';
+import { QuillIcon } from '@/video/desk-icons';
 import { SpinnerIcon as SpinnerIconPrimitive } from '@/video/icons';
 import type { ClassValue } from 'cn';
 
@@ -21,6 +22,13 @@ export function BufferingIndicator({ className }: { className?: ClassValue } = {
       className={(state) => cn('media-buffering-indicator', resolveClassName(className, state))}
     >
       <SpinnerIconPrimitive className={'media-buffering-indicator-spinner-icon'} />
+      {/* While the film loads, a quill writes a line of ink across the plate. */}
+      <span className={'voca-writing'} aria-hidden="true">
+        <span className={'voca-writing-line'}>
+          <QuillIcon className={'voca-writing-quill'} inked />
+        </span>
+        <span className={'voca-writing-text'}>turning the page…</span>
+      </span>
     </BufferingIndicatorPrimitive>
   );
 }

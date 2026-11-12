@@ -3035,6 +3035,485 @@
       text-transform: none;
     }
 
+    /* ---------- The cover swings open on first load ---------- */
+    .voca-cover-flap {
+      grid-column: 3 / 5;
+      grid-row: 1 / 2;
+      position: absolute;
+      inset: -0.6rem -0.6rem -0.6rem 0;
+      display: none;
+      z-index: 8;
+      transform-origin: left center;
+      transform-style: preserve-3d;
+      animation: voca-cover-open 1.5s cubic-bezier(0.55, 0, 0.25, 1) 0.35s both;
+      pointer-events: none;
+    }
+
+    .voca-cover-flap-face {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      border-radius: 0 0.6rem 0.6rem 0;
+      backface-visibility: hidden;
+      background-color: #0a1466;
+      background-image:
+        radial-gradient(circle at 30% 40%, rgb(255 255 255 / 0.05) 0.6px, transparent 1.2px),
+        radial-gradient(circle at 70% 70%, rgb(0 0 0 / 0.22) 0.8px, transparent 1.4px),
+        radial-gradient(120% 100% at 40% 30%, #1b2bd0 0%, #0c1789 50%, #060c47 100%);
+      background-size:
+        5px 5px,
+        7px 7px,
+        100% 100%;
+      box-shadow:
+        inset 0 0 0 6px rgb(3 7 38 / 0.6),
+        inset 0 0 0 7px rgb(224 184 77 / 0.8),
+        inset 0 0 0 11px transparent,
+        inset 0 0 0 12px rgb(224 184 77 / 0.35),
+        -8px 0 18px rgb(0 0 0 / 0.5);
+      color: var(--voca-gold-light);
+      text-shadow: 0 1px 0 rgb(0 0 0 / 0.6);
+    }
+
+    /* The inside of the cover, seen once it swings past the spine: marbled endpaper, as in the book itself. */
+    .voca-cover-flap::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 0.6rem 0 0 0.6rem;
+      transform: rotateY(180deg);
+      backface-visibility: hidden;
+      background-color: #11206b;
+      background-image:
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgb(246 227 161 / 0.55), transparent 60%),
+        radial-gradient(ellipse 50% 35% at 75% 65%, rgb(143 160 255 / 0.55), transparent 60%),
+        radial-gradient(ellipse 40% 30% at 45% 85%, rgb(138 42 32 / 0.5), transparent 60%),
+        repeating-radial-gradient(circle at 30% 40%, rgb(255 255 255 / 0.07) 0 2px, transparent 2px 9px);
+      box-shadow: inset 0 0 0 1px rgb(224 184 77 / 0.5);
+    }
+
+    .voca-cover-flap-title {
+      font-family: var(--voca-font-serif);
+      font-size: clamp(1.5rem, 3.4cqi, 2.75rem);
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    .voca-cover-flap-sub {
+      font-family: var(--voca-font-serif);
+      font-size: 0.875rem;
+      font-style: italic;
+      color: rgb(246 227 161 / 0.85);
+    }
+
+    .voca-cover-flap-mark {
+      color: var(--voca-gold);
+      font-size: 1.25rem;
+    }
+
+    .voca-cover-flap-rule {
+      width: 40%;
+      border-top: 1px solid rgb(224 184 77 / 0.6);
+    }
+
+    @keyframes voca-cover-open {
+      0% {
+        transform: perspective(2400px) rotateY(0deg);
+      }
+      100% {
+        transform: perspective(2400px) rotateY(-178deg);
+      }
+    }
+
+    @container media-root (width >= 52rem) {
+      .voca-cover-flap {
+        display: block;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .voca-cover-flap {
+        display: none !important;
+      }
+    }
+
+    /* ---------- Finis: the colophon at the end of the film ---------- */
+    .voca-finis {
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 0.4rem;
+      text-align: center;
+    }
+
+    .voca-finis-kicker {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--voca-rubric);
+    }
+
+    .voca-finis-title {
+      font-family: var(--voca-font-serif);
+      font-size: clamp(2rem, 4.6cqi, 3.25rem);
+      font-style: italic;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--voca-ink);
+    }
+
+    .voca-finis-seal {
+      width: 3.5rem;
+      height: 3.5rem;
+      filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.35));
+      animation: voca-stamp 600ms cubic-bezier(0.2, 0.8, 0.2, 1.4) 300ms both;
+    }
+
+    @keyframes voca-stamp {
+      from {
+        opacity: 0;
+        scale: 1.8;
+        rotate: -20deg;
+      }
+    }
+
+    .voca-finis-count {
+      font-family: var(--voca-font-serif);
+      font-size: 1rem;
+      color: var(--voca-ink);
+    }
+
+    .voca-finis-count b {
+      color: var(--voca-cobalt);
+      font-size: 1.25rem;
+    }
+
+    .voca-finis-note {
+      font-family: var(--voca-font-serif);
+      font-size: 0.8125rem;
+      font-style: italic;
+      color: var(--voca-ink-soft);
+    }
+
+    .voca-finis-again {
+      margin-top: 0.4rem;
+      min-height: 2.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      background: var(--voca-cobalt);
+      color: #fff;
+      font: 600 0.875rem/1 var(--voca-font-ui);
+      cursor: pointer;
+      box-shadow: 0 4px 10px -4px rgb(31 48 255 / 0.8);
+    }
+
+    .voca-finis-again:focus-visible,
+    .voca-guide-button:focus-visible {
+      outline: 2px solid var(--voca-cobalt);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .voca-finis-seal {
+        animation: none;
+      }
+    }
+
+    /* ---------- How to read this volume ---------- */
+    .voca-guide-button {
+      display: grid;
+      place-items: center;
+      width: 1.75rem;
+      height: 1.75rem;
+      margin-inline-start: auto;
+      border-radius: 50%;
+      border: 1.5px solid var(--voca-cobalt);
+      color: var(--voca-cobalt);
+      font: italic 700 0.9375rem/1 var(--voca-font-serif);
+      cursor: pointer;
+    }
+
+    .voca-card-live + .voca-guide-button {
+      margin-inline-start: 0.4rem;
+    }
+
+    @media (hover: hover) {
+      .voca-guide-button:hover {
+        background: var(--voca-cobalt);
+        color: #fff;
+      }
+    }
+
+    @media (pointer: coarse) {
+      .voca-guide-button {
+        width: 2.75rem;
+        height: 2.75rem;
+      }
+    }
+
+    .voca-guide-heading {
+      margin: 0.2rem 0 0.35rem;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--voca-rubric);
+    }
+
+    .voca-guide-keys,
+    .voca-guide-parts {
+      display: grid;
+      gap: 0.3rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .voca-guide-row {
+      display: grid;
+      grid-template-columns: 6.25rem minmax(0, 1fr);
+      gap: 0.5rem;
+      align-items: baseline;
+      font-family: var(--voca-font-serif);
+      font-size: 0.8125rem;
+      color: var(--voca-ink);
+    }
+
+    .voca-guide-parts dt {
+      font-weight: 700;
+    }
+
+    .voca-guide-row dd {
+      color: var(--voca-ink-soft);
+    }
+
+    .voca-guide kbd {
+      display: inline-block;
+      min-width: 1.4rem;
+      margin-inline-end: 0.25rem;
+      padding: 0.05rem 0.35rem;
+      border: 1px solid rgb(23 19 12 / 0.35);
+      border-bottom-width: 2px;
+      border-radius: 0.25rem;
+      background: #fff;
+      font: 700 0.6875rem/1.4 var(--voca-font-ui);
+      text-align: center;
+      color: var(--voca-ink);
+    }
+
+    /* ---------- Loading: a quill writing a line of ink ---------- */
+    .media-buffering-indicator-spinner-icon {
+      display: none;
+    }
+
+    .voca-writing {
+      display: grid;
+      justify-items: center;
+      gap: 0.4rem;
+      padding: 0.6rem 1rem;
+      border-radius: 0.4rem;
+      background: rgb(240 239 233 / 0.92);
+      box-shadow: 0 8px 20px -8px rgb(0 0 0 / 0.8);
+    }
+
+    .voca-writing-line {
+      position: relative;
+      width: 8rem;
+      height: 2rem;
+    }
+
+    .voca-writing-line::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0.3rem;
+      height: 2px;
+      width: 0;
+      border-radius: 1px;
+      background: linear-gradient(to right, #0a1466, #3a4bff);
+      animation: voca-ink-line 1.6s ease-in-out infinite;
+    }
+
+    .voca-writing-quill {
+      position: absolute;
+      bottom: 0.15rem;
+      left: 0;
+      width: 2rem;
+      height: 2rem;
+      translate: -0.3rem 0;
+      animation: voca-quill-write 1.6s ease-in-out infinite;
+    }
+
+    @keyframes voca-ink-line {
+      0% {
+        width: 0;
+        opacity: 1;
+      }
+      85% {
+        width: 100%;
+        opacity: 1;
+      }
+      100% {
+        width: 100%;
+        opacity: 0;
+      }
+    }
+
+    @keyframes voca-quill-write {
+      0% {
+        left: 0;
+        rotate: -4deg;
+      }
+      25% {
+        rotate: 4deg;
+      }
+      50% {
+        rotate: -4deg;
+      }
+      75% {
+        rotate: 4deg;
+      }
+      85% {
+        left: 100%;
+        rotate: 0deg;
+      }
+      100% {
+        left: 100%;
+        opacity: 0;
+      }
+    }
+
+    .voca-writing-text {
+      font-family: var(--voca-font-serif);
+      font-size: 0.8125rem;
+      font-style: italic;
+      color: var(--voca-ink-soft);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .voca-writing-line::before {
+        animation: none;
+        width: 100%;
+      }
+
+      .voca-writing-quill {
+        animation: none;
+        left: 100%;
+      }
+    }
+
+    /* ---------- Errors: an erratum slip pasted into the book ---------- */
+    .media-dialog-popup {
+      border-radius: 0.2rem;
+      border: 1px solid rgb(23 19 12 / 0.25);
+      background:
+        repeating-linear-gradient(to bottom, transparent 0 1.5rem, rgb(31 48 255 / 0.07) 1.5rem calc(1.5rem + 1px)),
+        var(--voca-paper);
+      color: var(--voca-ink);
+      box-shadow:
+        0 18px 40px -12px rgb(0 0 0 / 0.85),
+        inset 0 0 0 4px var(--voca-paper),
+        inset 0 0 0 5px rgb(138 42 32 / 0.35);
+      rotate: -1.2deg;
+      font-family: var(--voca-font-serif);
+    }
+
+    .media-dialog-popup::before {
+      content: "Erratum";
+      display: block;
+      font-family: var(--voca-font-ui);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--voca-rubric);
+    }
+
+    .media-dialog-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--voca-ink);
+    }
+
+    .media-dialog-description {
+      font-style: italic;
+      color: var(--voca-ink-soft);
+    }
+
+    .media-dialog-backdrop {
+      background-color: rgb(2 5 19 / 0.72);
+    }
+
+    .media-button.media-dialog-close,
+    .media-button.media-dialog-close:hover,
+    .media-button.media-dialog-close:focus-visible {
+      color: #fff;
+      background: var(--voca-cobalt);
+    }
+
+    .media-dialog-close {
+      width: auto;
+      min-height: 2.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      background: var(--voca-cobalt);
+      color: #fff;
+      font: 600 0.875rem/1 var(--voca-font-ui);
+    }
+
+    .media-dialog-close:focus-visible,
+    .media-dialog-popup:focus-visible {
+      outline: 2px solid var(--voca-cobalt);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .media-dialog-popup {
+        rotate: none;
+      }
+    }
+
+    /* ---------- Seek previews: a tiny engraved plate ---------- */
+    .media-time-slider-preview {
+      gap: 0;
+      padding: 0.3rem 0.3rem 0.25rem;
+      border-radius: 0.2rem;
+      background: var(--voca-paper);
+      box-shadow:
+        0 0 0 1px rgb(23 19 12 / 0.4),
+        0 10px 24px -8px rgb(0 0 0 / 0.85);
+    }
+
+    .media-slider-thumbnail {
+      border: 0;
+      border-radius: 1px;
+      box-shadow:
+        0 0 0 1px var(--voca-ink),
+        0 0 0 3px var(--voca-paper),
+        0 0 0 4px rgb(23 19 12 / 0.45);
+      margin: 4px;
+    }
+
+    .media-time-slider-preview-meta {
+      padding: 0.2rem 0 0;
+      border: 0;
+      background: transparent;
+      color: var(--voca-ink);
+      font-family: var(--voca-font-serif);
+      font-size: 0.75rem;
+      font-variant: small-caps;
+      letter-spacing: 0.06em;
+    }
+
+    .media-time-slider-preview-meta::before {
+      content: "Plate a0· a0";
+      color: var(--voca-rubric);
+      font-weight: 700;
+    }
+
     /* ---------- The poster stays inside the plate ---------- */
     .media-poster,
     .media-buffering-indicator,
@@ -3054,5 +3533,58 @@
       height: 100%;
       object-fit: contain;
     }
+    /* ---------- Audit fixes ---------- */
+
+    /* Readable over any footage: a soft dark backing behind the lines, and words not yet swept stay legible. */
+    .voca-subtitles-inner {
+      padding: 0.3rem 0.85rem 0.4rem;
+      border-radius: 0.5rem;
+      background: rgb(2 5 19 / 0.58);
+      backdrop-filter: blur(3px);
+      box-shadow: 0 6px 20px -8px rgb(0 0 0 / 0.7);
+    }
+
+    .voca-k {
+      color: rgb(255 255 255 / 0.72);
+    }
+
+    @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+      .voca-subtitles-inner {
+        background: rgb(2 5 19 / 0.9);
+        backdrop-filter: none;
+      }
+
+      .voca-k {
+        color: #fff;
+      }
+    }
+
+    /* Fullscreen: the title label would sit off the top of the screen. */
+    :scope:fullscreen .voca-title-label,
+    :scope:fullscreen .voca-cover-flap {
+      display: none;
+    }
+
+    /* Touch screens: the A–Z tabs are too small for a thumb, so the index is folded away and the word slip on the
+       plate announces each word instead. (The words remain on the dictionary page.) */
+    @media (pointer: coarse) {
+      .voca-thumb-index {
+        display: none !important;
+      }
+
+      .voca-word-slip {
+        display: flex !important;
+      }
+
+      .voca-volume-slider-thumb {
+        width: 1.125rem;
+        height: 1.375rem;
+      }
+
+      .voca-volume-slider {
+        width: 6rem;
+      }
+    }
+
   }
 }

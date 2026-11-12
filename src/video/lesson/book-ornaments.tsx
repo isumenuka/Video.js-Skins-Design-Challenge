@@ -16,9 +16,30 @@ const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
  * guards, gilt fleurons, and the leather title label on the top edge.
  */
 export function BookOrnaments() {
+  // The cover swings open once, when the volume first appears; under reduced motion the book is simply open.
+  const [coverClosed, setCoverClosed] = useState(
+    () => typeof window !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
   return (
     <>
       <div className="voca-endpaper" aria-hidden="true" />
+      {coverClosed && (
+        <div
+          className="voca-cover-flap"
+          aria-hidden="true"
+          onAnimationEnd={(event) => {
+            if (event.target === event.currentTarget) setCoverClosed(false);
+          }}
+        >
+          <div className="voca-cover-flap-face">
+            <span className="voca-cover-flap-rule" />
+            <span className="voca-cover-flap-mark">❦</span>
+            <span className="voca-cover-flap-title">Vocapedia</span>
+            <span className="voca-cover-flap-sub">A Dictionary in Moving Pictures</span>
+            <span className="voca-cover-flap-mark">❦</span>
+          </div>
+        </div>
+      )}
       <div className="voca-spine" data-interactive aria-hidden="true">
         <span className="voca-headband" />
         <span className="voca-headband voca-headband-tail" />
