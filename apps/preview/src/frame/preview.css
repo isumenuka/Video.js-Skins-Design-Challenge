@@ -204,3 +204,34 @@ live-audio-player {
 .lab-footer a {
   color: var(--lab-periwinkle);
 }
+
+/* ---------- Embedded in another page ---------- */
+html[data-framed] .preview-page {
+  padding: 6px;
+}
+
+html[data-framed] .lab-credit {
+  display: none;
+}
+
+html[data-framed] .lab {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+html[data-framed] .preview-player {
+  width: min(100%, var(--preview-player-width, 72rem), calc((100dvh - 44px) * 2.05));
+}
+
+/* Wide embeds show the open book, whose title label sits above the top board. */
+@media (min-width: 900px) {
+  html[data-framed] .preview-page {
+    padding-top: 30px;
+  }
+}
+
+/* Short, narrow embeds (a phone): the folded book is the picture plus the desk. */
+@media (max-height: 560px) {
+  html[data-framed] .preview-player {
+    width: min(100%, calc((100dvh - 150px) * 1.78));
+  }
+}

@@ -10,6 +10,10 @@ import { Player } from './player';
 
 const framed = window.self !== window.top;
 
+// Embedded in another page (the workbench, or a site such as Vocapedia), the host page carries the film credit and its
+// own margins, so the player drops its credit line and outer padding to give the volume every pixel it can.
+if (framed) document.documentElement.dataset.framed = '';
+
 function Preview() {
   const [params, setParams] = useState(initialParams);
 
