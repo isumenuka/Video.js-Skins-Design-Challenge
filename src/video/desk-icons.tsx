@@ -13,9 +13,9 @@ type Props = SVGProps<SVGSVGElement>;
 const BRASS_LIGHT = '#f6e3a1';
 const BRASS = '#d3a446';
 const BRASS_DEEP = '#8a6418';
-const PAPER = '#f0efe9';
-const PAPER_SHADE = '#d8cfb6';
-const INK = '#17130c';
+const PAPER = '#f3e8cc';
+const PAPER_SHADE = '#e4d5b2';
+const INK = '#241a12';
 const COBALT = '#1f30ff';
 
 function Svg({ children, ...props }: Props) {

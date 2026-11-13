@@ -63,14 +63,26 @@ The whole dictionary follows the choice: the subtitle line, the line-page and A�
 - **Touch:** on coarse pointers the 13px A–Z tabs fold away (the word slip announces words instead), and every button is at least 40px; the volume handle is enlarged.
 - **Sizes:** checked at 390×844, 844×390 (landscape phone, now fits without scrolling), 768×1024, 1180×820 tablet, 1366×768, 1440×900, 2560×1440 and fullscreen.
 
-## Palette (from vocapedia.base44.app's CSS)
+## Palette — the folio edition (from vocapedia.base44.app's article pages)
 | Role | Value |
 | --- | --- |
-| Cloth | cobalt `#1f30ff` → `#08105a` → navy `#040929` (ground `#020513`) |
-| Gilt | `hsl(43 74% 60%)` (site chart gold), light `#f6e3a1`, deep `#a57a24` |
-| Paper / edge | `#f0efe9` / `#e4e1d6` / `#b9b6ad` |
-| Ink / rubric | `#17130c` / `#8a2a20` |
+| Leather | lapis `#2c3f74` → `#1e2c52` → `#141d38` → `#0b1124` (ground `#020513`); cobalt `#1f30ff` only for things you press |
+| Gilt | `#cfa548` on leather, site gold `#b68a2c` on parchment, light `#ecd593`, deep `#7d5b17` |
+| Page / sheet | the site's `radial-gradient(120% 90% at 50% 0%, #f7efd9, #efe3c4 45%, #e4d5b2)` and sheet gradient |
+| Ink / faded / rubric / lapis | `#241a12` / `#5f4b31` / `#9d2b1b` / `#1e2c52`; hairline rules `rgb(160 134 92 / .45)` |
 | Type | Source Serif 4 (headwords, time, folios), Inter (UI) |
+
+## The folio edition
+- **Every word is a Vocapedia article:**
+  - an illuminated rubric initial on a gilt-ruled square (dimmed until the karaoke sweep reaches it);
+  - the part of speech, the IPA in lapis, and the definition in the chosen language;
+  - a hairline infobox (part of speech · register · difficulty ●●○), labelled in that language.
+- **Sections:** titled in Latin as on the site: *Exempla* (the spoken line, its translation and ▶ replay), *Origo* (`← OFr dragon ← Lat dracō ← Gk drákōn`, with abbreviations expanded in the chosen language), *Falsi amici* (curated real look-alikes per language, such as FR *lame* = boiteux, PL *krew* ≈ crew; none for RU) and *Vide etiam* (related words; those in the film open their letter).
+- **Rising embers:** gold and rubric sparks rise from the A–Z tab (or the phone's word slip) the first time a word is heard.
+- **XP:** +10 for each newly collected word, plus points from review. "✦ N XP" sits on the desk with a "+10 XP" floater. Collected words, XP and review boxes persist in this browser.
+- **Review:** the quill → "Review collected words", or the Finis page, opens Again / Hard / Good / Easy (+0/+2/+5/+5 XP) on the dictionary page. It pauses the film, is keyboard-first, and Esc closes it. It ends with a link to the full review on Vocapedia.
+- **Phrase passport:** at the end, Finis shows a rubric ink stamp ("SINTEL · EN → FR · 13 · XI · 2026"), the words collected and XP, plus Review, Read again and "Open your phrase passport ↗" (`/passport/fr` and so on; Polish falls back to the home page).
+- **Reduced motion:** no embers, floaters or stamp animation. Forced colours keep the initials and stamp legible.
 
 ## Layout
 `.media-skin` is a grid with the areas `"entry spine plate index" / "rail rail rail rail"`.

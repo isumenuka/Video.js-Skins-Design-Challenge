@@ -25,7 +25,10 @@ const STUDY_MODES: Array<{ mode: keyof StudyModes; label: string; hint: string }
 export function StudyMenu() {
   const lab = useLesson();
   if (!lab) return null;
-  const { study, setStudy } = lab;
+  const { study, setStudy, setReviewOpen, collected, heard, pages } = lab;
+  const reviewCount = new Set(
+    pages.flatMap((p) => p.words.map((w) => w.lemma)).filter((l) => collected.has(l) || heard.has(l))
+  ).size;
   const count = STUDY_MODES.filter(({ mode }) => study[mode]).length;
 
   return (
@@ -72,9 +75,43 @@ export function StudyMenu() {
               </span>
             </Menu.CheckboxItem>
           ))}
+          <Menu.Separator className="media-menu-separator voca-study-separator" />
+          <Menu.Item className="media-menu-item voca-study-item voca-study-review" onSelect={() => setReviewOpen(true)}>
+            <span className="voca-study-check voca-study-review-mark" aria-hidden="true">
+              ✦
+            </span>
+            <span className="voca-study-text">
+              <span className="voca-study-label">Review collected words ({reviewCount})</span>
+              <span className="voca-study-hint">Again, Hard, Good or Easy — as on Vocapedia.</span>
+            </span>
+          </Menu.Item>
         </Menu.Content>
       </Menu.Popup>
     </Menu.Root>
+  );
+}
+
+/**
+ * Experience, as on the Vocapedia dashboard: "✦ 120 XP" on the desk, with each award drifting up from it.
+ * The count is text, so it's read in place; the drifting "+10" is decoration.
+ */
+export function XpCounter() {
+  const lab = useLesson();
+  if (!lab) return null;
+  const { xp, xpBurst } = lab;
+  return (
+    <span className="voca-xp">
+      <span className="voca-xp-star" aria-hidden="true">
+        ✦
+      </span>
+      <span className="voca-sr-only">Experience: </span>
+      <span className="voca-xp-value">{xp}</span> XP
+      {xpBurst && (
+        <span className="voca-xp-burst" key={xpBurst.key} aria-hidden="true">
+          +{xpBurst.amount} XP
+        </span>
+      )}
+    </span>
   );
 }
 

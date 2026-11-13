@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/resolve-class-name';
 
 import { InkwellIcon } from '../desk-icons';
-import { StudyMenu, SubtitlesToggle } from '../lesson/lab-controls';
+import { StudyMenu, SubtitlesToggle, XpCounter } from '../lesson/lab-controls';
 import { Button } from './button';
 import { LiveButton } from './live-button';
 import { AudioPlayButton, PlayButton } from './play-button';
@@ -67,6 +67,7 @@ export function ControlsRow({
             </span>
           </Time.Group>
         )}
+        {!audio && <XpCounter />}
         {!audio && <InlineVolume />}
       </Controls.Group>
 

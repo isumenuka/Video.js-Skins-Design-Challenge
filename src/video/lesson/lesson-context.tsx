@@ -59,9 +59,50 @@ export interface LessonState {
   wordIn: (gloss: Gloss) => string;
   /** A word's short definition, written in the chosen translation language. */
   defineIn: (gloss: Gloss) => string;
+  /** True when the popped word is being heard for the first time in the film: its tab sends up embers. */
+  poppedIsNew: boolean;
+  /** Every word the viewer has ever collected here, kept in this browser across visits. */
+  collected: ReadonlySet<string>;
+  /** Experience points, as on the Vocapedia dashboard: ten for each new word, more for reviewing. */
+  xp: number;
+  /** The latest award, for the "+10 XP" that drifts up from the counter. */
+  xpBurst: { amount: number; key: number } | null;
+  awardXp: (amount: number) => void;
+  /** The Again / Hard / Good / Easy review of collected words, shown on the dictionary page. */
+  reviewOpen: boolean;
+  setReviewOpen: (open: boolean) => void;
   subtitlesOn: boolean;
   setSubtitlesOn: (on: boolean) => void;
   seekTo: (time: number, play?: boolean) => void;
+}
+
+const COLLECTED_KEY = 'vocapedia-lab:collected';
+const XP_KEY = 'vocapedia-lab:xp';
+
+function readCollected(): Set<string> {
+  try {
+    const saved = JSON.parse(localStorage.getItem(COLLECTED_KEY) ?? '[]');
+    return new Set(Array.isArray(saved) ? saved.filter((v) => typeof v === 'string') : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function readXp(): number {
+  try {
+    const saved = Number(localStorage.getItem(XP_KEY));
+    return Number.isFinite(saved) && saved > 0 ? saved : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function save(key: string, value: string) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Storage can be blocked; progress still counts for this visit.
+  }
 }
 
 const LANGUAGE_KEY = 'vocapedia-lab:translation';
@@ -146,6 +187,46 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
   const latest = spoken > 0 ? all[spoken - 1] : undefined;
   const popped = latest && currentTime - latest.time < POP_SECONDS ? latest : undefined;
 
+  // Where each word is first spoken: that occurrence is the moment it's collected.
+  const firstIndex = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const occurrence of all) if (!map.has(occurrence.gloss.lemma)) map.set(occurrence.gloss.lemma, occurrence.index);
+    return map;
+  }, [all]);
+  const poppedIsNew = Boolean(popped && firstIndex.get(popped.gloss.lemma) === popped.index);
+
+  // Collected words and experience persist in this browser, like a reader's progress on Vocapedia.
+  const [collected, setCollected] = useState<Set<string>>(readCollected);
+  const collectedRef = useRef(collected);
+  collectedRef.current = collected;
+  const [xp, setXp] = useState<number>(readXp);
+  const [xpBurst, setXpBurst] = useState<{ amount: number; key: number } | null>(null);
+  const awardXp = useCallback((amount: number) => {
+    if (amount <= 0) return;
+    setXp((current) => {
+      const next = current + amount;
+      save(XP_KEY, String(next));
+      return next;
+    });
+    setXpBurst({ amount, key: performance.now() });
+  }, []);
+
+  // A word is collected when it's heard for the first time while the film plays (not skipped past by a seek).
+  const lastCollected = useRef(-1);
+  useEffect(() => {
+    if (!latest || latest.index === lastCollected.current) return;
+    lastCollected.current = latest.index;
+    const lemma = latest.gloss.lemma;
+    if (firstIndex.get(lemma) !== latest.index || currentTime - latest.time > 2) return;
+    if (collectedRef.current.has(lemma)) return;
+    const next = new Set(collectedRef.current);
+    next.add(lemma);
+    collectedRef.current = next;
+    setCollected(next);
+    save(COLLECTED_KEY, JSON.stringify([...next]));
+    awardXp(10);
+  }, [latest?.index]);
+
   const pages = useMemo(() => linePages(lesson), [lesson]);
   const livePage = useMemo(() => {
     let page: LinePage | undefined;
@@ -219,6 +300,16 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
     [store]
   );
 
+  // Opening the review pauses the film, so the reader isn't racing it.
+  const [reviewOpen, setReviewOpenState] = useState(false);
+  const setReviewOpen = useCallback(
+    (open: boolean) => {
+      if (open) store.pause();
+      setReviewOpenState(open);
+    },
+    [store]
+  );
+
   const focusTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const playWord = useCallback(
     (lemma: string) => {
@@ -258,6 +349,13 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
       lineIn,
       wordIn,
       defineIn,
+      poppedIsNew,
+      collected,
+      xp,
+      xpBurst,
+      awardXp,
+      reviewOpen,
+      setReviewOpen,
       subtitlesOn,
       setSubtitlesOn,
       seekTo,
@@ -279,6 +377,13 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
       lineIn,
       wordIn,
       defineIn,
+      poppedIsNew,
+      collected,
+      xp,
+      xpBurst,
+      awardXp,
+      reviewOpen,
+      setReviewOpen,
       paused,
       playWord,
       popped,

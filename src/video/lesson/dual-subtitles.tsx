@@ -5,6 +5,7 @@
 import { usePlayer } from '@videojs/react/video';
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 
+import { Embers } from './book-ornaments';
 import { useLesson } from './lesson-context';
 import { type Cue, wordTimings } from './lesson-data';
 
@@ -97,6 +98,7 @@ function WordSlip() {
       <b>{popped.gloss.lemma}</b>
       <span className="voca-word-slip-sep">·</span>
       <span lang={lab!.translation.code.toLowerCase()}>{lab!.wordIn(popped.gloss)}</span>
+      {lab!.poppedIsNew && <Embers />}
     </p>
   );
 }

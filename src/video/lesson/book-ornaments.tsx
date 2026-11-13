@@ -2,6 +2,7 @@
 
 'use client';
 
+import type React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Fleuron } from '../icons';
@@ -10,6 +11,43 @@ import { useLesson } from './lesson-context';
 import { formatTime, letterOf, type Occurrence } from './lesson-data';
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+/** The ember spread: horizontal drift (px), delay (ms), size (px), and gold or rubric. */
+const EMBERS: Array<[number, number, number, 'gold' | 'rubric']> = [
+  [-22, 0, 5, 'gold'],
+  [14, 60, 4, 'rubric'],
+  [-8, 140, 6, 'gold'],
+  [26, 200, 4, 'gold'],
+  [-30, 260, 3, 'rubric'],
+  [6, 320, 5, 'gold'],
+  [-14, 420, 4, 'rubric'],
+  [20, 480, 3, 'gold'],
+];
+
+/**
+ * Rising embers, the site's folio flourish: sparks of gold and rubric that drift up and fade once when a word is
+ * caught for the first time. Purely decorative; reduced motion hides them.
+ */
+export function Embers() {
+  return (
+    <span className="voca-embers" aria-hidden="true">
+      {EMBERS.map(([dx, delay, size, tone], i) => (
+        <i
+          key={i}
+          className="voca-ember"
+          data-tone={tone}
+          style={
+            {
+              '--ember-dx': `${dx}px`,
+              '--ember-delay': `${delay}ms`,
+              '--ember-size': `${size}px`,
+            } as React.CSSProperties
+          }
+        />
+      ))}
+    </span>
+  );
+}
 
 /**
  * The binding, all decoration: marbled endpaper around the pages, the spine crease with its headbands, brass corner
@@ -137,7 +175,7 @@ export function ThumbIndex() {
   }, [byLetter]);
 
   if (!lab) return null;
-  const { heard, popped, openLetter, setOpenLetter } = lab;
+  const { heard, popped, poppedIsNew, openLetter, setOpenLetter } = lab;
   const poppedLetter = popped ? letterOf(popped.gloss) : undefined;
 
   const open = (letter: string) => {
@@ -187,6 +225,7 @@ export function ThumbIndex() {
                 {popped!.gloss.lemma}
               </span>
             )}
+            {isPopped && poppedIsNew && <Embers key={`e${popped!.index}`} />}
           </button>
         );
       })}

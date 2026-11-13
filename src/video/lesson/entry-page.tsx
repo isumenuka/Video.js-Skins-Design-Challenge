@@ -6,23 +6,27 @@ import { usePlayer } from '@videojs/react/video';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { ChevronIcon, PlayIcon } from '../icons';
+import { passportUrl } from './folio-data';
+import { Exempla, WordEntry } from './folio';
 import { type LessonState, useLesson } from './lesson-context';
 import { formatTime, type Gloss, letterOf } from './lesson-data';
+import { ReviewFace } from './review';
 
 /**
  * What the dictionary page shows: a spoken line's page (-1 is the title page), an A–Z letter section, the "How to
- * read this volume" guide, or the Finis colophon when the film ends.
+ * read this volume" guide, the review of collected words, or the Finis passport page when the film ends.
  */
 type View =
   | { kind: 'page'; index: number }
   | { kind: 'letter'; letter: string }
   | { kind: 'guide' }
+  | { kind: 'review' }
   | { kind: 'finis' };
 
 const viewKey = (view: View) =>
   view.kind === 'page' ? `p${view.index}` : view.kind === 'letter' ? `l${view.letter}` : view.kind;
 
-/** Opening a letter, the guide or the colophon turns forward, closing turns back; pages turn in reading order. */
+/** Opening a letter, the guide, the review or the colophon turns forward, closing turns back; pages turn in order. */
 function turnDirection(from: View, to: View): 'forward' | 'back' {
   if (from.kind === 'page' && to.kind === 'page') return to.index > from.index ? 'forward' : 'back';
   if (from.kind === 'letter' && to.kind === 'letter') return to.letter > from.letter ? 'forward' : 'back';
@@ -39,12 +43,12 @@ interface Turn {
 }
 
 /**
- * The right page of the open volume: the dictionary. One page per spoken line, listing every special word in it, so
- * it turns once per line instead of once per word. It holds still while the pointer or keyboard focus is on it, and
- * its ‹ › buttons page back through earlier lines.
+ * The right page of the open volume: the dictionary, set like a Vocapedia article. One page per spoken line, with the
+ * line as its example and an entry for every special word in it, so it turns once per line instead of once per word.
+ * It holds still while the pointer or keyboard focus is on it, and its ‹ › buttons page back through earlier lines.
  *
- * Every change of page is a real page turn: a copy of the leaf swings over the spine (showing its paper back halfway
- * round) while the next page waits beneath it. Under reduced motion the page simply changes.
+ * Every change of page is a real page turn: a copy of the leaf swings up to the spine while the next page waits
+ * beneath it. Under reduced motion the page simply changes.
  */
 export function EntryPage() {
   const lab = useLesson();
@@ -73,10 +77,15 @@ export function EntryPage() {
 
   const shownIndex = viewIndex ?? (frozenIndex ?? liveIndex);
   const openLetter = lab?.openLetter ?? null;
+  const reviewOpen = lab?.reviewOpen ?? false;
   const ended = usePlayer((s) => s.ended) ?? false;
 
-  // The guide opens from the ⓘ button or the ? key anywhere in the player, and closes the same way.
+  // The guide opens from the ⓘ button or the ? key anywhere in the player; Escape closes the guide or the review.
   const [guideOpen, setGuideOpen] = useState(false);
+  const guideRef = useRef(guideOpen);
+  guideRef.current = guideOpen;
+  const reviewRef = useRef({ open: reviewOpen, close: () => lab?.setReviewOpen(false) });
+  reviewRef.current = { open: reviewOpen, close: () => lab?.setReviewOpen(false) };
   useEffect(() => {
     const skin = sectionRef.current?.closest<HTMLElement>('.media-skin');
     if (!skin) return;
@@ -86,6 +95,8 @@ export function EntryPage() {
       if (event.key === '?' && !event.ctrlKey && !event.metaKey && !event.altKey) {
         event.preventDefault();
         setGuideOpen((open) => !open);
+      } else if (event.key === 'Escape' && reviewRef.current.open) {
+        reviewRef.current.close();
       } else if (event.key === 'Escape' && guideRef.current) {
         setGuideOpen(false);
       }
@@ -93,16 +104,16 @@ export function EntryPage() {
     skin.addEventListener('keydown', onKeyDown);
     return () => skin.removeEventListener('keydown', onKeyDown);
   }, []);
-  const guideRef = useRef(guideOpen);
-  guideRef.current = guideOpen;
 
-  const view: View = guideOpen
-    ? { kind: 'guide' }
-    : ended
-      ? { kind: 'finis' }
-      : openLetter
-        ? { kind: 'letter', letter: openLetter }
-        : { kind: 'page', index: shownIndex };
+  const view: View = reviewOpen
+    ? { kind: 'review' }
+    : guideOpen
+      ? { kind: 'guide' }
+      : ended
+        ? { kind: 'finis' }
+        : openLetter
+          ? { kind: 'letter', letter: openLetter }
+          : { kind: 'page', index: shownIndex };
   const key = viewKey(view);
 
   // Start a turn whenever the view changes. A layout effect, so the leaf covers the page in the same frame the new
@@ -133,6 +144,29 @@ export function EntryPage() {
     goLive: () => setViewIndex(null),
   };
 
+  const face = (v: View, interactive: boolean) =>
+    v.kind === 'review' ? (
+      <ReviewFace lab={lab} interactive={interactive} />
+    ) : v.kind === 'guide' ? (
+      <GuideFace lab={lab} onClose={interactive ? () => setGuideOpen(false) : undefined} />
+    ) : v.kind === 'finis' ? (
+      <FinisFace lab={lab} interactive={interactive} />
+    ) : v.kind === 'letter' ? (
+      <LetterFace lab={lab} letter={v.letter} interactive={interactive} />
+    ) : interactive ? (
+      <PageFace
+        lab={lab}
+        index={v.index}
+        liveIndex={liveIndex}
+        nav={nav}
+        following={viewIndex === null && frozenIndex === null}
+        held={held && viewIndex === null}
+        onGuide={() => setGuideOpen(true)}
+      />
+    ) : (
+      <PageFace lab={lab} index={v.index} liveIndex={liveIndex} />
+    );
+
   return (
     <section
       ref={sectionRef}
@@ -147,25 +181,7 @@ export function EntryPage() {
         if (!sectionRef.current?.contains(event.relatedTarget as Node)) setFocusIn(false);
       }}
     >
-      <div className="voca-page">
-        {baseView.kind === 'guide' ? (
-          <GuideFace lab={lab} onClose={() => setGuideOpen(false)} />
-        ) : baseView.kind === 'finis' ? (
-          <FinisFace lab={lab} interactive />
-        ) : baseView.kind === 'letter' ? (
-          <LetterFace lab={lab} letter={baseView.letter} interactive />
-        ) : (
-          <PageFace
-            lab={lab}
-            index={baseView.index}
-            liveIndex={liveIndex}
-            nav={nav}
-            following={viewIndex === null && frozenIndex === null}
-            held={held && viewIndex === null}
-            onGuide={() => setGuideOpen(true)}
-          />
-        )}
-      </div>
+      <div className="voca-page">{face(baseView, true)}</div>
 
       {turn && leafView && (
         <div
@@ -178,17 +194,7 @@ export function EntryPage() {
             if (event.target === event.currentTarget) setTurn(null);
           }}
         >
-          <div className="voca-page voca-leaf-front">
-            {leafView.kind === 'guide' ? (
-              <GuideFace lab={lab} />
-            ) : leafView.kind === 'finis' ? (
-              <FinisFace lab={lab} />
-            ) : leafView.kind === 'letter' ? (
-              <LetterFace lab={lab} letter={leafView.letter} />
-            ) : (
-              <PageFace lab={lab} index={leafView.index} liveIndex={liveIndex} />
-            )}
-          </div>
+          <div className="voca-page voca-leaf-front">{face(leafView, false)}</div>
           <div className="voca-leaf-back" />
         </div>
       )}
@@ -203,6 +209,17 @@ interface Nav {
   goBack: () => void;
   goForward: () => void;
   goLive: () => void;
+}
+
+function RunningHead({ lab, title = 'Dictionary' }: { lab: LessonState; title?: string }) {
+  return (
+    <header className="voca-running-head" aria-hidden="true">
+      <span>Vocapedia</span>
+      <span>
+        {title} · {lab.lesson.nativeLanguage.code}–{lab.translation.code}
+      </span>
+    </header>
+  );
 }
 
 /**
@@ -226,20 +243,14 @@ function PageFace({
   held?: boolean;
   onGuide?: () => void;
 }) {
-  const { lesson, occurrences, pages, currentTime, focusLemma } = lab;
-  const native = lesson.nativeLanguage;
-  const translation = lab.translation;
+  const { occurrences, pages, currentTime, focusLemma } = lab;
   const page = index >= 0 ? pages[index] : undefined;
   const isLive = index === liveIndex;
+  const interactive = Boolean(nav);
 
   return (
     <>
-      <header className="voca-running-head" aria-hidden="true">
-        <span>Vocapedia</span>
-        <span>
-          Dictionary · {native.code}–{translation.code}
-        </span>
-      </header>
+      <RunningHead lab={lab} />
 
       <div className="voca-just-heard" data-held={held || undefined}>
         {page ? (
@@ -282,43 +293,33 @@ function PageFace({
               {onGuide && <GuideButton onClick={onGuide} />}
             </nav>
 
-            {/* Announced only while the page follows playback. */}
-            <div aria-live={nav && following ? 'polite' : 'off'} aria-atomic="true" className="voca-card-stage">
-              <article className="voca-card">
+            {/* A short spoken summary while the page follows playback; the full article is there to read. */}
+            {interactive && (
+              <p className="voca-sr-only" aria-live={following ? 'polite' : 'off'}>
+                {isLive ? 'Just heard: ' : ''}
+                {page.words.map((g) => `${g.term}, ${lab.wordIn(g)}`).join('; ')}
+              </p>
+            )}
+
+            <div className="voca-card-stage">
+              <article className="voca-card voca-folio">
                 <p className="voca-card-kicker">
                   <span>{isLive ? 'Just heard' : 'Earlier'}</span>
                   <span className="voca-card-time">
                     § {page.cue.id} · {formatTime(page.cue.start)}
                   </span>
                 </p>
-                <p className="voca-card-quote" lang={native.code.toLowerCase()}>
-                  “{page.cue.native}”
-                </p>
-                <dl className="voca-card-words">
-                  {page.words.map((gloss, i) => (
-                    <div
-                      key={gloss.lemma}
-                      className="voca-card-word"
-                      data-reached={(isLive && page.wordTimes[i] <= currentTime) || !isLive || undefined}
-                      data-focus={(nav && gloss.lemma === focusLemma) || undefined}
-                    >
-                      <dt>
-                        <b lang={native.code.toLowerCase()}>{gloss.term}</b>{' '}
-                        <span className="voca-card-pos">{gloss.pos}</span>{' '}
-                        <span className="voca-card-ipa">{gloss.ipa}</span>
-                      </dt>
-                      <dd>
-                        <span lang={translation.code.toLowerCase()}>{lab.defineIn(gloss)}</span>{' '}
-                        <span className="voca-card-fr">
-                          <abbr className="voca-entry-label" title={translation.name}>
-                            {translation.code}.
-                          </abbr>{' '}
-                          <i lang={translation.code.toLowerCase()}>{lab.wordIn(gloss)}</i>
-                        </span>
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
+                <Exempla lab={lab} cue={page.cue} interactive={interactive} />
+                {page.words.map((gloss, i) => (
+                  <WordEntry
+                    key={gloss.lemma}
+                    lab={lab}
+                    gloss={gloss}
+                    reached={!isLive || page.wordTimes[i] <= currentTime}
+                    focus={interactive && gloss.lemma === focusLemma}
+                    interactive={interactive}
+                  />
+                ))}
               </article>
             </div>
             {held && (
@@ -346,9 +347,7 @@ function PageFace({
  * can replay the line where it's spoken; words not heard yet are shown lighter.
  */
 function LetterFace({ lab, letter, interactive = false }: { lab: LessonState; letter: string; interactive?: boolean }) {
-  const { lesson, pages, heard, focusLemma, playWord, setOpenLetter } = lab;
-  const native = lesson.nativeLanguage;
-  const translation = lab.translation;
+  const { pages, heard, focusLemma, playWord, setOpenLetter } = lab;
 
   // Each word under this letter, once, with the line it's first spoken in.
   const entries: Array<{ gloss: Gloss; start: number }> = [];
@@ -364,12 +363,7 @@ function LetterFace({ lab, letter, interactive = false }: { lab: LessonState; le
 
   return (
     <>
-      <header className="voca-running-head" aria-hidden="true">
-        <span>Vocapedia</span>
-        <span>
-          Dictionary · {native.code}–{translation.code}
-        </span>
-      </header>
+      <RunningHead lab={lab} />
 
       <div className="voca-just-heard">
         <nav className="voca-card-nav" aria-label={interactive ? `Section ${letter}` : undefined}>
@@ -387,47 +381,34 @@ function LetterFace({ lab, letter, interactive = false }: { lab: LessonState; le
         </nav>
 
         <div className="voca-card-stage">
-          <article className="voca-card">
+          <article className="voca-card voca-folio">
             <h2 className="voca-sr-only">Words under {letter}</h2>
-            <dl className="voca-card-words">
-              {entries.map(({ gloss, start }) => (
-                <div
-                  key={gloss.lemma}
-                  className="voca-card-word voca-letter-word"
-                  data-reached={heard.has(gloss.lemma) || undefined}
-                  data-unheard={!heard.has(gloss.lemma) || undefined}
-                  data-focus={(interactive && gloss.lemma === focusLemma) || undefined}
-                >
-                  <dt>
-                    <b lang={native.code.toLowerCase()}>{gloss.term}</b>{' '}
-                    <span className="voca-card-pos">{gloss.pos}</span>{' '}
-                    <span className="voca-card-ipa">{gloss.ipa}</span>
-                  </dt>
-                  <dd>
-                    <span lang={translation.code.toLowerCase()}>{lab.defineIn(gloss)}</span>{' '}
-                    <span className="voca-card-fr">
-                      <abbr className="voca-entry-label" title={translation.name}>
-                        {translation.code}.
-                      </abbr>{' '}
-                      <i lang={translation.code.toLowerCase()}>{lab.wordIn(gloss)}</i>
-                    </span>
-                  </dd>
-                  {interactive ? (
-                    <button
-                      type="button"
-                      className="voca-letter-play"
-                      aria-label={`Play the line with “${gloss.lemma}” at ${formatTime(start)}`}
-                      onClick={() => playWord(gloss.lemma)}
-                    >
-                      <PlayIcon className="voca-letter-play-icon" />
-                      {formatTime(start)}
-                    </button>
-                  ) : (
-                    <span className="voca-letter-play">{formatTime(start)}</span>
-                  )}
-                </div>
-              ))}
-            </dl>
+            {entries.map(({ gloss, start }) => (
+              <div key={gloss.lemma} className="voca-letter-entry" data-unheard={!heard.has(gloss.lemma) || undefined}>
+                <WordEntry
+                  lab={lab}
+                  gloss={gloss}
+                  compact
+                  interactive={interactive}
+                  focus={interactive && gloss.lemma === focusLemma}
+                  action={
+                    interactive ? (
+                      <button
+                        type="button"
+                        className="voca-letter-play"
+                        aria-label={`Play the line with “${gloss.lemma}” at ${formatTime(start)}`}
+                        onClick={() => playWord(gloss.lemma)}
+                      >
+                        <PlayIcon className="voca-letter-play-icon" />
+                        {formatTime(start)}
+                      </button>
+                    ) : (
+                      <span className="voca-letter-play">{formatTime(start)}</span>
+                    )
+                  }
+                />
+              </div>
+            ))}
           </article>
         </div>
       </div>
@@ -451,13 +432,14 @@ const GUIDE_KEYS: Array<[string, string]> = [
   ['M', 'Mute'],
   ['F', 'Full page'],
   ['?', 'This guide'],
-  ['Esc', 'Close a menu or this page'],
+  ['Esc', 'Close a menu, the review or this page'],
 ];
 
 const GUIDE_PARTS: Array<[string, string]> = [
   ['The ribbon', 'drag the brass clip to turn to any moment; each tab is a spoken line.'],
-  ['A–Z tabs', 'a tab pulls out when its word is spoken; press one to read every word under that letter.'],
-  ['The quill', 'study modes: pause after new words, repeat each line, slow lines down.'],
+  ['A–Z tabs', 'a tab pulls out, with rising embers, when a new word is spoken; press one to read every word under it.'],
+  ['The quill', 'study modes (pause, repeat, slow), and a review of the words you have collected.'],
+  ['XP', 'ten points for every new word you catch, more for every word you review.'],
   ['The inkwell', 'its ink is the volume; press it to cork the sound.'],
   ['The compass', 'settings: translation language, speed and quality.'],
   ['Double-tap', 'the left or right of the picture to go back or forward.'],
@@ -465,15 +447,9 @@ const GUIDE_PARTS: Array<[string, string]> = [
 
 /** "How to read this volume": the keys, the gestures, and what each object on the desk does. */
 function GuideFace({ lab, onClose }: { lab: LessonState; onClose?: () => void }) {
-  const { lesson, translation } = lab;
   return (
     <>
-      <header className="voca-running-head" aria-hidden="true">
-        <span>Vocapedia</span>
-        <span>
-          Dictionary · {lesson.nativeLanguage.code}–{translation.code}
-        </span>
-      </header>
+      <RunningHead lab={lab} />
       <div className="voca-just-heard">
         <nav className="voca-card-nav" aria-label={onClose ? 'How to read this volume' : undefined}>
           <span className="voca-letter-title">
@@ -519,47 +495,77 @@ function GuideFace({ lab, onClose }: { lab: LessonState; onClose?: () => void })
   );
 }
 
-/** The colophon when the film ends: Finis, the words collected, and a way to read it again. */
+const ROMAN_MONTHS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+
+/** The passport stamp, inked in rubric: the film, the language pair, and today's date. */
+function PassportStamp({ lab }: { lab: LessonState }) {
+  const now = new Date();
+  const date = `${now.getDate()} · ${ROMAN_MONTHS[now.getMonth()]} · ${now.getFullYear()}`;
+  const pair = `${lab.lesson.nativeLanguage.code} → ${lab.translation.code}`;
+  return (
+    <svg className="voca-stamp" viewBox="0 0 220 112" role="img" aria-label={`Stamped: Sintel, ${pair}, ${date}`}>
+      <defs>
+        {/* Uneven ink: a little noise eats into the stamp, as real ink does. */}
+        <filter id="voca-stamp-ink" x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="noise" />
+          <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.6" result="mask" />
+          <feComposite in="SourceGraphic" in2="mask" operator="in" result="inked" />
+          <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="1" seed="3" result="warp" />
+          <feDisplacementMap in="inked" in2="warp" scale="2.5" />
+        </filter>
+      </defs>
+      <g filter="url(#voca-stamp-ink)" fill="none" stroke="currentColor">
+        <rect x="4" y="4" width="212" height="104" rx="10" strokeWidth="3" />
+        <rect x="11" y="11" width="198" height="90" rx="6" strokeWidth="1.2" />
+        <g fill="currentColor" stroke="none" fontFamily="'Source Serif 4', Georgia, serif" textAnchor="middle">
+          <text x="110" y="31" fontSize="9" fontWeight="700" letterSpacing="2">
+            VOCAPEDIA · PHRASE PASSPORT
+          </text>
+          <text x="110" y="64" fontSize="28" fontWeight="700" letterSpacing="6">
+            SINTEL
+          </text>
+          <text x="110" y="88" fontSize="11" fontWeight="600" letterSpacing="2">
+            {pair} · {date}
+          </text>
+        </g>
+      </g>
+    </svg>
+  );
+}
+
+/** The colophon when the film ends, as a Phrase passport page: the stamp, the words collected, and what next. */
 function FinisFace({ lab, interactive = false }: { lab: LessonState; interactive?: boolean }) {
-  const { heard, pages, translation, seekTo, lesson } = lab;
-  const total = new Set(pages.flatMap((p) => p.words.map((w) => w.lemma))).size;
+  const { heard, collected, pages, translation, seekTo, lesson, xp, setReviewOpen } = lab;
+  const lemmas = new Set(pages.flatMap((p) => p.words.map((w) => w.lemma)));
+  const total = lemmas.size;
+  const gathered = [...lemmas].filter((l) => heard.has(l) || collected.has(l)).length;
   return (
     <>
-      <header className="voca-running-head" aria-hidden="true">
-        <span>Vocapedia</span>
-        <span>
-          Dictionary · {lesson.nativeLanguage.code}–{translation.code}
-        </span>
-      </header>
+      <RunningHead lab={lab} title="Phrase passport" />
       <div className="voca-just-heard">
         <article className="voca-card voca-finis">
           <p className="voca-finis-kicker">Here the volume closes</p>
           <h2 className="voca-finis-title">Finis</h2>
-          <svg className="voca-finis-seal" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-            <path
-              d="M32 4c4 3 7 1 10 3s3 6 6 8 6 1 7 5-1 6 1 9 4 4 3 8-5 4-6 7 0 7-3 9-6 0-9 2-4 5-8 5-5-3-9-3-6 3-9 1-2-6-5-8-6-1-7-5 1-6-1-9-4-4-3-8 5-4 6-7 0-7 3-9 6 0 9-2 4-5 8-5Z"
-              fill="url(#voca-finis-gilt)"
-            />
-            <defs>
-              <radialGradient id="voca-finis-gilt" cx="0.35" cy="0.3" r="0.8">
-                <stop offset="0" stopColor="#f6e3a1" />
-                <stop offset="0.55" stopColor="#d3a446" />
-                <stop offset="1" stopColor="#8a6418" />
-              </radialGradient>
-            </defs>
-            <circle cx="32" cy="32" r="17" fill="none" stroke="#7a5a16" strokeWidth="1.2" strokeDasharray="0.5 3" strokeLinecap="round" />
-            <path d="M23 22 32 43l9-21" fill="none" stroke="#5f430f" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <PassportStamp lab={lab} />
           <p className="voca-finis-count">
-            You collected <b>{heard.size}</b> of {total} words
+            You collected <b>{gathered}</b> of {total} words · <span className="voca-finis-xp">✦ {xp} XP</span>
           </p>
           <p className="voca-finis-note">
-            Read in {lesson.nativeLanguage.name}, with notes in <span lang={translation.code.toLowerCase()}>{translation.name}</span>.
+            Read in {lesson.nativeLanguage.name}, with notes in{' '}
+            <span lang={translation.code.toLowerCase()}>{translation.name}</span>.
           </p>
           {interactive && (
-            <button type="button" className="voca-finis-again" onClick={() => seekTo(0)}>
-              ↺ Read again
-            </button>
+            <div className="voca-finis-actions">
+              <button type="button" className="voca-finis-again" onClick={() => setReviewOpen(true)}>
+                ✦ Review {gathered} {gathered === 1 ? 'word' : 'words'}
+              </button>
+              <button type="button" className="voca-finis-secondary" onClick={() => seekTo(0)}>
+                ↺ Read again
+              </button>
+              <a className="voca-finis-secondary" href={passportUrl(translation.code)} target="_blank" rel="noreferrer">
+                Open your phrase passport ↗<span className="voca-sr-only"> (opens in a new tab)</span>
+              </a>
+            </div>
           )}
         </article>
       </div>
