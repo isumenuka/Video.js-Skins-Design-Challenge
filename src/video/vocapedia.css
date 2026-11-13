@@ -327,6 +327,12 @@
       }
     }
 
+    /* Seen in perspective the standing leaf grows taller than the page; keep it within the page's top and bottom
+       edges so it never spills over the ribbon (timeline) below. It's free sideways to swing over the spine. */
+    .voca-entry[data-turning] {
+      clip-path: inset(-1px -100vw -2px -100vw);
+    }
+
     /* The page being uncovered sits in the leaf's shadow for a moment. */
     .voca-entry[data-turning] > .voca-page {
       position: relative;
@@ -776,7 +782,8 @@
       background: none;
       opacity: 1 !important;
       pointer-events: auto !important;
-      z-index: 3;
+      /* Above the dictionary page (z-index 4), so the seek preview rising from the ribbon is never cut off by it. */
+      z-index: 5;
     }
 
     /* ---------- Buttons on the cloth ---------- */
@@ -3521,7 +3528,7 @@
     }
 
     .media-time-slider-preview-meta::before {
-      content: "Plate a0· a0";
+      content: "Plate\00a0·\00a0";
       color: var(--voca-rubric);
       font-weight: 700;
     }
