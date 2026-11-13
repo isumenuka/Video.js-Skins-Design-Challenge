@@ -322,11 +322,6 @@ function PageFace({
                 ))}
               </article>
             </div>
-            {held && (
-              <span className="voca-held-ribbon" aria-hidden="true">
-                Held
-              </span>
-            )}
           </>
         ) : (
           <article className="voca-card voca-title-page">

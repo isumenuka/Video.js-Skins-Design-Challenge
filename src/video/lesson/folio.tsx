@@ -12,11 +12,11 @@ import { type Cue, formatTime, type Gloss, letterOf } from './lesson-data';
 
 /*
  * A word set as a Vocapedia article, in the site's folio style: an illuminated initial, the definition in the
- * reader's language, a hairline infobox, and the Latin-titled sections the site uses on its article pages
- * (Exempla, Origo, Falsi amici, Vide etiam).
+ * reader's language, and — behind "More about this word" — a hairline infobox, the word's origin, a false friend to
+ * watch for, and related words. Section titles are plain words in the reader's language.
  */
 
-/** A rubric section title between hairline rules: "—— ORIGO ——". */
+/** A rubric section title between hairline rules: "—— ORIGIN ——". */
 export function Rubric({ children }: { children: ReactNode }) {
   return (
     <p className="voca-rubric-label" aria-hidden="true">
@@ -80,14 +80,14 @@ export function Infobox({ lab, gloss }: { lab: LessonState; gloss: Gloss }) {
   );
 }
 
-/** Origo: the word's descent in dictionary notation, "← OFr dragon ← Lat dracō ← Gk drákōn". */
+/** Origin: the word's descent in dictionary notation, "← OFr dragon ← Lat dracō ← Gk drákōn". */
 export function Origo({ lab, gloss }: { lab: LessonState; gloss: Gloss }) {
   const facts = folioFor(gloss.lemma);
   if (!facts) return null;
   const labels = folioLabels(lab.translation.code);
   return (
     <>
-      <Rubric>Origo</Rubric>
+      <Rubric>{labels.origin}</Rubric>
       <p className="voca-origo">
         {facts.origin.map(([from, form], i) =>
           from ? (
@@ -109,7 +109,7 @@ export function Origo({ lab, gloss }: { lab: LessonState; gloss: Gloss }) {
   );
 }
 
-/** Falsi amici: a look-alike in the reader's language, set out as the site does ("Looks like / Actually means"). */
+/** False friend: a look-alike in the reader's language, in one line: "lame ≠ English lame (= boiteux·se)". */
 export function FalsiAmici({ lab, gloss }: { lab: LessonState; gloss: Gloss }) {
   const friend = falseFriendFor(gloss.lemma, lab.translation.code);
   if (!friend) return null;
@@ -117,35 +117,25 @@ export function FalsiAmici({ lab, gloss }: { lab: LessonState; gloss: Gloss }) {
   const lang = lab.translation.code.toLowerCase();
   return (
     <>
-      <Rubric>Falsi amici</Rubric>
-      <dl className="voca-falsi" lang={lang}>
-        <div>
-          <dt>{labels.looksLike}</dt>
-          <dd>
-            <b>{friend.learner}</b> <span aria-hidden="true">≈</span> <span className="voca-falsi-en">EN</span>{' '}
-            <i lang="en">{friend.english}</i>
-          </dd>
-        </div>
-        <div>
-          <dt>{labels.actuallyMeans}</dt>
-          <dd>
-            <span className="voca-falsi-en">EN</span> <i lang="en">{friend.english}</i> = {friend.englishMeans}
-          </dd>
-        </div>
-      </dl>
+      <Rubric>{labels.falseFriend}</Rubric>
+      <p className="voca-falsi" lang={lang}>
+        <b>{friend.learner}</b> ≠ {labels.english} <i lang="en">{friend.english}</i>{' '}
+        <span className="voca-falsi-means">(= {friend.englishMeans})</span>
+      </p>
     </>
   );
 }
 
-/** Vide etiam: related English words; one that is itself in the lesson opens its letter section. */
+/** See also: related English words; one that is itself in the lesson opens its letter section. */
 export function VideEtiam({ lab, gloss, interactive }: { lab: LessonState; gloss: Gloss; interactive: boolean }) {
   const facts = folioFor(gloss.lemma);
   if (!facts?.related.length) return null;
+  const labels = folioLabels(lab.translation.code);
   const lessonWords = new Map<string, Gloss>();
   for (const page of lab.pages) for (const g of page.words) lessonWords.set(g.lemma, g);
   return (
     <>
-      <Rubric>Vide etiam</Rubric>
+      <Rubric>{labels.seeAlso}</Rubric>
       <p className="voca-vide" lang="en">
         {facts.related.map((word) => {
           const inLesson = lessonWords.get(word);
@@ -217,20 +207,23 @@ export function WordEntry({
           <i lang={lang}>{lab.wordIn(gloss)}</i>
         </span>
       </p>
-      <Infobox lab={lab} gloss={gloss} />
-      <Origo lab={lab} gloss={gloss} />
-      <FalsiAmici lab={lab} gloss={gloss} />
-      {!compact && <VideEtiam lab={lab} gloss={gloss} interactive={interactive} />}
+      {/* The extra detail waits behind one click, so the card stays readable while the film plays. */}
+      <details className="voca-word-more">
+        <summary lang={lang}>{folioLabels(lab.translation.code).more}</summary>
+        <Infobox lab={lab} gloss={gloss} />
+        <Origo lab={lab} gloss={gloss} />
+        <FalsiAmici lab={lab} gloss={gloss} />
+        {!compact && <VideEtiam lab={lab} gloss={gloss} interactive={interactive} />}
+      </details>
     </section>
   );
 }
 
-/** Exempla: the line from the film, its official translation, and a way to hear it again. */
+/** The line from the film, its official translation, and a way to hear it again. */
 export function Exempla({ lab, cue, interactive }: { lab: LessonState; cue: Cue; interactive: boolean }) {
   const lang = lab.translation.code.toLowerCase();
   return (
     <div className="voca-exempla">
-      <Rubric>Exempla</Rubric>
       <blockquote className="voca-exempla-line">
         <p lang={lab.lesson.nativeLanguage.code.toLowerCase()}>“{cue.native}”</p>
         <p className="voca-exempla-translation" lang={lang}>

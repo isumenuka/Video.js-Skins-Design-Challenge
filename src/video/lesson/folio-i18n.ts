@@ -1,6 +1,6 @@
 /**
- * The folio's small print in each translation language: infobox labels, registers, parts of speech, the false-friend
- * labels, and the full names behind the etymology abbreviations. Section titles stay in Latin, as on Vocapedia.
+ * The folio's small print in each translation language: infobox labels, registers, parts of speech, section titles,
+ * and the full names behind the etymology abbreviations. Section titles are plain words, so a reader knows what each part is.
  */
 
 import type { OriginLang, Register } from './folio-data';
@@ -12,8 +12,12 @@ interface FolioLabels {
   partOfSpeech: string;
   register: string;
   difficulty: string;
-  looksLike: string;
-  actuallyMeans: string;
+  origin: string;
+  falseFriend: string;
+  seeAlso: string;
+  more: string;
+  /** "English", as the false-friend line names the language. */
+  english: string;
   registers: Record<Register, string>;
   pos: Record<Pos, string>;
   origins: Record<OriginLang, string>;
@@ -24,8 +28,11 @@ const LABELS: Record<LangCode, FolioLabels> = {
     partOfSpeech: 'Classe',
     register: 'Registre',
     difficulty: 'Difficulté',
-    looksLike: 'Ressemble à',
-    actuallyMeans: 'Veut dire en fait',
+    origin: 'Origine',
+    falseFriend: 'Attention : faux ami',
+    seeAlso: 'Voir aussi',
+    more: 'En savoir plus sur ce mot',
+    english: 'anglais',
     registers: { neutral: 'neutre', informal: 'familier', literary: 'littéraire' },
     pos: { n: 'nom', v: 'verbe', adj: 'adjectif', adv: 'adverbe', pron: 'pronom', phr: 'locution' },
     origins: {
@@ -42,8 +49,11 @@ const LABELS: Record<LangCode, FolioLabels> = {
     partOfSpeech: 'Categoría',
     register: 'Registro',
     difficulty: 'Dificultad',
-    looksLike: 'Se parece a',
-    actuallyMeans: 'En realidad significa',
+    origin: 'Origen',
+    falseFriend: 'Cuidado: falso amigo',
+    seeAlso: 'Ver también',
+    more: 'Más sobre esta palabra',
+    english: 'inglés',
     registers: { neutral: 'neutro', informal: 'coloquial', literary: 'literario' },
     pos: { n: 'sustantivo', v: 'verbo', adj: 'adjetivo', adv: 'adverbio', pron: 'pronombre', phr: 'locución' },
     origins: {
@@ -60,8 +70,11 @@ const LABELS: Record<LangCode, FolioLabels> = {
     partOfSpeech: 'Wortart',
     register: 'Register',
     difficulty: 'Schwierigkeit',
-    looksLike: 'Sieht aus wie',
-    actuallyMeans: 'Bedeutet eigentlich',
+    origin: 'Herkunft',
+    falseFriend: 'Vorsicht: falscher Freund',
+    seeAlso: 'Siehe auch',
+    more: 'Mehr zu diesem Wort',
+    english: 'Englisch',
     registers: { neutral: 'neutral', informal: 'umgangssprachlich', literary: 'gehoben' },
     pos: { n: 'Substantiv', v: 'Verb', adj: 'Adjektiv', adv: 'Adverb', pron: 'Pronomen', phr: 'Wendung' },
     origins: {
@@ -78,8 +91,11 @@ const LABELS: Record<LangCode, FolioLabels> = {
     partOfSpeech: 'Categoria',
     register: 'Registro',
     difficulty: 'Difficoltà',
-    looksLike: 'Somiglia a',
-    actuallyMeans: 'In realtà significa',
+    origin: 'Origine',
+    falseFriend: 'Attenzione: falso amico',
+    seeAlso: 'Vedi anche',
+    more: 'Di più su questa parola',
+    english: 'inglese',
     registers: { neutral: 'neutro', informal: 'colloquiale', literary: 'letterario' },
     pos: { n: 'sostantivo', v: 'verbo', adj: 'aggettivo', adv: 'avverbio', pron: 'pronome', phr: 'locuzione' },
     origins: {
@@ -96,8 +112,11 @@ const LABELS: Record<LangCode, FolioLabels> = {
     partOfSpeech: 'Classe',
     register: 'Registro',
     difficulty: 'Dificuldade',
-    looksLike: 'Parece',
-    actuallyMeans: 'Na verdade significa',
+    origin: 'Origem',
+    falseFriend: 'Cuidado: falso amigo',
+    seeAlso: 'Ver também',
+    more: 'Mais sobre esta palavra',
+    english: 'inglês',
     registers: { neutral: 'neutro', informal: 'coloquial', literary: 'literário' },
     pos: { n: 'substantivo', v: 'verbo', adj: 'adjetivo', adv: 'advérbio', pron: 'pronome', phr: 'locução' },
     origins: {
@@ -114,8 +133,11 @@ const LABELS: Record<LangCode, FolioLabels> = {
     partOfSpeech: 'Woordsoort',
     register: 'Register',
     difficulty: 'Moeilijkheid',
-    looksLike: 'Lijkt op',
-    actuallyMeans: 'Betekent eigenlijk',
+    origin: 'Herkomst',
+    falseFriend: 'Let op: valse vriend',
+    seeAlso: 'Zie ook',
+    more: 'Meer over dit woord',
+    english: 'Engels',
     registers: { neutral: 'neutraal', informal: 'informeel', literary: 'literair' },
     pos: {
       n: 'zelfstandig naamwoord',
@@ -139,8 +161,11 @@ const LABELS: Record<LangCode, FolioLabels> = {
     partOfSpeech: 'Część mowy',
     register: 'Rejestr',
     difficulty: 'Trudność',
-    looksLike: 'Wygląda jak',
-    actuallyMeans: 'Naprawdę znaczy',
+    origin: 'Pochodzenie',
+    falseFriend: 'Uwaga: fałszywy przyjaciel',
+    seeAlso: 'Zobacz też',
+    more: 'Więcej o tym słowie',
+    english: 'angielskie',
     registers: { neutral: 'neutralny', informal: 'potoczny', literary: 'literacki' },
     pos: { n: 'rzeczownik', v: 'czasownik', adj: 'przymiotnik', adv: 'przysłówek', pron: 'zaimek', phr: 'wyrażenie' },
     origins: {
@@ -157,8 +182,11 @@ const LABELS: Record<LangCode, FolioLabels> = {
     partOfSpeech: 'Часть речи',
     register: 'Регистр',
     difficulty: 'Сложность',
-    looksLike: 'Похоже на',
-    actuallyMeans: 'На самом деле значит',
+    origin: 'Происхождение',
+    falseFriend: 'Осторожно: ложный друг',
+    seeAlso: 'См. также',
+    more: 'Подробнее об этом слове',
+    english: 'англ.',
     registers: { neutral: 'нейтральный', informal: 'разговорный', literary: 'книжный' },
     pos: {
       n: 'существительное',

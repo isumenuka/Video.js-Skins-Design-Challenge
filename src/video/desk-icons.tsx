@@ -26,42 +26,36 @@ function Svg({ children, ...props }: Props) {
   );
 }
 
-/** A page with its corner dog-eared, "10" written on it. Back turns the corner on the left, forward on the right. */
-export function DogEarIcon({ direction, ...props }: Props & { direction: 'back' | 'forward' }) {
-  const page = (
+/**
+ * A brass circular arrow around "10": a seek control readable at a glance. The arc and arrowhead are mirrored for
+ * going back; the number is not, so it always reads "10".
+ */
+export function SeekArrowIcon({ direction, ...props }: Props & { direction: 'back' | 'forward' }) {
+  // The arc runs clockwise from the upper right, round the bottom, to the top, where the arrowhead points on.
+  const arc = 'M28.5 12.5A12 12 0 1 1 20 9';
+  const head = 'M18.2 4.2 25 9l-6.8 4.8Z';
+  const arrow = (
     <g>
-      <path d="M8 6h17l8 8v20a1.5 1.5 0 0 1-1.5 1.5h-22A1.5 1.5 0 0 1 8 34V7.5A1.5 1.5 0 0 1 9.5 6Z" fill={PAPER} stroke={BRASS_DEEP} strokeWidth="1.2" />
-      <path d="M8.6 30.5h23.8M8.6 32.5h23.8" stroke={PAPER_SHADE} strokeWidth="0.8" />
-      {/* the folded corner, with its shadow */}
-      <path d="M25 6v6.5a1.5 1.5 0 0 0 1.5 1.5H33" fill="none" stroke={BRASS_DEEP} strokeWidth="1.2" />
-      <path d="M25 6l8 8h-6.5A1.5 1.5 0 0 1 25 12.5Z" fill={PAPER_SHADE} />
-      <path d="M25 14.5l7.5 0.5" stroke="rgb(0 0 0 / 0.15)" strokeWidth="1.4" />
+      <path d={arc} fill="none" stroke={BRASS_DEEP} strokeWidth="5" strokeLinecap="round" />
+      <path d={arc} fill="none" stroke={BRASS} strokeWidth="3" strokeLinecap="round" />
+      <path d={arc} fill="none" stroke={BRASS_LIGHT} strokeWidth="1" strokeLinecap="round" opacity="0.7" />
+      <path d={head} fill={BRASS} stroke={BRASS_DEEP} strokeWidth="1.2" strokeLinejoin="round" />
     </g>
   );
   return (
     <Svg {...props}>
-      {direction === 'back' ? <g transform="translate(40 0) scale(-1 1)">{page}</g> : page}
+      {direction === 'back' ? <g transform="translate(40 0) scale(-1 1)">{arrow}</g> : arrow}
       <text
-        x={direction === 'back' ? 21.5 : 18.5}
-        y="25.5"
+        x="20"
+        y="25"
         textAnchor="middle"
         fontFamily="'Source Serif 4', Georgia, serif"
         fontWeight="700"
         fontSize="11"
-        fill={INK}
+        fill={BRASS_LIGHT}
       >
         10
       </text>
-      {/* a little arrow drawn in ink: which way the page turns */}
-      <path
-        d={direction === 'back' ? 'M17 30.2h8l-2-1.6M17 30.2l2 1.6' : 'M23 30.2h-8l2-1.6M23 30.2l-2 1.6'}
-        transform={direction === 'back' ? 'scale(-1 1) translate(-40 0)' : undefined}
-        fill="none"
-        stroke={COBALT}
-        strokeWidth="1.3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
     </Svg>
   );
 }

@@ -1,7 +1,7 @@
 /** @jsxImportSource react */
 
 import { SeekButton as SeekButtonPrimitive } from '@videojs/react';
-import { DogEarIcon } from '@/video/desk-icons';
+import { SeekArrowIcon } from '@/video/desk-icons';
 import type { ClassValue } from 'cn';
 
 import { cn, resolveClassName } from '@/lib/resolve-class-name';
@@ -33,9 +33,10 @@ export function SeekButton({
         className={(state) => cn(resolveClassName(className, state))}
         seconds={seconds}
       >
-        {/* A dog-eared page corner, the seconds written on it. */}
-        <DogEarIcon
-          className={cn('voca-desk-icon', 'voca-dog-ear', iconClassName)}
+        {/* A brass circular arrow, the seconds written inside it. */}
+        <SeekArrowIcon
+          className={cn('voca-desk-icon', 'voca-seek-arrow', iconClassName)}
+          data-direction={backward ? 'back' : 'forward'}
           direction={backward ? 'back' : 'forward'}
         />
       </SeekButtonPrimitive>
