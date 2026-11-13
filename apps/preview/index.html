@@ -3,10 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>challenge-skin - Video.js</title>
+    <title>Vocapedia Language Lab — Video.js skin</title>
+    <meta name="description" content="A Video.js 10 skin for learning a language from film, in Vocapedia's colors." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap"
+    />
   </head>
-  <body class="text-foreground h-screen overflow-hidden font-sans">
-    <div id="root" class="h-full"></div>
-    <script type="module" src="/src/shell/main.tsx"></script>
+  <body>
+    <main id="root" class="preview-page"></main>
+    <script type="module" src="/src/frame/main.tsx"></script>
   </body>
 </html>
