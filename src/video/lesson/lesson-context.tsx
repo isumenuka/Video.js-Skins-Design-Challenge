@@ -63,11 +63,6 @@ export interface LessonState {
   poppedIsNew: boolean;
   /** Every word the viewer has ever collected here, kept in this browser across visits. */
   collected: ReadonlySet<string>;
-  /** Experience points, as on the Vocapedia dashboard: ten for each new word, more for reviewing. */
-  xp: number;
-  /** The latest award, for the "+10 XP" that drifts up from the counter. */
-  xpBurst: { amount: number; key: number } | null;
-  awardXp: (amount: number) => void;
   /** The Again / Hard / Good / Easy review of collected words, shown on the dictionary page. */
   reviewOpen: boolean;
   setReviewOpen: (open: boolean) => void;
@@ -77,7 +72,6 @@ export interface LessonState {
 }
 
 const COLLECTED_KEY = 'vocapedia-lab:collected';
-const XP_KEY = 'vocapedia-lab:xp';
 
 function readCollected(): Set<string> {
   try {
@@ -85,15 +79,6 @@ function readCollected(): Set<string> {
     return new Set(Array.isArray(saved) ? saved.filter((v) => typeof v === 'string') : []);
   } catch {
     return new Set();
-  }
-}
-
-function readXp(): number {
-  try {
-    const saved = Number(localStorage.getItem(XP_KEY));
-    return Number.isFinite(saved) && saved > 0 ? saved : 0;
-  } catch {
-    return 0;
   }
 }
 
@@ -195,21 +180,10 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
   }, [all]);
   const poppedIsNew = Boolean(popped && firstIndex.get(popped.gloss.lemma) === popped.index);
 
-  // Collected words and experience persist in this browser, like a reader's progress on Vocapedia.
+  // Collected words persist in this browser, like a reader's progress on Vocapedia.
   const [collected, setCollected] = useState<Set<string>>(readCollected);
   const collectedRef = useRef(collected);
   collectedRef.current = collected;
-  const [xp, setXp] = useState<number>(readXp);
-  const [xpBurst, setXpBurst] = useState<{ amount: number; key: number } | null>(null);
-  const awardXp = useCallback((amount: number) => {
-    if (amount <= 0) return;
-    setXp((current) => {
-      const next = current + amount;
-      save(XP_KEY, String(next));
-      return next;
-    });
-    setXpBurst({ amount, key: performance.now() });
-  }, []);
 
   // A word is collected when it's heard for the first time while the film plays (not skipped past by a seek).
   const lastCollected = useRef(-1);
@@ -224,7 +198,6 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
     collectedRef.current = next;
     setCollected(next);
     save(COLLECTED_KEY, JSON.stringify([...next]));
-    awardXp(10);
   }, [latest?.index]);
 
   const pages = useMemo(() => linePages(lesson), [lesson]);
@@ -351,9 +324,6 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
       defineIn,
       poppedIsNew,
       collected,
-      xp,
-      xpBurst,
-      awardXp,
       reviewOpen,
       setReviewOpen,
       subtitlesOn,
@@ -379,9 +349,6 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
       defineIn,
       poppedIsNew,
       collected,
-      xp,
-      xpBurst,
-      awardXp,
       reviewOpen,
       setReviewOpen,
       paused,

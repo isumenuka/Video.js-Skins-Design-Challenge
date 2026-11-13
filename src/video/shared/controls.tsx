@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/resolve-class-name';
 
 import { InkwellIcon } from '../desk-icons';
-import { StudyMenu, SubtitlesToggle, XpCounter } from '../lesson/lab-controls';
+import { StudyMenu, SubtitlesToggle } from '../lesson/lab-controls';
 import { Button } from './button';
 import { LiveButton } from './live-button';
 import { AudioPlayButton, PlayButton } from './play-button';
@@ -67,7 +67,6 @@ export function ControlsRow({
             </span>
           </Time.Group>
         )}
-        {!audio && <XpCounter />}
         {!audio && <InlineVolume />}
       </Controls.Group>
 
@@ -92,9 +91,10 @@ function PageNumbers() {
   const duration = usePlayer((s) => s.duration) ?? 0;
   return (
     <span className={'voca-pages-number'} aria-hidden="true">
-      <span className={'voca-pages-p'}>p.</span> {Math.floor(currentTime) + 1}
-      <span className={'voca-pages-of'}> of </span>
-      {duration ? Math.ceil(duration) : '—'}
+      <span className={'voca-pages-p'}>p.</span>
+      <span>{Math.floor(currentTime) + 1}</span>
+      <span className={'voca-pages-of'}>of</span>
+      <span className={'voca-pages-total'}>{duration ? Math.ceil(duration) : '—'}</span>
     </span>
   );
 }

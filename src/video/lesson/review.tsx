@@ -20,11 +20,11 @@ const SESSION_SIZE = 10;
 
 type Grade = 'again' | 'hard' | 'good' | 'easy';
 
-const GRADES: Array<{ grade: Grade; label: string; xp: number }> = [
-  { grade: 'again', label: 'Again', xp: 0 },
-  { grade: 'hard', label: 'Hard', xp: 2 },
-  { grade: 'good', label: 'Good', xp: 5 },
-  { grade: 'easy', label: 'Easy', xp: 5 },
+const GRADES: Array<{ grade: Grade; label: string }> = [
+  { grade: 'again', label: 'Again' },
+  { grade: 'hard', label: 'Hard' },
+  { grade: 'good', label: 'Good' },
+  { grade: 'easy', label: 'Easy' },
 ];
 
 function readBoxes(): Record<string, number> {
@@ -46,7 +46,7 @@ function writeBoxes(boxes: Record<string, number>) {
 
 /** The review page of the dictionary. Without `interactive` it's the printed copy a turning leaf carries. */
 export function ReviewFace({ lab, interactive = false }: { lab: LessonState; interactive?: boolean }) {
-  const { lesson, translation, pages, collected, heard, awardXp, setReviewOpen } = lab;
+  const { lesson, translation, pages, collected, heard, setReviewOpen } = lab;
   const native = lesson.nativeLanguage.code.toLowerCase();
   const lang = translation.code.toLowerCase();
 
@@ -66,7 +66,6 @@ export function ReviewFace({ lab, interactive = false }: { lab: LessonState; int
   const [total] = useState(queue.length);
   const [revealed, setRevealed] = useState(false);
   const [finished, setFinished] = useState(0);
-  const [earned, setEarned] = useState(0);
 
   const current = lessonWords.find((g) => g.lemma === queue[0]);
   const line = current && pages.find((p) => p.words.includes(current))?.cue;
@@ -85,9 +84,6 @@ export function ReviewFace({ lab, interactive = false }: { lab: LessonState; int
     const box = boxes[current.lemma] ?? 0;
     boxes[current.lemma] = g === 'again' ? 0 : g === 'hard' ? Math.max(1, box) : g === 'good' ? box + 1 : box + 2;
     writeBoxes(boxes);
-    const xp = GRADES.find((x) => x.grade === g)!.xp;
-    awardXp(xp);
-    setEarned((e) => e + xp);
     setQueue(([head, ...rest]) => {
       if (g === 'again') return [...rest.slice(0, 2), head, ...rest.slice(2)];
       if (g === 'hard') return [...rest, head];
@@ -129,7 +125,7 @@ export function ReviewFace({ lab, interactive = false }: { lab: LessonState; int
               <div className="voca-review-done">
                 <p className="voca-finis-kicker">Review complete</p>
                 <p className="voca-review-done-count">
-                  {finished} {finished === 1 ? 'word' : 'words'} reviewed · <b>+{earned} XP</b>
+                  {finished} {finished === 1 ? 'word' : 'words'} reviewed
                 </p>
                 {interactive && (
                   <a className="voca-review-link" href={vocapediaReviewUrl} target="_blank" rel="noreferrer">
@@ -177,7 +173,7 @@ export function ReviewFace({ lab, interactive = false }: { lab: LessonState; int
                         Show answer
                       </button>
                     ) : (
-                      GRADES.map(({ grade: g, label, xp }) => (
+                      GRADES.map(({ grade: g, label }) => (
                         <button
                           key={g}
                           ref={g === 'good' ? goodRef : undefined}
@@ -187,7 +183,6 @@ export function ReviewFace({ lab, interactive = false }: { lab: LessonState; int
                           onClick={() => grade(g)}
                         >
                           {label}
-                          {xp > 0 && <span className="voca-review-xp">+{xp}</span>}
                         </button>
                       ))
                     )}

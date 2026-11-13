@@ -434,7 +434,6 @@ const GUIDE_PARTS: Array<[string, string]> = [
   ['The ribbon', 'drag the brass clip to turn to any moment; each tab is a spoken line.'],
   ['A–Z tabs', 'a tab pulls out, with rising embers, when a new word is spoken; press one to read every word under it.'],
   ['The quill', 'study modes (pause, repeat, slow), and a review of the words you have collected.'],
-  ['XP', 'ten points for every new word you catch, more for every word you review.'],
   ['The inkwell', 'its ink is the volume; press it to cork the sound.'],
   ['The compass', 'settings: translation language, speed and quality.'],
   ['Double-tap', 'the left or right of the picture to go back or forward.'],
@@ -530,7 +529,7 @@ function PassportStamp({ lab }: { lab: LessonState }) {
 
 /** The colophon when the film ends, as a Phrase passport page: the stamp, the words collected, and what next. */
 function FinisFace({ lab, interactive = false }: { lab: LessonState; interactive?: boolean }) {
-  const { heard, collected, pages, translation, seekTo, lesson, xp, setReviewOpen } = lab;
+  const { heard, collected, pages, translation, seekTo, lesson, setReviewOpen } = lab;
   const lemmas = new Set(pages.flatMap((p) => p.words.map((w) => w.lemma)));
   const total = lemmas.size;
   const gathered = [...lemmas].filter((l) => heard.has(l) || collected.has(l)).length;
@@ -543,7 +542,7 @@ function FinisFace({ lab, interactive = false }: { lab: LessonState; interactive
           <h2 className="voca-finis-title">Finis</h2>
           <PassportStamp lab={lab} />
           <p className="voca-finis-count">
-            You collected <b>{gathered}</b> of {total} words · <span className="voca-finis-xp">✦ {xp} XP</span>
+            You collected <b>{gathered}</b> of {total} words
           </p>
           <p className="voca-finis-note">
             Read in {lesson.nativeLanguage.name}, with notes in{' '}

@@ -2473,18 +2473,24 @@
     .voca-pages {
       display: grid;
       justify-items: start;
-      gap: 0;
+      align-content: center;
+      row-gap: 0.2rem;
       height: auto;
-      padding-inline: 0.5rem;
-      line-height: 1.1;
+      padding-inline: 0.5rem 0.875rem;
+      margin-inline-end: 0.25rem;
+      border-inline-end: 1px solid rgb(207 165 72 / 0.22);
+      line-height: 1;
     }
 
     .voca-pages-number {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.3em;
       font-family: var(--voca-font-serif);
       font-size: 1.0625rem;
       font-weight: 700;
       color: var(--voca-gold-light);
-      font-variant-numeric: tabular-nums oldstyle-nums;
+      font-variant-numeric: tabular-nums lining-nums;
       text-shadow: 0 1px 0 rgb(0 0 0 / 0.6);
       white-space: nowrap;
     }
@@ -2493,17 +2499,23 @@
     .voca-pages-of {
       font-style: italic;
       font-weight: 400;
-      color: rgb(246 227 161 / 0.75);
+      font-size: 0.8125rem;
+      color: rgb(246 227 161 / 0.6);
+    }
+
+    .voca-pages-total {
+      font-weight: 500;
+      color: rgb(246 227 161 / 0.72);
     }
 
     .voca-pages-time {
       display: flex;
-      gap: 0.25rem;
+      gap: 0.3rem;
       font-family: var(--voca-font-ui);
-      font-size: 0.6875rem;
+      font-size: 0.625rem;
       font-weight: 500;
-      letter-spacing: 0.06em;
-      color: rgb(246 227 161 / 0.7);
+      letter-spacing: 0.08em;
+      color: rgb(246 227 161 / 0.55);
       font-variant-numeric: tabular-nums;
     }
 
@@ -2513,6 +2525,10 @@
       display: inline;
       opacity: 1;
       color: inherit;
+    }
+
+    .voca-pages-time .media-time-separator {
+      opacity: 0.5;
     }
 
     /* Volume: a line of ink drawn out from the well. */
@@ -4240,62 +4256,6 @@
       inset-inline-start: 1rem;
     }
 
-    /* ---------- XP on the desk ---------- */
-    .voca-xp {
-      position: relative;
-      display: inline-flex;
-      align-items: baseline;
-      gap: 0.25rem;
-      padding: 0.2rem 0.55rem;
-      border: 1px solid rgb(207 165 72 / 0.55);
-      border-radius: 999px;
-      background: rgb(11 17 36 / 0.45);
-      color: var(--voca-gold-light);
-      font: 600 0.75rem/1 var(--voca-font-serif);
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
-
-    .voca-xp-star {
-      color: var(--voca-gold);
-    }
-
-    .voca-xp-value {
-      font-weight: 700;
-    }
-
-    .voca-xp-burst {
-      position: absolute;
-      inset-inline-start: 50%;
-      bottom: 100%;
-      translate: -50% 0;
-      color: var(--voca-foil);
-      font: 700 0.75rem/1 var(--voca-font-serif);
-      text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
-      pointer-events: none;
-      animation: voca-xp-float 1.4s ease-out both;
-    }
-
-    @keyframes voca-xp-float {
-      0% {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-      20% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-26px);
-      }
-    }
-
-    @container media-root (width < 30rem) {
-      .voca-xp {
-        display: none;
-      }
-    }
-
     /* The passport fits the page without scrolling: a compact stamp and title, the actions on one line. */
     .voca-finis {
       gap: 0.3rem;
@@ -4336,8 +4296,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .voca-embers,
-      .voca-xp-burst {
+      .voca-embers {
         display: none;
       }
 
