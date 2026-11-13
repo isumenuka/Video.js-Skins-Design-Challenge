@@ -20,6 +20,12 @@ export function BookOrnaments() {
   const [coverClosed, setCoverClosed] = useState(
     () => typeof window !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
   );
+  // Remove the cover even if its animation never reports finishing (a background tab, say), so it can't linger.
+  useEffect(() => {
+    if (!coverClosed) return;
+    const timer = setTimeout(() => setCoverClosed(false), 2000);
+    return () => clearTimeout(timer);
+  }, [coverClosed]);
   return (
     <>
       <div className="voca-endpaper" aria-hidden="true" />
