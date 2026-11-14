@@ -40,21 +40,28 @@ export interface BridgeWordIn {
   line?: { english: string; translated: string };
 }
 
-function embedded(): boolean {
-  if (typeof window === 'undefined' || window.parent === window) return false;
+/**
+ * The site's origin, when the player is framed by a Vocapedia page on its own origin. The site may load the player as
+ * `srcdoc` (its host forbids framing its pages by URL), where `location.origin` is "null" but `window.origin` is the
+ * site's: so the frame's own origin is read from `window.origin`.
+ */
+function siteOrigin(): string | null {
+  if (typeof window === 'undefined' || window.parent === window) return null;
   try {
-    // Reading the parent's origin throws when it's another site: then we have nobody to talk to.
-    return window.parent.location.origin === window.location.origin;
+    // Reading the parent's location throws when it's another site: then we have nobody to talk to.
+    const parent = window.parent.location.origin;
+    return parent === window.origin ? parent : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
-export const isEmbeddedInSite = embedded();
+const SITE_ORIGIN = siteOrigin();
+export const isEmbeddedInSite = SITE_ORIGIN !== null;
 
 function post(message: BridgeMessage) {
-  if (!isEmbeddedInSite) return;
-  window.parent.postMessage(message, window.location.origin);
+  if (!SITE_ORIGIN) return;
+  window.parent.postMessage(message, SITE_ORIGIN);
 }
 
 export function wordIn(gloss: Gloss, code: LangCode, cue?: Cue): BridgeWordIn {
@@ -78,7 +85,7 @@ export const bridge = {
  * site in a new tab.
  */
 export function siteLink(url: string): { href: string; target: string; rel?: string } {
-  if (!isEmbeddedInSite) return { href: url, target: '_blank', rel: 'noreferrer' };
+  if (!SITE_ORIGIN) return { href: url, target: '_blank', rel: 'noreferrer' };
   const { pathname, search } = new URL(url);
   return { href: `${pathname}${search}`, target: '_top' };
 }
@@ -150,7 +157,7 @@ export function useSiteBridge({
   useEffect(() => {
     if (!isEmbeddedInSite) return;
     const onMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin || event.source !== window.parent) return;
+      if (event.origin !== SITE_ORIGIN || event.source !== window.parent) return;
       const data = event.data as { type?: string; lemma?: unknown; language?: unknown };
       if (data?.type === 'vocapedia:open-word' && typeof data.lemma === 'string') playRef.current(data.lemma);
       if (data?.type === 'vocapedia:set-language' && typeof data.language === 'string') {
