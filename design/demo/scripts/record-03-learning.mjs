@@ -70,4 +70,4 @@ if (await entry.count()) {
 }
 await h.captionOff();
 await h.outro('Every word, <em>kept</em>', 'vocapedia.base44.app/watch', 'Video.js 10 skin · Sintel © Blender Foundation · CC BY 3.0 · streamed by Mux');
-await finish(s, '03-learning', h.cues);
+await finish(s, '03-learning', h.cues, h.markers);

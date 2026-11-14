@@ -128,4 +128,4 @@ await h.captionOff();
 // 11 · Responsive, then the colophon
 await h.caption('Responsive', 'From phone to full page', 'The desk objects give way in steps; nothing overflows.', { dwell: 2600 });
 await h.outro('<em>Vocapedia</em> · Video.js 10', 'vocapedia.base44.app/watch', 'Sintel © Blender Foundation · CC BY 3.0 · streamed by Mux · built with @videojs/react');
-await finish(s, '02-the-player', h.cues);
+await finish(s, '02-the-player', h.cues, h.markers);

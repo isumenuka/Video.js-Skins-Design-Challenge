@@ -65,7 +65,7 @@ The site serves this player at `/player/` and shows it on `/watch` as `srcdoc`: 
 Standalone, the bridge is silent, and links open vocapedia.base44.app in a new tab. Inside the site, links stay in the same tab.
 
 ## Demo films
-Three silent product films of the skin on the live site (the site, every player control, the learning features) are in `design/demo/`, with the scripts that recorded them. See `design/demo/README.md`.
+Three launch-style films of the skin on the live site (the site, every player control, the learning features), with kinetic titles, enlarged cut-outs of the controls, the screen in perspective, and Sintel's own sound, are in `design/demo/`, with the scripts that made them. See `design/demo/README.md`.
 
 ## Translation language
 English is always the spoken line. **Settings (the brass dial) → Translation** chooses the line beneath it from eight languages, all from Sintel's official subtitles (durian.blender.org, CC BY 3.0): Français, Español, Deutsch, Italiano, Português, Nederlands, Polski, Русский. The source files were mixed encodings (UTF-8, Latin-1, Mac Roman) and are converted to UTF-8 in `src/video/lesson/sintel-translations.ts`.

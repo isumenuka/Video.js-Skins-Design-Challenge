@@ -67,4 +67,4 @@ await h.sleep(1600);
 await h.captionOff();
 await scrollTo(230, 1600);
 await h.outro('<em>Vocapedia</em>', 'vocapedia.base44.app', 'Built on Base44 · player: Video.js 10 · film: Sintel © Blender Foundation, CC BY 3.0');
-await finish(s, '01-the-site', h.cues);
+await finish(s, '01-the-site', h.cues, h.markers);

@@ -10,6 +10,10 @@ export const OUT = join(here, 'out');
 mkdirSync(OUT, { recursive: true });
 const OVERLAY = readFileSync(join(here, 'overlay.js'), 'utf8');
 export const W = 1920, H = 1080;
+/** Footage mode: the overlay draws only the cursor; cards and badges become timeline markers for the composition. */
+export const FOOTAGE = !!process.env.DEMO_FOOTAGE;
+export const FOOTAGE_DIR = join(here, 'footage');
+mkdirSync(FOOTAGE_DIR, { recursive: true });
 
 export async function open(url, { viewport = { width: W, height: H } } = {}) {
   const browser = await chromium.launch({
@@ -20,10 +24,25 @@ export async function open(url, { viewport = { width: W, height: H } } = {}) {
     viewport,
     deviceScaleFactor: 1,
     reducedMotion: 'no-preference',
-    recordVideo: { dir: OUT, size: viewport },
+    recordVideo: { dir: FOOTAGE ? FOOTAGE_DIR : OUT, size: viewport },
   });
   const started = Date.now();
   const page = await context.newPage();
+  // The film's own clock, sampled while recording, so the composition can lay Sintel's audio under the footage.
+  const film = [];
+  const sampler = setInterval(async () => {
+    try {
+      for (const f of page.frames()) {
+        const r = await f.evaluate(() => {
+          const v = document.querySelector('video, mux-video, hls-video');
+          return v ? { time: v.currentTime, paused: v.paused, muted: v.muted || v.volume === 0 } : null;
+        }).catch(() => null);
+        if (r) { film.push({ t: (Date.now() - started) / 1000, ...r }); break; }
+      }
+    } catch { /* page gone */ }
+  }, 200);
+  page.__film = film;
+  page.__sampler = sampler;
   await page.addInitScript(OVERLAY);
   // Keep the film silent in the recording: the clips carry only their own sound effects.
   await page.addInitScript(() => {
@@ -45,6 +64,8 @@ export function hand(page, started) {
   const clock = () => (Date.now() - started) / 1000; // seconds since the video began
   const cues = [];
   const cue = (sound) => cues.push({ t: clock(), sound });
+  const markers = [];
+  const mark = (kind, data) => markers.push({ t: clock(), kind, ...data });
   const sleep = (ms) => page.waitForTimeout(ms * SPEED);
   const h = {
     cues,
@@ -92,26 +113,32 @@ export function hand(page, started) {
       for (const ch of text) { await page.keyboard.type(ch); cue('click'); await sleep(delay); }
     },
     async caption(label, title, line, { dwell = 3200 } = {}) {
+      if (FOOTAGE) { mark('caption', { label, title, line }); if (dwell) { await sleep(dwell); mark('caption-off', {}); } return; }
       await demo('caption', label, title, line || ''); cue('swish');
       if (dwell) { await sleep(dwell); await demo('uncaption'); }
     },
-    captionOn: (label, title, line) => demo('caption', label, title, line || '').then(() => cue('swish')),
-    captionOff: () => demo('uncaption'),
+    captionOn: (label, title, line) => FOOTAGE ? Promise.resolve(mark('caption', { label, title, line })) : demo('caption', label, title, line || '').then(() => cue('swish')),
+    captionOff: () => FOOTAGE ? Promise.resolve(mark('caption-off', {})) : demo('uncaption'),
     async key(keys, what, combo, { dwell = 1400, press = true } = {}) {
-      await demo('key', keys, what || ''); cue('click');
+      if (FOOTAGE) mark('key', { keys, what }); else { await demo('key', keys, what || ''); cue('click'); }
       await sleep(150);
       if (press) await page.keyboard.press(combo || keys[0]);
       await sleep(dwell);
-      await demo('unkey');
+      if (!FOOTAGE) await demo('unkey');
     },
     async intro(eyebrow, big, sub, { dwell = 2600 } = {}) {
+      // In footage mode the intro is skipped entirely: the composition has its own opening.
+      if (FOOTAGE) { mark('intro', { eyebrow, big, sub }); await sleep(400); return; }
       await demo('full', `<div><div class="eyebrow">${eyebrow}</div><div class="big">${big}</div><div class="rule"></div><div class="sub">${sub}</div><div class="fleuron">❦</div></div>`);
       cue('swish'); await sleep(dwell); await demo('unfull'); await sleep(750);
     },
     async outro(big, url, small, { dwell = 3600 } = {}) {
+      if (FOOTAGE) { mark('outro', { big, url, small }); await sleep(1500); return; }
       await demo('full', `<div><div class="big">${big}</div><div class="url">${url}</div><div class="rule"></div><div class="small">${small}</div></div>`);
       cue('swish'); cue('chime'); await sleep(dwell);
     },
+    markers,
+    mark,
     chime: () => cue('chime'),
     hideCursor: () => demo('hide'),
     showCursor: () => demo('show'),
@@ -120,13 +147,17 @@ export function hand(page, started) {
 }
 
 /** Stop recording, move the WebM to a stable name and write the cue list beside it. */
-export async function finish({ browser, context, page }, name, cues) {
+export async function finish({ browser, context, page }, name, cues, markers = []) {
+  clearInterval(page.__sampler);
+  const film = page.__film || [];
   const video = page.video();
   await context.close();
   const path = await video.path();
-  const webm = join(OUT, `${name}.webm`);
+  const dir = FOOTAGE ? FOOTAGE_DIR : OUT;
+  const webm = join(dir, `${name}.webm`);
   renameSync(path, webm);
-  writeFileSync(join(OUT, `${name}.cues.json`), JSON.stringify(cues, null, 1));
+  if (FOOTAGE) writeFileSync(join(dir, `${name}.json`), JSON.stringify({ cues, markers, film }, null, 1));
+  else writeFileSync(join(dir, `${name}.cues.json`), JSON.stringify(cues, null, 1));
   await browser.close();
-  console.log('recorded', webm, cues.length, 'cues');
+  console.log('recorded', webm, cues.length, 'cues', markers.length, 'markers', film.length, 'film samples');
 }

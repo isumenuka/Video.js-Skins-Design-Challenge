@@ -1,0 +1,20 @@
+{
+  "footage": "02-the-player",
+  "wordmarkSub": "a Video.js 10 skin",
+  "intro": { "words": "A Video.js 10 skin / shaped like a **book.**", "dur": 3.6, "eyebrow": "Vocapedia · The Living Encyclopedia" },
+  "beats": [
+    { "label": "The wax seal", "words": "Press the **seal.**", "crop": "seal", "h": 150, "screenMax": 5 },
+    { "label": "The brass clasp", "crop": "transport", "h": 120, "press": [0.1, 0.5], "screenMax": 3, "line": "Stop closes the book at its first page." },
+    { "label": "The page corners", "words": "Fold a **corner** forward.", "crop": "transport", "h": 120, "press": [0.6, 0.5], "screenMax": 5, "line": "Press again and they add up: +10, +20, +30." },
+    { "label": "The line-markers", "words": "Turn to the next **line.**", "crop": "transport", "h": 120, "press": [0.9, 0.5], "screenMax": 4.5, "line": "A leaf sweeps across the plate · Shift + ← / →" },
+    { "label": "The silk ribbon", "words": "Drag the **brass clip.**", "crop": "ribbon", "h": 72, "press": [0.08, 0.6], "screenMax": 6, "line": "The pages riffle, the plate leans, the folio is printed large." },
+    { "label": "The folio", "crop": "folio", "h": 110, "screenMax": 2.4, "line": "p. 150 of 888 — a page a second, the clock set beneath." },
+    { "label": "The inkwell", "words": "Cork the well / to **mute.**", "crop": "inkwell", "h": 120, "press": [0.2, 0.5], "screenMax": 5, "line": "The ink level is the volume · M" },
+    { "label": "The magnifier", "crop": "magnifier", "h": 130, "screenMax": 3, "line": "Subtitles: English above, your language beneath." },
+    { "label": "The compass dial", "words": "Translation · Speed · **Quality.**", "crop": "dial", "h": 130, "screenMax": 5.5, "line": "Eight languages, from Sintel’s own subtitles." },
+    { "label": "The open book", "words": "Open it / **full page.**", "crop": "book", "h": 130, "screenMax": 2.4, "line": "F from the keyboard · Esc to close" },
+    { "label": "Keyboard", "words": "Every control, / from the **keyboard.**", "screenMax": 6, "line": "Tab through the desk · a gold-foil focus ring · ? opens the guide" },
+    { "label": "Responsive", "screen": false, "words": "From phone / to **full page.**", "wordsDur": 2.6 }
+  ],
+  "outro": { "words": "**Vocapedia**", "url": "vocapedia.base44.app/watch", "rule": true, "small": "Sintel © Blender Foundation · CC BY 3.0 · streamed by Mux · built with @videojs/react", "dur": 5 }
+}
