@@ -2022,7 +2022,9 @@
 
     /* ---------- Phones ---------- */
     @container media-root (width < 30rem) {
-      .voca-seek-button {
+      .voca-seek-button,
+      .voca-transport,
+      .voca-review-button {
         display: none;
       }
 
@@ -2314,7 +2316,7 @@
       align-items: center;
       flex-wrap: wrap;
       min-height: 3.5rem;
-      padding-inline-start: 3.25rem;
+      padding-inline-start: 4rem;
     }
 
     .video-controls-group {
@@ -2429,6 +2431,1350 @@
     .media-fullscreen-button-enter-icon,
     .media-fullscreen-button-exit-icon {
       grid-area: 1 / 1;
+    }
+
+    /* The transport tray: one brass-rimmed recess holding stop, the line markers and the ±10 corners. */
+    .voca-transport {
+      display: flex;
+      align-items: center;
+      gap: 0.125rem;
+      padding: 0.1875rem;
+      border-radius: 999px;
+      background: linear-gradient(rgb(0 0 0 / 0.34), rgb(0 0 0 / 0.18));
+      box-shadow:
+        inset 0 2px 5px rgb(0 0 0 / 0.6),
+        inset 0 -1px 0 rgb(255 255 255 / 0.07),
+        0 0 0 1px rgb(224 184 77 / 0.4);
+    }
+
+    .voca-transport .voca-desk-button {
+      width: 2.5rem;
+      height: 2.5rem;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .voca-transport .voca-desk-icon {
+      width: 1.875rem;
+      height: 1.875rem;
+    }
+
+    @media (hover: hover) {
+      .voca-transport .voca-desk-button:hover {
+        background-color: rgb(246 227 161 / 0.1);
+        box-shadow: inset 0 0 0 1px rgb(224 184 77 / 0.7);
+      }
+    }
+
+    .voca-transport .voca-desk-button:focus-visible {
+      outline-offset: 1px;
+    }
+
+    /* A thin gilt rule sets stop apart from the ways through the text. */
+    .voca-transport-rule {
+      width: 1px;
+      height: 1.5rem;
+      margin-inline: 0.25rem;
+      background: linear-gradient(transparent, rgb(224 184 77 / 0.6), transparent);
+    }
+
+    /* The wax seal stays the first thing on the desk, a little larger than the rest. */
+    .media-button.media-play-button {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      translate: 0 -50%;
+      margin: 0;
+      width: 3.25rem;
+      min-width: 0;
+      height: 3.25rem;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 48% 52% 50% 50% / 52% 47% 53% 48%;
+      color: #fff;
+      background: radial-gradient(circle at 34% 28%, #5a68ff 0%, var(--voca-cobalt) 38%, #0d189a 78%, #070d5c 100%);
+      box-shadow:
+        inset 0 -3px 6px rgb(0 0 0 / 0.35),
+        inset 0 2px 3px rgb(255 255 255 / 0.25),
+        0 0 0 3px rgb(31 48 255 / 0.25),
+        0 5px 12px -3px rgb(0 0 0 / 0.7);
+    }
+
+    .media-button.media-play-button .media-button-icon-base {
+      width: 1.375rem;
+      height: 1.375rem;
+    }
+
+    @media (hover: hover) {
+      .media-button.media-play-button:hover {
+        color: #fff;
+        background: radial-gradient(circle at 34% 28%, #6b78ff 0%, #2f40ff 38%, #1220b0 78%, #070d5c 100%);
+        box-shadow:
+          inset 0 -3px 6px rgb(0 0 0 / 0.35),
+          inset 0 2px 3px rgb(255 255 255 / 0.3),
+          0 0 0 3px rgb(224 184 77 / 0.6),
+          0 0 22px -2px rgb(31 48 255 / 0.9);
+      }
+    }
+
+    .media-button.media-play-button:focus-visible {
+      outline: 2px solid var(--voca-foil);
+      outline-offset: 3px;
+    }
+
+    /* Page numbers: "p. 150 of 887" in gilt serif, with the clock time beneath in small print. */
+    .voca-pages {
+      display: grid;
+      justify-items: start;
+      align-content: center;
+      row-gap: 0.2rem;
+      height: auto;
+      padding-inline: 0.5rem 0.875rem;
+      margin-inline-end: 0.25rem;
+      border-inline-end: 1px solid rgb(207 165 72 / 0.22);
+      line-height: 1;
+    }
+
+    .voca-pages-number {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.3em;
+      font-family: var(--voca-font-serif);
+      font-size: 1.0625rem;
+      font-weight: 700;
+      color: var(--voca-gold-light);
+      font-variant-numeric: tabular-nums lining-nums;
+      text-shadow: 0 1px 0 rgb(0 0 0 / 0.6);
+      white-space: nowrap;
+    }
+
+    .voca-pages-p,
+    .voca-pages-of {
+      font-style: italic;
+      font-weight: 400;
+      font-size: 0.8125rem;
+      color: rgb(246 227 161 / 0.6);
+    }
+
+    .voca-pages-total {
+      font-weight: 500;
+      color: rgb(246 227 161 / 0.72);
+    }
+
+    .voca-pages-time {
+      display: flex;
+      gap: 0.3rem;
+      font-family: var(--voca-font-ui);
+      font-size: 0.625rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: rgb(246 227 161 / 0.55);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .voca-pages-time .media-time-current-value,
+    .voca-pages-time .media-time-separator,
+    .voca-pages-time .media-time-duration-value {
+      display: inline;
+      opacity: 1;
+      color: inherit;
+    }
+
+    .voca-pages-time .media-time-separator {
+      opacity: 0.5;
+    }
+
+    /* Volume: a line of ink drawn out from the well. */
+    .voca-volume {
+      gap: 0.4rem;
+    }
+
+    .voca-volume-slider-track {
+      height: 3px;
+      background-color: rgb(246 227 161 / 0.2);
+    }
+
+    .voca-volume-slider-fill {
+      background: linear-gradient(to right, #1e2c52, #3a4bff);
+      box-shadow: 0 0 6px rgb(58 75 255 / 0.6);
+    }
+
+    .voca-volume-slider-thumb {
+      width: 0.625rem;
+      height: 0.875rem;
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      background: radial-gradient(circle at 40% 35%, #6b78ff, #1f30ff 55%, #1e2c52);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+    }
+
+    .voca-volume-slider-thumb:focus-visible {
+      outline: 2px solid var(--voca-foil);
+      outline-offset: 3px;
+    }
+
+    /* The quill's count of study modes on: a tiny gilt disc. */
+    .voca-study-button {
+      position: relative;
+    }
+
+    .voca-study-badge {
+      position: absolute;
+      top: -0.15rem;
+      right: -0.15rem;
+      display: grid;
+      place-items: center;
+      width: 1.05rem;
+      height: 1.05rem;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, var(--voca-gold-light), var(--voca-gold-deep));
+      color: var(--voca-ink);
+      font: 700 0.625rem/1 var(--voca-font-serif);
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+    }
+
+    /* The word cards' count sits where the quill's does. */
+    .voca-review-button {
+      position: relative;
+    }
+
+    .voca-review-badge {
+      min-width: 1.05rem;
+      width: auto;
+      padding-inline: 0.2rem;
+      border-radius: 999px;
+    }
+
+    .voca-review-button[aria-disabled] .voca-desk-icon {
+      opacity: 0.5;
+      filter: grayscale(0.6) drop-shadow(0 2px 1.5px rgb(0 0 0 / 0.55));
+    }
+
+    .voca-review-button[aria-disabled] {
+      cursor: default;
+    }
+
+    /* ---------- The Study focus slip ---------- */
+    /* Tall enough for all three modes; it scrolls only when the player itself is short. */
+    .media-menu-popup.voca-study-popup {
+      max-height: var(--media-menu-available-height, 24rem);
+    }
+
+    .voca-study-popup {
+      width: min(21rem, 92cqi);
+      padding: 0.5rem;
+      background: var(--voca-folio-page);
+    }
+
+    .voca-study-head {
+      padding: 0.35rem 0.6rem 0.6rem;
+      margin-bottom: 0.35rem;
+      border-bottom: 1px solid var(--voca-rule);
+    }
+
+    .voca-study-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin: 0;
+      font-family: var(--voca-font-serif);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      font-variant: small-caps;
+      letter-spacing: 0.08em;
+      color: var(--voca-rubric);
+    }
+
+    .voca-study-chip {
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      background: radial-gradient(circle at 35% 30%, var(--voca-gold-light), var(--voca-gold));
+      color: var(--voca-ink);
+      font: 700 0.6875rem/1.4 var(--voca-font-serif);
+      font-variant: normal;
+      letter-spacing: 0;
+      box-shadow: inset 0 0 0 1px rgb(125 91 23 / 0.5);
+    }
+
+    .voca-study-intro {
+      margin: 0.15rem 0 0;
+      font-family: var(--voca-font-serif);
+      font-size: 0.75rem;
+      font-style: italic;
+      color: var(--voca-ink-soft);
+    }
+
+    .media-menu-item.voca-study-item {
+      display: grid;
+      grid-template-columns: 1.9rem 1fr auto;
+      align-items: center;
+      gap: 0.7rem;
+      width: 100%;
+      padding: 0.6rem 0.6rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      transition: background-color 150ms ease-out;
+    }
+
+    .voca-study-item + .voca-study-item {
+      margin-top: 0.15rem;
+    }
+
+    .media-menu-item.voca-study-item[data-highlighted] {
+      background-color: rgb(207 165 72 / 0.16);
+    }
+
+    .media-menu-item.voca-study-item[aria-checked="true"] {
+      background-color: rgb(31 48 255 / 0.07);
+    }
+
+    .media-menu-item.voca-study-item[aria-checked="true"][data-highlighted] {
+      background-color: rgb(31 48 255 / 0.12);
+    }
+
+    .media-menu-item.voca-study-item:focus-visible {
+      outline: 2px solid var(--voca-cobalt);
+      outline-offset: -2px;
+    }
+
+    /* Each mode's mark, pressed into a small brass-rimmed disc. */
+    .voca-study-glyph {
+      display: grid;
+      place-items: center;
+      width: 1.9rem;
+      height: 1.9rem;
+      border-radius: 50%;
+      background: var(--voca-paper);
+      box-shadow:
+        inset 0 1px 2px rgb(0 0 0 / 0.18),
+        0 0 0 1px rgb(165 122 36 / 0.55);
+      color: var(--voca-gold-ink);
+      font: 700 0.9375rem/1 var(--voca-font-serif);
+      transition:
+        background-color 150ms ease-out,
+        color 150ms ease-out;
+    }
+
+    .voca-study-item[aria-checked="true"] .voca-study-glyph {
+      background: var(--voca-cobalt);
+      color: #fff;
+      box-shadow: 0 0 0 1px var(--voca-gold);
+    }
+
+    .voca-study-text {
+      display: grid;
+      gap: 0.15rem;
+      min-width: 0;
+      white-space: normal;
+    }
+
+    .voca-study-label {
+      font-family: var(--voca-font-serif);
+      font-size: 0.875rem;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--voca-ink);
+    }
+
+    .voca-study-item[aria-checked="true"] .voca-study-label {
+      color: var(--voca-cobalt);
+    }
+
+    .voca-study-hint {
+      font-family: var(--voca-font-serif);
+      font-size: 0.75rem;
+      font-style: italic;
+      line-height: 1.3;
+      color: var(--voca-ink-soft);
+    }
+
+    /* The switch: a leather track with a brass knob that slides across when the mode is on. */
+    .voca-study-switch {
+      position: relative;
+      width: 2.25rem;
+      height: 1.25rem;
+      border-radius: 999px;
+      background: rgb(36 26 18 / 0.18);
+      box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.3);
+      transition: background-color 180ms ease-out;
+    }
+
+    .voca-study-knob {
+      position: absolute;
+      top: 0.125rem;
+      inset-inline-start: 0.125rem;
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #fff, var(--voca-paper-shade));
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
+      transition:
+        translate 220ms cubic-bezier(0.2, 0.8, 0.2, 1.2),
+        background 180ms ease-out;
+    }
+
+    .voca-study-item[aria-checked="true"] .voca-study-switch {
+      background: var(--voca-cobalt);
+    }
+
+    .voca-study-item[aria-checked="true"] .voca-study-knob {
+      translate: 1rem 0;
+      background: radial-gradient(circle at 35% 30%, var(--voca-gold-light), var(--voca-gold));
+    }
+
+    .voca-study-item[aria-checked="true"] .voca-study-knob:where(:dir(rtl), [dir="rtl"] *) {
+      translate: -1rem 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .voca-study-knob,
+      .voca-study-switch,
+      .voca-study-glyph {
+        transition: none;
+      }
+    }
+
+    @media (forced-colors: active) {
+      .voca-study-switch {
+        border: 1px solid CanvasText;
+      }
+
+      .voca-study-item[aria-checked="true"] .voca-study-knob {
+        background: Highlight;
+      }
+    }
+
+    /* Paused in study mode: the wax seal glows, asking to be pressed to read on. */
+    @media (prefers-reduced-motion: no-preference) {
+      :scope:has(.voca-study-button[aria-pressed="true"]) .media-play-button[data-started][data-paused] {
+        animation: voca-seal-call 1.6s ease-in-out infinite;
+      }
+
+      @keyframes voca-seal-call {
+        0%,
+        100% {
+          box-shadow:
+            inset 0 -3px 6px rgb(0 0 0 / 0.35),
+            0 0 0 2px rgb(224 184 77 / 0.5);
+        }
+        50% {
+          box-shadow:
+            inset 0 -3px 6px rgb(0 0 0 / 0.35),
+            0 0 0 4px rgb(224 184 77 / 0.85),
+            0 0 24px 2px rgb(224 184 77 / 0.6);
+        }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .voca-card-word[data-focus],
+      .voca-glossary-row[data-focus] {
+        animation: none;
+        background-color: rgb(224 184 77 / 0.35);
+      }
+    }
+
+    .voca-card-kicker {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--voca-rubric);
+    }
+
+    .voca-card-time {
+      font-family: var(--voca-font-serif);
+      letter-spacing: 0;
+      color: var(--voca-ink-soft);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .voca-card-headword {
+      margin-top: 0.15rem;
+      font-family: var(--voca-font-serif);
+      font-weight: 700;
+      font-size: clamp(1.25rem, 2.9cqi, 2rem);
+      line-height: 1.1;
+      color: var(--voca-ink);
+    }
+
+    .voca-card-pos {
+      font-size: 0.55em;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--voca-ink-soft);
+    }
+
+    .voca-card-ipa {
+      margin-top: 0.1rem;
+      font-family: var(--voca-font-serif);
+      font-size: 0.8125rem;
+      color: var(--voca-lapis);
+    }
+
+    .voca-card-definition {
+      margin-top: 0.35rem;
+      font-family: var(--voca-font-serif);
+      font-size: clamp(0.8125rem, 1.35cqi, 0.9375rem);
+      line-height: 1.35;
+      color: var(--voca-ink);
+    }
+
+    .voca-card-translation {
+      margin-top: 0.25rem;
+      font-family: var(--voca-font-serif);
+      font-size: 0.875rem;
+      color: var(--voca-ink-soft);
+    }
+
+    .voca-card-quote {
+      margin-top: 0.3rem;
+      padding-inline-start: 0.5rem;
+      border-inline-start: 2px solid var(--voca-gold);
+      font-family: var(--voca-font-serif);
+      font-size: 0.75rem;
+      font-style: italic;
+      color: var(--voca-ink-soft);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .voca-just-heard .voca-title-page {
+      height: 100%;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      text-align: center;
+      gap: 0.25rem;
+    }
+
+    .voca-glossary-count {
+      margin: 0.55rem 0 0.35rem;
+      text-align: center;
+      font-family: var(--voca-font-serif);
+      font-size: 0.75rem;
+      font-style: italic;
+      color: var(--voca-gold-ink);
+    }
+
+    .voca-glossary-count span {
+      font-style: normal;
+      font-weight: 700;
+      color: var(--voca-rubric);
+    }
+
+    .voca-glossary {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      padding-inline-end: 0.25rem;
+      /* Two columns of letters that scroll down together (CSS columns would overflow sideways instead). */
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+      align-content: start;
+      gap: 0.4rem 1rem;
+    }
+
+    .voca-glossary-section {
+      min-width: 0;
+    }
+
+    .voca-glossary-letter {
+      font-family: var(--voca-font-serif);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--voca-lapis);
+      border-bottom: 1px solid rgb(31 48 255 / 0.25);
+      transition: color 300ms ease-out;
+    }
+
+    .voca-glossary-section[data-empty] .voca-glossary-letter {
+      color: rgb(23 19 12 / 0.2);
+      border-bottom-color: rgb(23 19 12 / 0.08);
+    }
+
+    .voca-glossary-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+      padding-block: 0.1rem;
+      font-size: 0.75rem;
+      line-height: 1.3;
+      animation: voca-ink 700ms ease-out both;
+    }
+
+    .voca-glossary-row dt b {
+      font-family: var(--voca-font-serif);
+      font-weight: 700;
+    }
+
+    .voca-leader {
+      flex: 1;
+      min-width: 0.75rem;
+      border-bottom: 1px dotted rgb(23 19 12 / 0.35);
+      translate: 0 -0.2em;
+    }
+
+    .voca-glossary-row dt {
+      white-space: nowrap;
+    }
+
+    .voca-glossary-row dd {
+      min-width: 0;
+      color: var(--voca-lapis);
+      font-weight: 500;
+      text-align: end;
+      overflow-wrap: anywhere;
+    }
+
+    /* Ink being written: the row wipes in left to right behind a nib. */
+    @keyframes voca-ink {
+      from {
+        clip-path: inset(0 100% 0 0);
+      }
+      to {
+        clip-path: inset(0 0 0 0);
+      }
+    }
+
+    .voca-glossary-row[data-new] {
+      position: relative;
+      background: linear-gradient(to right, rgb(224 184 77 / 0.28), transparent);
+      border-radius: 0.2rem;
+    }
+
+    .voca-glossary-row[data-new]::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 0.35rem;
+      height: 0.35rem;
+      border-radius: 50%;
+      background: var(--voca-ink);
+      translate: -50% -50%;
+      animation: voca-nib 700ms ease-out both;
+    }
+
+    @keyframes voca-nib {
+      from {
+        left: 0;
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      to {
+        left: 100%;
+        opacity: 0;
+      }
+    }
+
+    /* ---------- Karaoke subtitles ---------- */
+    .voca-k {
+      position: relative;
+      color: rgb(255 255 255 / 0.5);
+      animation: voca-sweep 220ms ease-out var(--d, 0s) both;
+    }
+
+    @keyframes voca-sweep {
+      to {
+        color: #fff;
+      }
+    }
+
+    .voca-k[data-special] {
+      animation-name: voca-sweep-gold;
+    }
+
+    @keyframes voca-sweep-gold {
+      to {
+        color: var(--voca-gold-light);
+      }
+    }
+
+    /* The special word's gilt underline draws in, and a spark lands on it. */
+    .voca-k[data-special]::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      bottom: -0.06em;
+      height: 0.08em;
+      border-radius: 0.04em;
+      background: var(--voca-gold);
+      box-shadow: 0 0 6px rgb(224 184 77 / 0.8);
+      transform-origin: left;
+      scale: 0 1;
+      animation: voca-underline 380ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--d, 0s) both;
+    }
+
+    @keyframes voca-underline {
+      to {
+        scale: 1 1;
+      }
+    }
+
+    .voca-k[data-special]::before {
+      content: "✦";
+      position: absolute;
+      top: -0.55em;
+      right: -0.35em;
+      font-size: 0.45em;
+      color: var(--voca-gold-light);
+      text-shadow: 0 0 6px rgb(224 184 77 / 0.9);
+      opacity: 0;
+      scale: 0;
+      animation: voca-spark 900ms cubic-bezier(0.2, 0.8, 0.2, 1.4) var(--d, 0s) both;
+    }
+
+    @keyframes voca-spark {
+      0% {
+        opacity: 0;
+        scale: 0;
+        rotate: -90deg;
+      }
+      50% {
+        opacity: 1;
+        scale: 1.4;
+      }
+      100% {
+        opacity: 0.9;
+        scale: 1;
+        rotate: 0deg;
+      }
+    }
+
+    /* Hover a gold word to see its translation on a paper slip above it. */
+    .voca-k[data-special] {
+      pointer-events: auto;
+      cursor: help;
+    }
+
+    .voca-k-tip {
+      position: absolute;
+      bottom: calc(100% + 0.45em);
+      left: 50%;
+      z-index: 2;
+      display: flex;
+      align-items: baseline;
+      gap: 0.35em;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid var(--voca-gold-deep);
+      border-radius: 0.3rem;
+      background: var(--voca-paper);
+      color: var(--voca-ink);
+      box-shadow: 0 8px 18px -8px rgb(0 0 0 / 0.8);
+      font-family: var(--voca-font-serif);
+      font-size: clamp(0.8125rem, 0.55em, 1rem);
+      font-weight: 400;
+      line-height: 1.2;
+      text-shadow: none;
+      white-space: nowrap;
+      opacity: 0;
+      translate: -50% 0.25rem;
+      pointer-events: none;
+      transition:
+        opacity 150ms ease-out,
+        translate 150ms ease-out;
+    }
+
+    .voca-k-tip b {
+      color: var(--voca-lapis);
+      font-weight: 700;
+    }
+
+    .voca-k-tip-pos {
+      font-style: italic;
+      color: var(--voca-ink-soft);
+    }
+
+    /* A small notch pointing down at the word. */
+    .voca-k-tip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      translate: -50% 0;
+      border: 0.35rem solid transparent;
+      border-top-color: var(--voca-paper);
+    }
+
+    .voca-k[data-special]:hover .voca-k-tip {
+      opacity: 1;
+      translate: -50% 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .voca-k-tip {
+        transition: none;
+      }
+    }
+
+    .voca-subtitles[data-paused] .voca-k,
+    .voca-subtitles[data-paused] .voca-k::before,
+    .voca-subtitles[data-paused] .voca-k::after {
+      animation-play-state: paused;
+    }
+
+    /* ---------- The word slip (phones) ---------- */
+    .voca-word-slip {
+      grid-area: plate;
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      z-index: 4;
+      display: flex;
+      align-items: baseline;
+      gap: 0.35rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 0.25rem 0.6rem 0.6rem 0.25rem;
+      background: linear-gradient(to right, var(--voca-gold-light), var(--voca-gold));
+      color: var(--voca-ink);
+      box-shadow: 0 6px 16px -6px rgb(0 0 0 / 0.7);
+      font-family: var(--voca-font-serif);
+      font-size: 0.8125rem;
+      pointer-events: none;
+      animation: voca-slip 4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .voca-word-slip-spark {
+      color: var(--voca-rubric);
+    }
+
+    .voca-word-slip-sep {
+      color: var(--voca-gold-ink);
+    }
+
+    @keyframes voca-slip {
+      0% {
+        opacity: 0;
+        translate: -1rem 0;
+      }
+      10%,
+      85% {
+        opacity: 1;
+        translate: 0 0;
+      }
+      100% {
+        opacity: 0;
+        translate: 0 0;
+      }
+    }
+
+    @container media-root (width >= 52rem) {
+      .voca-word-slip {
+        display: none;
+      }
+    }
+
+    /* ---------- Reduced motion: the words are simply there ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      .voca-k {
+        animation: none;
+        color: #fff;
+      }
+
+      .voca-k[data-special] {
+        color: var(--voca-gold-light);
+      }
+
+      .voca-k[data-special]::after {
+        animation: none;
+        scale: 1 1;
+      }
+
+      .voca-k[data-special]::before {
+        animation: none;
+        opacity: 0.9;
+        scale: 1;
+      }
+
+      .voca-glossary-row,
+      .voca-glossary-row[data-new]::after {
+        animation: none;
+      }
+
+      .voca-thumb-tab {
+        transition: none;
+      }
+
+      .voca-thumb-word,
+      .voca-word-slip {
+        animation-name: voca-fade-hold;
+      }
+
+      @keyframes voca-fade-hold {
+        0%,
+        90% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+    }
+
+    /* ---------- Phones ---------- */
+    @container media-root (width < 30rem) {
+      .voca-seek-button,
+      .voca-transport {
+        display: none;
+      }
+
+      .video-controls-group {
+        gap: 0.25rem;
+      }
+
+      .media-time-group {
+        font-size: 0.8125rem;
+        padding-inline: 0.25rem;
+      }
+
+      .media-play-button {
+        width: 2.75rem;
+        height: 2.75rem;
+        margin-block: 0;
+      }
+    }
+
+    @media (pointer: coarse) {
+      :scope {
+        --voca-control: 2.75rem;
+      }
+    }
+
+    /* ---------- Fullscreen: the volume fills the screen ---------- */
+    :scope:fullscreen {
+      grid-template-rows: minmax(0, 1fr) auto;
+      border-radius: 0;
+    }
+
+    :scope:fullscreen > mux-video,
+    :scope:fullscreen > video,
+    :scope:fullscreen > hls-video {
+      align-self: stretch;
+      aspect-ratio: auto;
+      height: calc(100% - var(--voca-plate-inset) - var(--voca-plate-inset-bottom));
+    }
+
+    /* ---------- Reduced motion ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      .voca-subtitles,
+      .media-button,
+      .media-play-button {
+        transition: none;
+      }
+    }
+
+    @media (forced-colors: active) {
+      :scope {
+        background: Canvas;
+        box-shadow: none;
+        border: 1px solid CanvasText;
+      }
+
+      .media-play-button {
+        forced-color-adjust: none;
+        background: Highlight;
+        color: HighlightText;
+      }
+
+      .media-time-slider-thumb::before {
+        forced-color-adjust: none;
+        background: Highlight;
+      }
+
+      .voca-subtitles-native,
+      .voca-subtitles-translation {
+        background-color: Canvas;
+        color: CanvasText;
+        padding-inline: 0.25em;
+      }
+    }
+
+    /* =====================================================================================================
+       The old leather dictionary: grained cobalt leather, brass corner guards, a gilt title label, marbled
+       endpaper around a thick page block. The controls are set as a printed line on a paper strip.
+       ===================================================================================================== */
+
+    :scope,
+    :scope.media-video {
+      padding: clamp(0.375rem, 2.6%, 1.875rem) clamp(0.375rem, 2.6%, 1.875rem) 0;
+      background-color: #1e2c52;
+      background-image:
+        /* leather grain: two offset fields of pores */
+        radial-gradient(circle at 30% 40%, rgb(255 255 255 / 0.05) 0.6px, transparent 1.2px),
+        radial-gradient(circle at 70% 70%, rgb(0 0 0 / 0.22) 0.8px, transparent 1.4px),
+        /* light pooling on the cover, darker toward the edges */
+        radial-gradient(120% 100% at 50% 0%, #2c3f74 0%, #1e2c52 45%, #141d38 80%, #0b1124 100%);
+      background-size:
+        5px 5px,
+        7px 7px,
+        100% 100%;
+      box-shadow:
+        /* tooled gilt rules */
+        inset 0 0 0 5px rgb(8 13 28 / 0.6),
+        inset 0 0 0 6px rgb(224 184 77 / 0.8),
+        inset 0 0 0 9px transparent,
+        inset 0 0 0 10px rgb(224 184 77 / 0.35),
+        /* the board's bevel */
+        inset 0 2px 0 rgb(255 255 255 / 0.12),
+        inset 0 -3px 6px rgb(0 0 0 / 0.5),
+        /* lying on the desk */
+        0 2px 0 #0e1630,
+        0 6px 0 -1px #080d1c,
+        0 45px 80px -30px rgb(0 0 0 / 0.95),
+        0 0 140px -40px rgb(58 82 148 / 0.45);
+    }
+
+    /* ---------- Marbled endpaper, showing around the pages ---------- */
+    .voca-endpaper {
+      /* Both lines explicit: on an absolutely positioned grid item an "auto" end line falls back to the container's
+         edge, which stretched the endpaper down past the controls and out of the book. */
+      grid-column: 1 / -1;
+      grid-row: 1 / 2;
+      position: absolute;
+      inset: -0.7rem -0.55rem -0.7rem -0.7rem;
+      display: none;
+      border-radius: 4px;
+      background-color: #1e2c52;
+      background-image:
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgb(246 227 161 / 0.55), transparent 60%),
+        radial-gradient(ellipse 50% 35% at 75% 65%, rgb(239 227 196 / 0.45), transparent 60%),
+        radial-gradient(ellipse 40% 30% at 45% 85%, rgb(157 43 27 / 0.55), transparent 60%),
+        radial-gradient(ellipse 35% 25% at 85% 20%, rgb(246 227 161 / 0.4), transparent 60%),
+        repeating-radial-gradient(circle at 30% 40%, rgb(255 255 255 / 0.07) 0 2px, transparent 2px 9px),
+        repeating-radial-gradient(circle at 80% 70%, rgb(0 0 0 / 0.12) 0 3px, transparent 3px 11px);
+      box-shadow:
+        inset 0 0 0 1px rgb(224 184 77 / 0.4),
+        inset 0 0 18px rgb(8 13 28 / 0.6);
+      z-index: 0;
+    }
+
+    /* ---------- The page block: stacked leaves visible along the foot of each page ---------- */
+    .voca-plate-frame {
+      z-index: 1;
+    }
+
+    @container media-root (width >= 52rem) {
+      .voca-endpaper {
+        display: block;
+      }
+
+      .voca-plate-frame {
+        box-shadow:
+          -2px 0 0 var(--voca-paper-shade),
+          -4px 0 0 var(--voca-paper-edge),
+          -6px 0 0 var(--voca-paper-shade),
+          -7px 1px 0 var(--voca-paper-edge),
+          0 2px 0 var(--voca-paper-shade),
+          -2px 4px 0 var(--voca-paper-edge),
+          -4px 6px 0 var(--voca-paper-shade),
+          -6px 8px 0 var(--voca-paper-edge),
+          -6px 12px 14px -6px rgb(0 0 0 / 0.6);
+      }
+
+      .voca-page {
+        box-shadow:
+          2px 0 0 var(--voca-paper-shade),
+          4px 0 0 var(--voca-paper-edge),
+          6px 0 0 var(--voca-paper-shade),
+          7px 1px 0 var(--voca-paper-edge),
+          0 2px 0 var(--voca-paper-shade),
+          2px 4px 0 var(--voca-paper-edge),
+          4px 6px 0 var(--voca-paper-shade),
+          6px 8px 0 var(--voca-paper-edge),
+          6px 12px 14px -6px rgb(0 0 0 / 0.6);
+      }
+    }
+
+    /* ---------- Brass corner guards ---------- */
+    .voca-corner {
+      position: absolute;
+      width: clamp(1.75rem, 4.2cqi, 3.25rem);
+      aspect-ratio: 1;
+      background:
+        radial-gradient(circle at 26% 26%, #fff3c4 0 0.12rem, #8a6418 0.13rem 0.2rem, transparent 0.21rem),
+        linear-gradient(135deg, #f6e3a1 0%, #d3a446 30%, #9c7222 65%, #5f430f 100%);
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+      filter: drop-shadow(1px 2px 1px rgb(0 0 0 / 0.55));
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    .voca-corner[data-corner="tl"] {
+      top: -2px;
+      left: -2px;
+    }
+
+    .voca-corner[data-corner="tr"] {
+      top: -2px;
+      right: -2px;
+      scale: -1 1;
+    }
+
+    .voca-corner[data-corner="bl"] {
+      bottom: -2px;
+      left: -2px;
+      scale: 1 -1;
+    }
+
+    .voca-corner[data-corner="br"] {
+      bottom: -2px;
+      right: -2px;
+      scale: -1 -1;
+    }
+
+    /* The fleurons sit just inside the brass. */
+    .voca-fleuron[data-corner="tl"] {
+      top: 0.9rem;
+      left: 0.9rem;
+    }
+
+    .voca-fleuron[data-corner="tr"] {
+      top: 0.9rem;
+      right: 0.9rem;
+    }
+
+    .voca-fleuron[data-corner="bl"] {
+      bottom: 0.9rem;
+      left: 0.9rem;
+    }
+
+    .voca-fleuron[data-corner="br"] {
+      bottom: 0.9rem;
+      right: 0.9rem;
+    }
+
+    /* ---------- The title label, set into the top board ---------- */
+    .voca-title-label {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      z-index: 6;
+      display: none;
+      align-items: baseline;
+      gap: 0.6rem;
+      padding: 0.3rem 1.1rem 0.35rem;
+      translate: -50% -55%;
+      border-radius: 0.25rem;
+      background: linear-gradient(#9d2b1b, #6f1d12);
+      box-shadow:
+        inset 0 0 0 1px rgb(246 227 161 / 0.85),
+        inset 0 0 0 3px #6f1d12,
+        inset 0 0 0 4px rgb(246 227 161 / 0.45),
+        0 3px 8px -2px rgb(0 0 0 / 0.7);
+      color: var(--voca-gold-light);
+      font-family: var(--voca-font-serif);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-shadow: 0 1px 0 rgb(0 0 0 / 0.6);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .voca-title-label-sub {
+      font-size: 0.6875rem;
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: none;
+      color: rgb(246 227 161 / 0.85);
+    }
+
+    .voca-title-label-mark {
+      font-size: 0.75rem;
+      letter-spacing: 0;
+      color: var(--voca-gold);
+    }
+
+    @container media-root (width >= 52rem) {
+      .voca-title-label {
+        display: flex;
+      }
+    }
+
+    /* ---------- The scholar's desk: controls as objects on the leather ---------- */
+    .video-controls-bottom,
+    .video-controls-video-bottom {
+      gap: 0.35rem;
+      padding: 0.35rem 0.5rem 0.9rem;
+    }
+
+    .video-controls-row {
+      position: relative;
+      gap: 0.25rem 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+      min-height: 3.5rem;
+      padding-inline-start: 4rem;
+    }
+
+    .video-controls-group {
+      gap: 0.25rem;
+      align-items: center;
+    }
+
+    .video-controls-end {
+      margin-inline-start: 0;
+    }
+
+    /* A gilt fleuron parts the two halves of the desk. */
+    .voca-desk-fleuron {
+      margin-inline: auto 0.25rem;
+      color: var(--voca-gold);
+      font-size: 1.125rem;
+      opacity: 0.8;
+      text-shadow: 0 1px 0 rgb(0 0 0 / 0.5);
+    }
+
+    /* Each object sits in a shallow brass-rimmed recess pressed into the leather. */
+    .voca-desk-button {
+      width: 2.875rem;
+      min-width: 0;
+      height: 2.875rem;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: inherit;
+      background: radial-gradient(circle at 50% 40%, rgb(255 255 255 / 0.06), rgb(0 0 0 / 0.28) 70%);
+      box-shadow:
+        inset 0 2px 4px rgb(0 0 0 / 0.55),
+        inset 0 -1px 0 rgb(255 255 255 / 0.08),
+        0 0 0 1px rgb(224 184 77 / 0.35);
+      transition:
+        box-shadow 150ms ease-out,
+        background-color 150ms ease-out;
+    }
+
+    .voca-desk-icon {
+      width: 2.25rem;
+      height: 2.25rem;
+      filter: drop-shadow(0 2px 1.5px rgb(0 0 0 / 0.55));
+      transition:
+        transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1.3),
+        filter 150ms ease-out;
+    }
+
+    @media (hover: hover) {
+      .voca-desk-button:hover {
+        background-color: rgb(246 227 161 / 0.1);
+        box-shadow:
+          inset 0 2px 4px rgb(0 0 0 / 0.5),
+          0 0 0 1px var(--voca-gold),
+          0 0 14px -2px rgb(224 184 77 / 0.6);
+      }
+
+      .voca-desk-button:hover .voca-desk-icon {
+        transform: translateY(-1px) scale(1.06);
+        filter: drop-shadow(0 4px 3px rgb(0 0 0 / 0.55));
+      }
+
+      /* A tactile response for each object. */
+      /* The arrow turns a little the way it seeks. */
+      .voca-desk-button:hover .voca-seek-arrow {
+        transform: rotate(20deg) scale(1.06);
+      }
+
+      .voca-desk-button:hover .voca-seek-arrow[data-direction="back"] {
+        transform: rotate(-20deg) scale(1.06);
+      }
+
+      .voca-dial-button:hover .voca-dial-needle {
+        transform: rotate(40deg);
+      }
+
+      .voca-inkwell:hover .voca-desk-icon {
+        transform: rotate(-4deg) scale(1.06);
+      }
+    }
+
+    .voca-desk-button:active .voca-desk-icon {
+      transform: translateY(1px) scale(0.96);
+    }
+
+    .voca-desk-button:focus-visible {
+      outline: 2px solid var(--voca-foil);
+      outline-offset: 3px;
+      background-color: rgb(246 227 161 / 0.1);
+    }
+
+    /* Switched on: the recess is gilt-ringed and the object glows. */
+    .voca-desk-button[aria-pressed="true"],
+    .voca-desk-button[data-on] {
+      color: inherit;
+      background-color: rgb(246 227 161 / 0.12);
+      box-shadow:
+        inset 0 2px 4px rgb(0 0 0 / 0.45),
+        0 0 0 2px var(--voca-gold),
+        0 0 16px -2px rgb(224 184 77 / 0.75);
+    }
+
+    .voca-dial-needle {
+      transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1.4);
+    }
+
+    .voca-dial-button[aria-expanded="true"] .voca-dial-needle {
+      transform: rotate(135deg);
+    }
+
+    .media-fullscreen-button-enter-icon,
+    .media-fullscreen-button-exit-icon {
+      grid-area: 1 / 1;
+    }
+
+    /* The transport tray: one brass-rimmed recess holding stop, the line markers and the ±10 corners. */
+    .voca-transport {
+      display: flex;
+      align-items: center;
+      gap: 0.125rem;
+      padding: 0.1875rem;
+      border-radius: 999px;
+      background: linear-gradient(rgb(0 0 0 / 0.34), rgb(0 0 0 / 0.18));
+      box-shadow:
+        inset 0 2px 5px rgb(0 0 0 / 0.6),
+        inset 0 -1px 0 rgb(255 255 255 / 0.07),
+        0 0 0 1px rgb(224 184 77 / 0.4);
+    }
+
+    .voca-transport .voca-desk-button {
+      width: 2.5rem;
+      height: 2.5rem;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .voca-transport .voca-desk-icon {
+      width: 1.875rem;
+      height: 1.875rem;
+    }
+
+    @media (hover: hover) {
+      .voca-transport .voca-desk-button:hover {
+        background-color: rgb(246 227 161 / 0.1);
+        box-shadow: inset 0 0 0 1px rgb(224 184 77 / 0.7);
+      }
+    }
+
+    .voca-transport .voca-desk-button:focus-visible {
+      outline-offset: 1px;
+    }
+
+    /* A thin gilt rule sets stop apart from the ways through the text. */
+    .voca-transport-rule {
+      width: 1px;
+      height: 1.5rem;
+      margin-inline: 0.25rem;
+      background: linear-gradient(transparent, rgb(224 184 77 / 0.6), transparent);
     }
 
     /* The wax seal stays the first thing on the desk, a little larger than the rest. */
@@ -2686,7 +4032,8 @@
     }
 
     @container media-root (width < 30rem) {
-      .voca-seek-button {
+      .voca-seek-button,
+      .voca-transport {
         display: none;
       }
 
@@ -2695,7 +4042,7 @@
       }
 
       .video-controls-row {
-        padding-inline-start: 3rem;
+        padding-inline-start: 3.5rem;
         justify-content: space-between;
       }
 
@@ -4286,20 +5633,6 @@
       min-height: 2.25rem;
       padding: 0.35rem 0.75rem;
       font-size: 0.75rem;
-    }
-
-    /* ---------- The review item in the quill's menu ---------- */
-    .voca-study-separator {
-      height: 1px;
-      margin: 0.3rem 0.5rem;
-      background: var(--voca-rule);
-    }
-
-    .voca-study-review-mark {
-      display: grid;
-      place-items: center;
-      color: var(--voca-gold-ink);
-      font-size: 0.875rem;
     }
 
     @media (prefers-reduced-motion: reduce) {

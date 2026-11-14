@@ -4,6 +4,8 @@ import { SeekButton as SeekButtonPrimitive } from '@videojs/react';
 import { SeekArrowIcon } from '@/video/desk-icons';
 import type { ClassValue } from 'cn';
 
+import { useFireEffect } from '@/video/effects/effects-context';
+
 import { cn, resolveClassName } from '@/lib/resolve-class-name';
 
 import { Button } from './button';
@@ -25,6 +27,7 @@ export function SeekButton({
   tooltip?: boolean;
 }) {
   const backward = seconds < 0;
+  const fire = useFireEffect();
 
   return (
     <ButtonTooltip disabled={!tooltip}>
@@ -32,6 +35,7 @@ export function SeekButton({
         render={<Button className={'voca-desk-button'} />}
         className={(state) => cn(resolveClassName(className, state))}
         seconds={seconds}
+        onClick={() => fire({ kind: 'skip', direction: backward ? 'back' : 'forward', seconds: Math.abs(seconds) })}
       >
         {/* A brass circular arrow, the seconds written inside it. */}
         <SeekArrowIcon

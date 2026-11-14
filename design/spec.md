@@ -32,10 +32,13 @@ The controls are objects from a lexicographer's desk, set into brass-rimmed rece
 | --- | --- |
 | Play / pause | Cobalt wax seal |
 | −10 s / +10 s | Dog-eared page corners with "10" written on them |
+| Stop | A brass book clasp: pauses and returns to the first page. Sits with the line-markers and ±10 corners in one brass-rimmed transport tray |
+| Previous / next line | Rubric silk line-markers with a brass arrow (Shift + ← / →); hidden below 44rem |
 | Time | Page numbers, "p. 151 of 888" (a page a second), with the clock time beneath |
 | Mute / volume | An inkwell whose ink level is the volume (corked when muted), with a line of ink as the slider |
 | Subtitles | A magnifying glass over two lines of print (gilt-ringed when on) |
-| Study | A quill, which opens the study modes; inked, with a count, when any is on |
+| Study | A quill, which opens the Study focus slip (a switch per mode); inked, with a count, when any is on |
+| Review | A fan of word cards with a gilt count of collected words; opens the review, dimmed until a word is collected |
 | Settings | A brass compass-dial (the needle turns when open) |
 | Fullscreen | An open book (enter) / a closed book (exit) |
 
@@ -43,6 +46,15 @@ The controls are objects from a lexicographer's desk, set into brass-rimmed rece
 - **Pause after new words:** stops at the end of each line with special words.
 - **Repeat each line twice:** plays every line once more before moving on.
 - **Slow lines to 0.75×:** slows the speech, then returns to the viewer's own speed between lines.
+
+## Playback effects
+Every event answers in the book's own materials, in about 300–700 ms, over the plate (inside the aria-hidden indicator group; `StatusAnnouncer` still speaks them). Under reduced motion each one is a short fade. Source: `src/video/effects/`.
+
+- **Play / pause:** nothing is drawn over the middle of the picture; paused, the picture yellows slightly, like an old engraving, until play resumes.
+- **±10 s (buttons, arrow keys, double-tap):** a page corner folds over on that side, with "+10s" / "−10s" written on its back in rubric. Repeated skips keep it open and count up (+20s, +30s). The brass arrow on the button turns as it's pressed.
+- **Scrubbing the ribbon:** the gilt edges riffle like thumbed pages, a bright "wet gilt" smear follows the clip, the clip lifts, the plate leans toward the direction you're turning, and the folio ("p. 533 · 8:52") is printed large across the plate.
+- **Previous / next line:** a leaf sweeps across the plate in the direction of travel, under a "next line ›" slip.
+- **Stop:** no overlay; the clasp pauses and returns to 0:00.
 
 ## Translation language
 English is always the spoken line. **Settings (the brass dial) → Translation** chooses the line beneath it from eight languages, all from Sintel's official subtitles (durian.blender.org, CC BY 3.0): Français, Español, Deutsch, Italiano, Português, Nederlands, Polski, Русский. The source files were mixed encodings (UTF-8, Latin-1, Mac Roman) and are converted to UTF-8 in `src/video/lesson/sintel-translations.ts`.
@@ -58,7 +70,7 @@ The whole dictionary follows the choice: the subtitle line, the line-page and A�
 - **Errors:** an "Erratum" slip pasted askew into the book, with a cobalt OK button. Its focus is trapped and Esc closes it.
 
 ## Accessibility audit (Playwright)
-- **Keyboard:** the Tab order follows the visual layout (A–Z toolbar → seek ribbon → seal → ±10 → mute → volume → quill → magnifier → dial → book → credit links). Every control has a visible ring.
+- **Keyboard:** the Tab order follows the visual layout (A–Z toolbar → seek ribbon → seal → ±10 → mute → volume → quill → word cards → magnifier → dial → book → credit links). Every control has a visible ring.
 - **Contrast:** the subtitles sit on a soft dark backing (made solid under reduced transparency or more contrast), and words not yet swept stay at 72% white.
 - **Touch:** on coarse pointers the 13px A–Z tabs fold away (the word slip announces words instead), and every button is at least 40px; the volume handle is enlarged.
 - **Sizes:** checked at 390×844, 844×390 (landscape phone, now fits without scrolling), 768×1024, 1180×820 tablet, 1366×768, 1440×900, 2560×1440 and fullscreen.
@@ -80,7 +92,7 @@ The whole dictionary follows the choice: the subtitle line, the line-page and A�
 - **Sections:** titled in Latin as on the site: *Exempla* (the spoken line, its translation and ▶ replay), *Origo* (`← OFr dragon ← Lat dracō ← Gk drákōn`, with abbreviations expanded in the chosen language), *Falsi amici* (curated real look-alikes per language, such as FR *lame* = boiteux, PL *krew* ≈ crew; none for RU) and *Vide etiam* (related words; those in the film open their letter).
 - **Rising embers:** gold and rubric sparks rise from the A–Z tab (or the phone's word slip) the first time a word is heard.
 - **XP:** +10 for each newly collected word, plus points from review. "✦ N XP" sits on the desk with a "+10 XP" floater. Collected words, XP and review boxes persist in this browser.
-- **Review:** the quill → "Review collected words", or the Finis page, opens Again / Hard / Good / Easy (+0/+2/+5/+5 XP) on the dictionary page. It pauses the film, is keyboard-first, and Esc closes it. It ends with a link to the full review on Vocapedia.
+- **Review:** the word-cards button beside the quill, or the Finis page, opens Again / Hard / Good / Easy (+0/+2/+5/+5 XP) on the dictionary page. It pauses the film, is keyboard-first, and Esc closes it. It ends with a link to the full review on Vocapedia.
 - **Phrase passport:** at the end, Finis shows a rubric ink stamp ("SINTEL · EN → FR · 13 · XI · 2026"), the words collected and XP, plus Review, Read again and "Open your phrase passport ↗" (`/passport/fr` and so on; Polish falls back to the home page).
 - **Reduced motion:** no embers, floaters or stamp animation. Forced colours keep the initials and stamp legible.
 

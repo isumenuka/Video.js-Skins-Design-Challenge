@@ -7,11 +7,13 @@ import type { ReactNode } from 'react';
 import { cn } from '@/lib/resolve-class-name';
 
 import { InkwellIcon } from '../desk-icons';
-import { StudyMenu, SubtitlesToggle } from '../lesson/lab-controls';
+import { ReviewButton, StudyMenu, SubtitlesToggle } from '../lesson/lab-controls';
 import { Button } from './button';
+import { NextLineButton, PreviousLineButton } from './line-button';
 import { LiveButton } from './live-button';
 import { AudioPlayButton, PlayButton } from './play-button';
 import { FullscreenButton } from './screen-controls';
+import { StopButton } from './stop-button';
 import { TimeSlider } from './time-slider';
 import { type ThumbnailSlot } from './time-slider';
 import { ButtonTooltip } from './tooltip';
@@ -54,8 +56,22 @@ export function ControlsRow({
     <Controls.Group className={'video-controls-row'}>
       <Controls.Group className={cn('video-controls-group', 'video-controls-start')}>
         {audio ? <AudioPlayButton /> : <PlayButton />}
-        {seekBackward}
-        {seekForward}
+        {/* The transport tray: stop, then the ways through the text, from the line before to the line after. */}
+        {!audio && !live ? (
+          <div className={'voca-transport'} role="group" aria-label="Navigation">
+            <StopButton />
+            <span className={'voca-transport-rule'} aria-hidden="true" />
+            <PreviousLineButton />
+            {seekBackward}
+            {seekForward}
+            <NextLineButton />
+          </div>
+        ) : (
+          <>
+            {seekBackward}
+            {seekForward}
+          </>
+        )}
         {live && <LiveButton />}
         {!live && (
           <Time.Group className={'media-time-group voca-pages'}>
@@ -76,6 +92,7 @@ export function ControlsRow({
 
       <Controls.Group className={cn('video-controls-group', 'video-controls-end')}>
         {!audio && <StudyMenu />}
+        {!audio && <ReviewButton />}
         {captions}
         {rate}
         {menu ?? (audio && <VolumePopover />)}
@@ -132,7 +149,7 @@ export function ControlsContent({
           className={cn(
             'video-controls-bottom',
             audio && 'audio-controls-bottom',
-            !audio && 'video-controls-video-bottom'
+            !audio && 'video-controls-video-bottom',
           )}
         >
           {!live && <TimeSlider audio={audio} renderThumbnail={renderThumbnail} />}

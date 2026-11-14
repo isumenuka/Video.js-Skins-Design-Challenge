@@ -1,0 +1,495 @@
+/*
+ * Playback effects for "The Living Encyclopedia": every event the reader causes answers in the book's own materials.
+ * Pause yellows the plate like an old print; a skip folds a page corner with the
+ * seconds written on it; a line jump sweeps a leaf across the plate; scrubbing riffles
+ * the gilt edges, leans the plate and prints the folio large. Under reduced motion, every effect is a short fade.
+ */
+
+/* ---------- Motion tokens ---------- */
+@layer base.preset {
+  .media-skin[data-theme="vocapedia"] {
+    --voca-fx-quick: 320ms;
+    --voca-fx-base: 560ms;
+    --voca-fx-corner: 820ms;
+    --voca-fx-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --voca-fx-size: clamp(3.75rem, 14cqi, 6.5rem);
+  }
+}
+
+@layer components {
+  @scope (.media-skin[data-theme="vocapedia"][data-preset="video"]) {
+    /* ---------- The layer over the plate ---------- */
+    .voca-fx {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      border-radius: 2px;
+      container-type: inline-size;
+    }
+
+    /* Paused, the plate yellows a little, like an old engraving. */
+    :scope > :is(mux-video, video, hls-video) {
+      transition:
+        filter var(--voca-fx-base) ease,
+        transform var(--voca-fx-base) var(--voca-fx-ease);
+    }
+
+    :scope[data-paused]:not([data-ended]):has(.media-play-button[data-started]) > :is(mux-video, video, hls-video) {
+      filter: sepia(0.38) saturate(0.85) brightness(0.92);
+    }
+
+    /* ---------- ±10 s: a page corner folds over, the seconds written on its back ---------- */
+    .voca-fx-corner {
+      position: absolute;
+      top: 0;
+      width: clamp(4.5rem, 20cqi, 8rem);
+      aspect-ratio: 1;
+      filter: drop-shadow(-3px 4px 5px rgb(2 5 19 / 0.55));
+    }
+
+    .voca-fx-corner:is([data-direction="forward"]) {
+      right: 0;
+    }
+
+    .voca-fx-corner:is([data-direction="back"]) {
+      left: 0;
+      filter: drop-shadow(3px 4px 5px rgb(2 5 19 / 0.55));
+    }
+
+    .voca-fx-corner-leaf {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 0 14% 12%;
+      background: linear-gradient(to top right, var(--voca-paper-shade) 0%, var(--voca-paper) 55%, #fbf4df 100%);
+      clip-path: polygon(0 0, 100% 100%, 0 100%);
+      color: var(--voca-ink);
+      transform-origin: top right;
+      animation: voca-fx-curl-in var(--voca-fx-quick) var(--voca-fx-ease) both;
+    }
+
+    .voca-fx-corner[data-closing] .voca-fx-corner-leaf {
+      animation: voca-fx-curl-out 260ms ease-in both;
+    }
+
+    /* Each stacked skip rewrites the number with a small press of the pen. */
+    .voca-fx-corner .voca-fx-corner-value {
+      animation: voca-fx-pop var(--voca-fx-quick) var(--voca-fx-ease) both;
+    }
+
+    .voca-fx-corner[data-direction="back"] .voca-fx-corner-leaf {
+      justify-content: flex-end;
+      padding: 0 12% 14% 0;
+      background: linear-gradient(to top left, var(--voca-paper-shade) 0%, var(--voca-paper) 55%, #fbf4df 100%);
+      clip-path: polygon(100% 0, 100% 100%, 0 100%);
+      transform-origin: top left;
+    }
+
+    .voca-fx-corner-value {
+      display: inline-block;
+      font-family: var(--voca-font-serif);
+      font-size: clamp(0.9rem, 3.6cqi, 1.5rem);
+      font-weight: 700;
+      font-style: italic;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      color: var(--voca-rubric);
+    }
+
+    @keyframes voca-fx-curl-in {
+      0% {
+        transform: scale(0);
+      }
+      70% {
+        transform: scale(1.06);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes voca-fx-curl-out {
+      from {
+        transform: scale(1);
+      }
+      to {
+        transform: scale(0);
+      }
+    }
+
+    @keyframes voca-fx-pop {
+      0% {
+        opacity: 0.4;
+        transform: scale(1.35);
+      }
+      100% {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* The engine's seek indicator (arrow keys, double-tap) folds the same corner, opening and closing on transitions. */
+    .media-indicator.media-seek-indicator.voca-fx-corner {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline: auto;
+      margin: 0;
+      padding: 0;
+      gap: 0 !important;
+      background: none;
+      outline: none;
+    }
+
+    .media-seek-indicator.voca-fx-corner[data-direction="backward"] {
+      left: 0;
+      right: auto;
+      filter: drop-shadow(3px 4px 5px rgb(2 5 19 / 0.55));
+    }
+
+    .media-seek-indicator.voca-fx-corner[data-direction="forward"] {
+      right: 0;
+      left: auto;
+    }
+
+    .media-seek-indicator .voca-fx-corner-leaf {
+      animation: none;
+      transform: scale(1);
+      transition: transform var(--voca-fx-quick) var(--voca-fx-ease);
+    }
+
+    .media-seek-indicator[data-direction="backward"] .voca-fx-corner-leaf {
+      justify-content: flex-end;
+      padding: 0 12% 14% 0;
+      background: linear-gradient(to top left, var(--voca-paper-shade) 0%, var(--voca-paper) 55%, #fbf4df 100%);
+      clip-path: polygon(100% 0, 100% 100%, 0 100%);
+      transform-origin: top left;
+    }
+
+    .media-seek-indicator:is([data-starting-style], [data-ending-style]) .voca-fx-corner-leaf {
+      transform: scale(0);
+    }
+
+    .media-seek-indicator[data-direction="forward"] .voca-fx-corner-value::before {
+      content: "+";
+    }
+
+    .media-seek-indicator[data-direction="backward"] .voca-fx-corner-value::before {
+      content: "−";
+    }
+
+    /* ---------- Previous / next line: a leaf sweeps across the plate ---------- */
+    .voca-fx-leaf {
+      position: absolute;
+      inset: 0;
+    }
+
+    .voca-fx-leaf::before {
+      content: "";
+      position: absolute;
+      inset-block: 0;
+      left: 0;
+      width: 50%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgb(36 26 18 / 0.25) 30%,
+        rgb(247 239 217 / 0.82) 52%,
+        rgb(228 213 178 / 0.6) 70%,
+        transparent 100%
+      );
+      animation: voca-fx-sweep-forward var(--voca-fx-base) var(--voca-fx-ease) both;
+    }
+
+    .voca-fx-leaf[data-direction="back"]::before {
+      animation-name: voca-fx-sweep-back;
+    }
+
+    .voca-fx-leaf-label {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      translate: -50% 0;
+      padding: 0.25rem 0.75rem;
+      border-radius: 2px;
+      background: var(--voca-folio-page);
+      box-shadow:
+        inset 0 0 0 1px var(--voca-rule),
+        0 4px 10px rgb(2 5 19 / 0.5);
+      font-family: var(--voca-font-serif);
+      font-size: 0.875rem;
+      font-variant: small-caps;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      color: var(--voca-rubric);
+      animation: voca-fx-label var(--voca-fx-corner) ease both;
+    }
+
+    @keyframes voca-fx-sweep-forward {
+      from {
+        transform: translateX(200%);
+      }
+      to {
+        transform: translateX(-100%);
+      }
+    }
+
+    @keyframes voca-fx-sweep-back {
+      from {
+        transform: translateX(-100%);
+      }
+      to {
+        transform: translateX(200%);
+      }
+    }
+
+    @keyframes voca-fx-label {
+      0% {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+      }
+      25%,
+      70% {
+        opacity: 1;
+        transform: none;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    /* ---------- Scrubbing ---------- */
+    /* The folio the ribbon has turned to, printed large in gilt across the plate. */
+    .voca-fx-folio {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-content: center;
+      justify-items: center;
+      gap: 0.125rem;
+      background: radial-gradient(closest-side, rgb(2 5 19 / 0.55), transparent);
+      font-family: var(--voca-font-serif);
+      color: var(--voca-foil);
+      text-shadow: var(--voca-text-plate);
+      opacity: 0;
+      transform: scale(0.94);
+      transition:
+        opacity var(--voca-fx-quick) ease,
+        transform var(--voca-fx-quick) var(--voca-fx-ease);
+    }
+
+    .voca-fx-folio-page {
+      font-size: clamp(1.75rem, 9cqi, 4rem);
+      font-weight: 700;
+      font-style: italic;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .voca-fx-folio-time {
+      font-family: var(--voca-font-ui);
+      font-size: clamp(0.75rem, 2.4cqi, 1rem);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.08em;
+      color: var(--voca-gold-light);
+    }
+
+    :scope:has(.media-time-slider[data-dragging]) .voca-fx-folio {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* The plate leans the way the pages are turning. */
+    :scope:has(.media-time-slider[data-dragging]) > :is(mux-video, video, hls-video) {
+      transform: perspective(70rem) rotateY(-3deg) scale(0.985);
+    }
+
+    :scope:has(.media-time-slider[data-dragging]):has(.voca-fx[data-drag-direction="back"]) > :is(mux-video, video, hls-video) {
+      transform: perspective(70rem) rotateY(3deg) scale(0.985);
+    }
+
+    /* The gilt edges riffle like pages thumbed past. */
+    .media-time-slider[data-dragging] .media-time-slider-fill {
+      background-image:
+        repeating-linear-gradient(90deg, rgb(95 67 15 / 0.45) 0 1px, transparent 1px 4px),
+        linear-gradient(to bottom, #fff3c4 0%, var(--voca-gold) 40%, var(--voca-gold-deep) 80%, var(--voca-gold) 100%);
+      background-size: 8px 100%, 100% 100%;
+      animation: voca-fx-riffle 240ms linear infinite;
+    }
+
+    /* Wet gilt: a bright smear where the ribbon has just passed. */
+    .media-time-slider-fill::after {
+      content: "";
+      position: absolute;
+      inset-block: 0;
+      right: 0;
+      width: 3rem;
+      background: linear-gradient(90deg, transparent, rgb(255 243 196 / 0.95));
+      opacity: 0;
+      transition: opacity var(--voca-fx-quick) ease;
+    }
+
+    .media-time-slider[data-dragging] .media-time-slider-fill::after {
+      opacity: 1;
+    }
+
+    /* The brass clip lifts off the ribbon while held. */
+    .media-time-slider-thumb {
+      transition:
+        scale var(--voca-fx-quick) var(--voca-fx-ease),
+        translate var(--voca-fx-quick) var(--voca-fx-ease);
+    }
+
+    .media-time-slider[data-dragging] .media-time-slider-thumb {
+      scale: 1.28;
+      translate: 0 -0.2rem;
+    }
+
+    .media-time-slider[data-dragging] .media-time-slider-thumb::before {
+      box-shadow:
+        inset 0 0 0 1px rgb(95 67 15 / 0.8),
+        0 8px 10px rgb(0 0 0 / 0.6),
+        0 0 14px rgb(255 233 168 / 0.55);
+    }
+
+    @keyframes voca-fx-riffle {
+      from {
+        background-position: 0 0, 0 0;
+      }
+      to {
+        background-position: -8px 0, 0 0;
+      }
+    }
+
+    /* ---------- The desk objects answer the press ---------- */
+    .voca-seek-arrow {
+      transition: rotate var(--voca-fx-quick) var(--voca-fx-ease);
+    }
+
+    .voca-seek-button:active .voca-seek-arrow[data-direction="forward"] {
+      rotate: 30deg;
+    }
+
+    .voca-seek-button:active .voca-seek-arrow[data-direction="back"] {
+      rotate: -30deg;
+    }
+
+    .voca-stop-button .voca-desk-icon,
+    .voca-line-button .voca-desk-icon {
+      transition:
+        scale var(--voca-fx-quick) var(--voca-fx-ease),
+        translate var(--voca-fx-quick) var(--voca-fx-ease);
+    }
+
+    .voca-stop-button:active .voca-desk-icon {
+      scale: 0.88;
+    }
+
+    .voca-line-button[data-direction="forward"]:not([aria-disabled]):active .voca-desk-icon {
+      translate: 0.2rem 0;
+    }
+
+    .voca-line-button[data-direction="back"]:not([aria-disabled]):active .voca-desk-icon {
+      translate: -0.2rem 0;
+    }
+
+    .voca-line-button[aria-disabled] {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    /* ---------- Narrow desks: the new objects give way first ---------- */
+    @container media-root (width < 44rem) {
+      .voca-line-button {
+        display: none;
+      }
+    }
+
+    @container media-root (width < 34rem) {
+      .voca-stop-button,
+      .voca-transport-rule {
+        display: none;
+      }
+    }
+
+    /* ---------- Reduced motion: no stamping, folding, sweeping or leaning; each effect simply fades ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      .voca-fx-corner .voca-fx-corner-leaf {
+        animation: voca-fx-fade-in 200ms ease both !important;
+        transform: none !important;
+      }
+
+      .voca-fx-leaf-label {
+        animation: voca-fx-fade var(--voca-fx-base) ease both !important;
+        transform: none !important;
+      }
+
+      .voca-fx-corner[data-closing] .voca-fx-corner-leaf {
+        animation: voca-fx-fade-out 260ms ease both !important;
+      }
+
+      .voca-fx-corner .voca-fx-corner-value {
+        animation: none;
+      }
+
+      .voca-fx-leaf::before {
+        display: none;
+      }
+
+      .media-seek-indicator .voca-fx-corner-leaf {
+        transform: none !important;
+        transition: opacity var(--voca-fx-quick) ease;
+      }
+
+      .media-seek-indicator:is([data-starting-style], [data-ending-style]) .voca-fx-corner-leaf {
+        opacity: 0;
+      }
+
+      :scope:has(.media-time-slider[data-dragging]) > :is(mux-video, video, hls-video) {
+        transform: none;
+      }
+
+      .media-time-slider[data-dragging] .media-time-slider-fill {
+        animation: none;
+      }
+
+      .media-time-slider[data-dragging] .media-time-slider-thumb {
+        translate: none;
+      }
+
+      .voca-fx-folio,
+      .voca-seek-arrow,
+      .voca-stop-button .voca-desk-icon,
+      .voca-line-button .voca-desk-icon {
+        transform: none;
+        rotate: none !important;
+        translate: none !important;
+        scale: none !important;
+      }
+
+      @keyframes voca-fx-fade-in {
+        from {
+          opacity: 0;
+        }
+      }
+
+      @keyframes voca-fx-fade-out {
+        to {
+          opacity: 0;
+        }
+      }
+
+      @keyframes voca-fx-fade {
+        0%,
+        100% {
+          opacity: 0;
+        }
+        20%,
+        75% {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}

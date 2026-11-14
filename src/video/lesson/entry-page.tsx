@@ -75,7 +75,7 @@ export function EntryPage() {
     }
   }, [lab?.focusLemma]);
 
-  const shownIndex = viewIndex ?? (frozenIndex ?? liveIndex);
+  const shownIndex = viewIndex ?? frozenIndex ?? liveIndex;
   const openLetter = lab?.openLetter ?? null;
   const reviewOpen = lab?.reviewOpen ?? false;
   const ended = usePlayer((s) => s.ended) ?? false;
@@ -423,6 +423,7 @@ function GuideButton({ onClick }: { onClick: () => void }) {
 const GUIDE_KEYS: Array<[string, string]> = [
   ['Space · K', 'Play or pause'],
   ['← · →', 'Back or forward 10 seconds'],
+  ['Shift ← · Shift →', 'Previous or next spoken line'],
   ['↑ · ↓', 'Volume'],
   ['M', 'Mute'],
   ['F', 'Full page'],
@@ -432,8 +433,14 @@ const GUIDE_KEYS: Array<[string, string]> = [
 
 const GUIDE_PARTS: Array<[string, string]> = [
   ['The ribbon', 'drag the brass clip to turn to any moment; each tab is a spoken line.'],
-  ['A–Z tabs', 'a tab pulls out, with rising embers, when a new word is spoken; press one to read every word under it.'],
-  ['The quill', 'study modes (pause, repeat, slow), and a review of the words you have collected.'],
+  ['The clasp', 'stop: pause and return to the first page.'],
+  ['The line-markers', 'turn back or on by one spoken line, beside the 10-second corners.'],
+  [
+    'A–Z tabs',
+    'a tab pulls out, with rising embers, when a new word is spoken; press one to read every word under it.',
+  ],
+  ['The quill', 'study focus: pause after new words, repeat each line, or slow the speech.'],
+  ['The word cards', 'review the words you have collected: Again, Hard, Good or Easy.'],
   ['The inkwell', 'its ink is the volume; press it to cork the sound.'],
   ['The compass', 'settings: translation language, speed and quality.'],
   ['Double-tap', 'the left or right of the picture to go back or forward.'],
@@ -502,7 +509,12 @@ function PassportStamp({ lab }: { lab: LessonState }) {
         {/* Uneven ink: a little noise eats into the stamp, as real ink does. */}
         <filter id="voca-stamp-ink" x="-5%" y="-5%" width="110%" height="110%">
           <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="noise" />
-          <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.6" result="mask" />
+          <feColorMatrix
+            in="noise"
+            type="matrix"
+            values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.6"
+            result="mask"
+          />
           <feComposite in="SourceGraphic" in2="mask" operator="in" result="inked" />
           <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="1" seed="3" result="warp" />
           <feDisplacementMap in="inked" in2="warp" scale="2.5" />

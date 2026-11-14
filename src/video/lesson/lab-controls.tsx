@@ -6,17 +6,24 @@ import { usePlayer } from '@videojs/react/video';
 
 import { Menu } from '@videojs/react';
 
-import { MagnifierIcon, QuillIcon } from '../desk-icons';
-import { CheckIcon } from '../icons';
+import { MagnifierIcon, QuillIcon, ReviewCardsIcon } from '../desk-icons';
 import { Button } from '../shared/button';
 import { ButtonTooltip } from '../shared/tooltip';
-import { type StudyModes, useLesson } from './lesson-context';
+import { type LessonState, type StudyModes, useLesson } from './lesson-context';
 
-const STUDY_MODES: Array<{ mode: keyof StudyModes; label: string; hint: string }> = [
-  { mode: 'pause', label: 'Pause after new words', hint: 'Stop at the end of each line worth learning.' },
-  { mode: 'repeat', label: 'Repeat each line twice', hint: 'Hear every line once more before moving on.' },
-  { mode: 'slow', label: 'Slow lines to 0.75×', hint: 'Speech slows down; the gaps between keep pace.' },
+const STUDY_MODES: Array<{ mode: keyof StudyModes; glyph: string; label: string; hint: string }> = [
+  { mode: 'pause', glyph: '❙❙', label: 'Pause after new words', hint: 'Stop at the end of each line worth learning.' },
+  { mode: 'repeat', glyph: '↻', label: 'Repeat each line twice', hint: 'Hear every line once more before moving on.' },
+  { mode: 'slow', glyph: '¾', label: 'Slow lines to 0.75×', hint: 'Speech slows down; the gaps between keep pace.' },
 ];
+
+/** The words collected or heard so far, counted once each: what the review will ask about. */
+function useReviewCount(lab: LessonState | null) {
+  if (!lab) return 0;
+  const { pages, collected, heard } = lab;
+  return new Set(pages.flatMap((p) => p.words.map((w) => w.lemma)).filter((l) => collected.has(l) || heard.has(l)))
+    .size;
+}
 
 /**
  * The quill: opens the study modes on a paper slip. It carries a drop of ink, and a count, when any mode is on.
@@ -25,10 +32,7 @@ const STUDY_MODES: Array<{ mode: keyof StudyModes; label: string; hint: string }
 export function StudyMenu() {
   const lab = useLesson();
   if (!lab) return null;
-  const { study, setStudy, setReviewOpen, collected, heard, pages } = lab;
-  const reviewCount = new Set(
-    pages.flatMap((p) => p.words.map((w) => w.lemma)).filter((l) => collected.has(l) || heard.has(l))
-  ).size;
+  const { study, setStudy } = lab;
   const count = STUDY_MODES.filter(({ mode }) => study[mode]).length;
 
   return (
@@ -54,40 +58,64 @@ export function StudyMenu() {
       </ButtonTooltip>
       <Menu.Popup className="media-popup media-popup-safe-area media-menu-popup voca-study-popup">
         <Menu.Content className="media-menu-content">
-          <p className="voca-study-heading" aria-hidden="true">
-            ✒ Study
-          </p>
-          {STUDY_MODES.map(({ mode, label, hint }) => (
+          <div className="voca-study-head">
+            <p className="voca-study-heading" aria-hidden="true">
+              <span>✒ Study focus</span>
+              {count > 0 && <span className="voca-study-chip">{count} on</span>}
+            </p>
+            <p className="voca-study-intro" aria-hidden="true">
+              Choose how the film helps you learn.
+            </p>
+          </div>
+          {STUDY_MODES.map(({ mode, glyph, label, hint }) => (
             <Menu.CheckboxItem
               key={mode}
               className="media-menu-item voca-menu-checkbox voca-study-item"
               checked={study[mode]}
               onCheckedChange={(on) => setStudy(mode, on)}
             >
-              <span className="voca-study-check" aria-hidden="true">
-                <Menu.ItemIndicator checked={study[mode]}>
-                  <CheckIcon className="voca-study-check-icon" />
-                </Menu.ItemIndicator>
+              <span className="voca-study-glyph" aria-hidden="true">
+                {glyph}
               </span>
               <span className="voca-study-text">
                 <span className="voca-study-label">{label}</span>
                 <span className="voca-study-hint">{hint}</span>
               </span>
+              <span className="voca-study-switch" aria-hidden="true">
+                <span className="voca-study-knob" />
+              </span>
             </Menu.CheckboxItem>
           ))}
-          <Menu.Separator className="media-menu-separator voca-study-separator" />
-          <Menu.Item className="media-menu-item voca-study-item voca-study-review" onSelect={() => setReviewOpen(true)}>
-            <span className="voca-study-check voca-study-review-mark" aria-hidden="true">
-              ✦
-            </span>
-            <span className="voca-study-text">
-              <span className="voca-study-label">Review collected words ({reviewCount})</span>
-              <span className="voca-study-hint">Again, Hard, Good or Easy — as on Vocapedia.</span>
-            </span>
-          </Menu.Item>
         </Menu.Content>
       </Menu.Popup>
     </Menu.Root>
+  );
+}
+
+/** The word cards: opens the review of the words collected so far, with a gilt count of them. */
+export function ReviewButton() {
+  const lab = useLesson();
+  const count = useReviewCount(lab);
+  if (!lab) return null;
+  const empty = count === 0;
+  return (
+    <ButtonTooltip label={empty ? 'Collect words to review' : `Review collected words (${count})`}>
+      <Button
+        className="voca-desk-button voca-review-button"
+        aria-label={empty ? 'Review collected words, none yet' : `Review collected words, ${count}`}
+        aria-disabled={empty || undefined}
+        onClick={() => {
+          if (!empty) lab.setReviewOpen(true);
+        }}
+      >
+        <ReviewCardsIcon className="voca-desk-icon" />
+        {!empty && (
+          <span className="voca-study-badge voca-review-badge" aria-hidden="true">
+            {count > 99 ? '99+' : count}
+          </span>
+        )}
+      </Button>
+    </ButtonTooltip>
   );
 }
 
