@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { vocapediaReviewUrl } from './folio-data';
+import { bridge, siteLink, wordIn as bridgeWordIn } from './site-bridge';
 import { Headword, Rubric } from './folio';
 import type { LessonState } from './lesson-context';
 import type { Gloss } from './lesson-data';
@@ -80,6 +81,7 @@ export function ReviewFace({ lab, interactive = false }: { lab: LessonState; int
 
   const grade = (g: Grade) => {
     if (!current) return;
+    bridge.grade(bridgeWordIn(current, translation.code, line), g);
     const boxes = readBoxes();
     const box = boxes[current.lemma] ?? 0;
     boxes[current.lemma] = g === 'again' ? 0 : g === 'hard' ? Math.max(1, box) : g === 'good' ? box + 1 : box + 2;
@@ -128,7 +130,7 @@ export function ReviewFace({ lab, interactive = false }: { lab: LessonState; int
                   {finished} {finished === 1 ? 'word' : 'words'} reviewed
                 </p>
                 {interactive && (
-                  <a className="voca-review-link" href={vocapediaReviewUrl} target="_blank" rel="noreferrer">
+                  <a className="voca-review-link" {...siteLink(vocapediaReviewUrl)}>
                     Continue in your Vocapedia review ↗<span className="voca-sr-only"> (opens in a new tab)</span>
                   </a>
                 )}

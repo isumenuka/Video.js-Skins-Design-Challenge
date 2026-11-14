@@ -7,6 +7,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { ChevronIcon, PlayIcon } from '../icons';
 import { passportUrl } from './folio-data';
+import { siteLink } from './site-bridge';
 import { Exempla, WordEntry } from './folio';
 import { type LessonState, useLesson } from './lesson-context';
 import { formatTime, type Gloss, letterOf } from './lesson-data';
@@ -568,7 +569,7 @@ function FinisFace({ lab, interactive = false }: { lab: LessonState; interactive
               <button type="button" className="voca-finis-secondary" onClick={() => seekTo(0)}>
                 ↺ Read again
               </button>
-              <a className="voca-finis-secondary" href={passportUrl(translation.code)} target="_blank" rel="noreferrer">
+              <a className="voca-finis-secondary" {...siteLink(passportUrl(translation.code))}>
                 Open your phrase passport ↗<span className="voca-sr-only"> (opens in a new tab)</span>
               </a>
             </div>

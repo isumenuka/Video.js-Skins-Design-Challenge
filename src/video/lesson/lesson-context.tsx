@@ -15,6 +15,7 @@ import {
   type TranslationLanguage,
 } from './translations';
 import { definitionIn } from './definitions';
+import { bridge, useSiteBridge, wordIn as bridgeWordIn } from './site-bridge';
 
 /** How long a tab stays pulled out after its word is spoken. */
 const POP_SECONDS = 4;
@@ -124,6 +125,7 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
   const store = usePlayer();
   const currentTime = usePlayer((s) => s.currentTime) ?? 0;
   const paused = usePlayer((s) => s.paused) ?? true;
+  const duration = usePlayer((s) => s.duration) ?? 0;
   const [subtitlesOn, setSubtitlesOn] = useState(true);
   const rate = usePlayer((s) => s.playbackRate) ?? 1;
   const [study, setStudyState] = useState<StudyModes>({ pause: false, repeat: false, slow: false });
@@ -133,6 +135,8 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
   const [focusLemma, setFocusLemma] = useState<string | undefined>();
   const [openLetter, setOpenLetter] = useState<string | null>(null);
   const [translationCode, setTranslationCode] = useState<LangCode>(readLanguage);
+  const translationRef = useRef(translationCode);
+  translationRef.current = translationCode;
   const setTranslation = useCallback((code: LangCode) => {
     setTranslationCode(code);
     try {
@@ -198,6 +202,8 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
     collectedRef.current = next;
     setCollected(next);
     save(COLLECTED_KEY, JSON.stringify([...next]));
+    // Inside Vocapedia, the word goes into the reader's own review queue too.
+    bridge.collect(bridgeWordIn(latest.gloss, translationRef.current, cues.find((c) => c.id === latest.cueId)));
   }, [latest?.index]);
 
   const pages = useMemo(() => linePages(lesson), [lesson]);
@@ -297,6 +303,8 @@ export function LessonProvider({ lesson, children }: { lesson: Lesson; children:
     [pages, seekTo]
   );
   useEffect(() => () => clearTimeout(focusTimer.current), []);
+
+  useSiteBridge({ pages, language: translation.code, currentTime, duration, playWord, setTranslation });
 
   const value = useMemo<LessonState>(
     () => ({
