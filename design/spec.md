@@ -56,6 +56,14 @@ Every event answers in the book's own materials, in about 300–700 ms, over the
 - **Previous / next line:** a leaf sweeps across the plate in the direction of travel, under a "next line ›" slip.
 - **Stop:** no overlay; the clasp pauses and returns to 0:00.
 
+## On the Vocapedia site
+The site serves this player at `/player/` and shows it on `/watch` as `srcdoc`: the host denies framing its pages by URL. Framed by a page on its own origin, the player talks to it through `src/video/lesson/site-bridge.ts`:
+- **Messages it sends:** the lesson's words (`vocapedia:ready`), the reading language, each word collected, each Again/Hard/Good/Easy grade, and the 25/50/75/100% points of the film.
+- **Messages it accepts:** "play this word" and "switch language".
+- **What the site does with them:** files each word as an Entry in the reading language and a Review in the reader's SM-2 queue, and counts XP and the streak.
+
+Standalone, the bridge is silent, and links open vocapedia.base44.app in a new tab. Inside the site, links stay in the same tab.
+
 ## Translation language
 English is always the spoken line. **Settings (the brass dial) → Translation** chooses the line beneath it from eight languages, all from Sintel's official subtitles (durian.blender.org, CC BY 3.0): Français, Español, Deutsch, Italiano, Português, Nederlands, Polski, Русский. The source files were mixed encodings (UTF-8, Latin-1, Mac Roman) and are converted to UTF-8 in `src/video/lesson/sintel-translations.ts`.
 
