@@ -679,16 +679,18 @@
       box-shadow: 0 0 14px rgb(224 184 77 / 0.75);
     }
 
+    /* The word slides out to the left, over the page's edge: to the right it would run past the player's edge and
+       be cut off. */
     .voca-thumb-word {
       position: absolute;
       top: 50%;
-      left: calc(100% - 0.25rem);
+      right: calc(100% - 0.25rem);
       display: flex;
       align-items: center;
       height: max(100%, 1.25rem);
-      padding: 0 0.6rem 0 0.5rem;
-      border-radius: 0 0.6rem 0.6rem 0;
-      background: linear-gradient(to right, var(--voca-gold-light), var(--voca-gold));
+      padding: 0 0.5rem 0 0.6rem;
+      border-radius: 0.6rem 0 0 0.6rem;
+      background: linear-gradient(to left, var(--voca-gold-light), var(--voca-gold));
       color: var(--voca-ink);
       box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.55);
       font-family: var(--voca-font-serif);
@@ -697,14 +699,14 @@
       font-weight: 700;
       white-space: nowrap;
       translate: 0 -50%;
-      transform-origin: left center;
+      transform-origin: right center;
       animation: voca-drawer 4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
       pointer-events: none;
     }
 
     @keyframes voca-drawer {
       0% {
-        clip-path: inset(0 100% 0 0);
+        clip-path: inset(0 0 0 100%);
         opacity: 0;
       }
       10% {
@@ -716,7 +718,7 @@
         opacity: 1;
       }
       100% {
-        clip-path: inset(0 100% 0 0);
+        clip-path: inset(0 0 0 100%);
         opacity: 0;
       }
     }
